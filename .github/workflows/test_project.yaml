@@ -19,7 +19,7 @@ on:  # yamllint disable-line rule:truthy
   # presubmit
   pull_request:
     branches:
-    - 'cl/[0-9]+'
+      - 'cl/[0-9]+'
 
   # manual
   workflow_dispatch:
@@ -47,14 +47,13 @@ jobs:
       uses: actions/cache@v4.0.2
       with:
         path: "~/.cache/bazel/"
-        key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'WORKSPACE') }}
+        key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel') }}
         restore-keys: ${{ runner.os }}-bazel-
 
     - name: Setup Python
       uses: actions/setup-python@v5.1.0
       with:
         python-version: ${{ matrix.python-version }}
-        cache: "pip"
 
     # Temporarily test Bazel version; currently there are no targets to actually test.
     - name: Test project
