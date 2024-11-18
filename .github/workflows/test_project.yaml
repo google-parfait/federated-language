@@ -1,0 +1,62 @@
+# Copyright 2024 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Test Project
+
+on:  # yamllint disable-line rule:truthy
+
+  # presubmit
+  pull_request:
+    branches:
+    - 'cl/[0-9]+'
+
+  # manual
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  test-project:
+    name: Linux PY ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11"]
+    steps:
+
+    - name: Checkout repository
+      uses: actions/checkout@v4.1.7
+
+    - name: Setup bazel repository cache
+      uses: actions/cache@v4.0.2
+      with:
+        path: "~/.cache/bazel/"
+        key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'WORKSPACE') }}
+        restore-keys: ${{ runner.os }}-bazel-
+
+    - name: Setup Python
+      uses: actions/setup-python@v5.1.0
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: "pip"
+
+    # Temporarily test Bazel version; currently there are no targets to actually test.
+    - name: Test project
+      run: |
+        bazelisk --version
