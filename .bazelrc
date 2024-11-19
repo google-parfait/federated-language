@@ -1,0 +1,26 @@
+# Bazel configuration.
+#
+# See https://docs.bazel.build/versions/master/user-manual.html#config for more
+# information.
+
+# Enable logging rc options.
+common --announce_rc
+
+# Enable platform-specific configs from bazelrc files.
+common --enable_platform_specific_config
+
+# Enable verbose failures.
+build --verbose_failures
+
+# Enable logging error output.
+test --test_output=errors
+test --test_summary=detailed
+
+# Suppress warnings from external dependencies.
+build --output_filter='^//'
+
+# Enable build optimizations.
+build --compilation_mode=opt
+
+# Do not automatically create `__init__.py` in the runfiles of Python targets.
+build --incompatible_default_to_explicit_init_py
