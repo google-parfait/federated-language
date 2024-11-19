@@ -55,7 +55,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    # Temporarily test Bazel version; currently there are no targets to actually test.
     - name: Test project
       run: |
-        bazelisk --version
+        bazelisk test //federated_language/... \
+            --@rules_python//python/config_settings:python_version="${{ matrix.python-version }}"

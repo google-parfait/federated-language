@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "federated_language"
+description = "A framework for implementing federated algorithms and computations on privacy-sensitive data."
+readme = "README.md"
+requires-python = ">=3.9,<3.12"
+license = {file = "LICENSE"}
+authors = [
+  { name="Federated Language Team", email="no-reply@google.com" },
+]
+keywords = ["federated", "machine", "learning"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Education",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Scientific/Engineering :: Mathematics",
+  "Topic :: Software Development",
+  "Topic :: Software Development :: Libraries",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+  'absl-py>=1.0,==1.*',
+  'attrs~=23.1',
+  'dm-tree==0.1.8',
+  'googleapis-common-protos==1.61.0',
+  'ml_dtypes>=0.2.0,==0.2.*',
+  'numpy~=1.25',
+  'typing-extensions>=4.5.0,==4.5.*',
+]
+dynamic = ["version"]
+
+[project.urls]
+"Issues" = "https://github.com/google-parfait/federated-language/issues"
+"Releases" = "https://github.com/google-parfait/federated-language/releases"
+"Source" = "https://github.com/google-parfait/federated-language"
+"Documentation" = "https://www.tensorflow.org/federated"
+
+[tool.setuptools.dynamic]
+version = {attr = "federated_language.version.__version__"}
+
+[tool.setuptools.packages.find]
+namespaces = false
