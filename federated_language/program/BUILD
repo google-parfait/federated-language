@@ -1,0 +1,233 @@
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
+
+package(
+    default_applicable_licenses = ["//:package_license"],
+    default_visibility = ["//visibility:private"],
+)
+
+licenses(["notice"])
+
+py_library(
+    name = "program",
+    srcs = ["__init__.py"],
+    visibility = [
+        "//federated_language:__pkg__",
+        "//tools:__subpackages__",
+    ],
+    deps = [
+        ":data_source",
+        ":federated_context",
+        ":logging_release_manager",
+        ":memory_release_manager",
+        ":program_state_manager",
+        ":release_manager",
+        ":value_reference",
+    ],
+)
+
+py_library(
+    name = "data_source",
+    srcs = ["data_source.py"],
+    deps = [
+        "//federated_language/common_libs:serializable",
+        "//federated_language/types:computation_types",
+    ],
+)
+
+py_library(
+    name = "federated_context",
+    srcs = ["federated_context.py"],
+    deps = [
+        ":structure_utils",
+        ":value_reference",
+        "//federated_language/computation:computation_base",
+        "//federated_language/context_stack:context_base",
+        "//federated_language/context_stack:get_context_stack",
+        "//federated_language/types:computation_types",
+        "//federated_language/types:placements",
+        "//federated_language/types:type_analysis",
+    ],
+)
+
+py_test(
+    name = "federated_context_test",
+    srcs = ["federated_context_test.py"],
+    deps = [
+        ":federated_context",
+        "//federated_language/context_stack:context_base",
+        "//federated_language/context_stack:context_stack_impl",
+        "//federated_language/types:computation_types",
+        "//federated_language/types:placements",
+        "@pypi//absl_py",
+        "@pypi//numpy",
+    ],
+)
+
+py_library(
+    name = "logging_release_manager",
+    srcs = ["logging_release_manager.py"],
+    deps = [
+        ":release_manager",
+        ":value_reference",
+        "@pypi//absl_py",
+    ],
+)
+
+py_test(
+    name = "logging_release_manager_test",
+    srcs = ["logging_release_manager_test.py"],
+    deps = [
+        ":logging_release_manager",
+        ":program_test_utils",
+        "@pypi//absl_py",
+        "@pypi//dm_tree",
+        "@pypi//numpy",
+    ],
+)
+
+py_library(
+    name = "memory_release_manager",
+    srcs = ["memory_release_manager.py"],
+    deps = [
+        ":release_manager",
+        ":value_reference",
+    ],
+)
+
+py_test(
+    name = "memory_release_manager_test",
+    srcs = ["memory_release_manager_test.py"],
+    deps = [
+        ":memory_release_manager",
+        ":program_test_utils",
+        "@pypi//absl_py",
+        "@pypi//dm_tree",
+        "@pypi//numpy",
+    ],
+)
+
+py_library(
+    name = "program_state_manager",
+    srcs = ["program_state_manager.py"],
+    deps = [
+        ":structure_utils",
+        ":value_reference",
+        "//federated_language/common_libs:serializable",
+    ],
+)
+
+py_test(
+    name = "program_state_manager_test",
+    srcs = ["program_state_manager_test.py"],
+    deps = [
+        ":program_state_manager",
+        "@pypi//absl_py",
+    ],
+)
+
+py_library(
+    name = "program_test_utils",
+    testonly = True,
+    srcs = ["program_test_utils.py"],
+    deps = [
+        ":value_reference",
+        "//federated_language/common_libs:py_typecheck",
+        "//federated_language/common_libs:serializable",
+        "//federated_language/types:computation_types",
+        "@pypi//attrs",
+        "@pypi//dm_tree",
+        "@pypi//numpy",
+    ],
+)
+
+py_library(
+    name = "release_manager",
+    srcs = ["release_manager.py"],
+    deps = [
+        ":structure_utils",
+        ":value_reference",
+        "//federated_language/common_libs:py_typecheck",
+        "@pypi//attrs",
+        "@pypi//dm_tree",
+    ],
+)
+
+py_test(
+    name = "release_manager_test",
+    srcs = ["release_manager_test.py"],
+    deps = [
+        ":program_test_utils",
+        ":release_manager",
+        "@pypi//absl_py",
+        "@pypi//dm_tree",
+        "@pypi//numpy",
+    ],
+)
+
+py_library(
+    name = "serialization_utils",
+    srcs = ["serialization_utils.py"],
+    deps = [
+        "//federated_language/common_libs:serializable",
+        "//federated_language/proto:computation_py_pb2",
+        "//federated_language/types:computation_types",
+        "//federated_language/types:type_serialization",
+    ],
+)
+
+py_test(
+    name = "serialization_utils_test",
+    srcs = ["serialization_utils_test.py"],
+    deps = [
+        ":program_test_utils",
+        ":serialization_utils",
+        "//federated_language/types:computation_types",
+        "@pypi//absl_py",
+        "@pypi//numpy",
+    ],
+)
+
+py_library(
+    name = "structure_utils",
+    srcs = ["structure_utils.py"],
+    deps = [
+        "//federated_language/common_libs:py_typecheck",
+        "@pypi//attrs",
+        "@pypi//dm_tree",
+    ],
+)
+
+py_test(
+    name = "structure_utils_test",
+    srcs = ["structure_utils_test.py"],
+    deps = [
+        ":program_test_utils",
+        ":structure_utils",
+        "@pypi//absl_py",
+        "@pypi//dm_tree",
+        "@pypi//numpy",
+    ],
+)
+
+py_library(
+    name = "value_reference",
+    srcs = ["value_reference.py"],
+    deps = [
+        ":structure_utils",
+        "//federated_language/types:computation_types",
+        "//federated_language/types:typed_object",
+        "@pypi//numpy",
+    ],
+)
+
+py_test(
+    name = "value_reference_test",
+    srcs = ["value_reference_test.py"],
+    deps = [
+        ":program_test_utils",
+        ":value_reference",
+        "@pypi//absl_py",
+        "@pypi//dm_tree",
+        "@pypi//numpy",
+    ],
+)
