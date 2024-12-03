@@ -24,6 +24,9 @@ on:  # yamllint disable-line rule:truthy
   # manual
   workflow_dispatch:
 
+  # other
+  workflow_call:
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
@@ -38,8 +41,6 @@ jobs:
 
     - name: Checkout repository
       uses: actions/checkout@v4.2.2
-      with:
-        ref: ${{ inputs.ref }}
 
     - name: Setup Bazel
       uses: bazel-contrib/setup-bazel@0.9.1
@@ -62,7 +63,7 @@ jobs:
       uses: actions/upload-artifact@v4.4.3
       with:
         name: python-package-distributions
-        path: dist/*.whl
+        path: dist/
 
   test-package:
     name: Test Package
@@ -73,8 +74,6 @@ jobs:
 
     - name: Checkout repository
       uses: actions/checkout@v4.2.2
-      with:
-        ref: ${{ inputs.ref }}
 
     - name: Setup Python
       uses: actions/setup-python@v5.3.0
