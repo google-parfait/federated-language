@@ -33,7 +33,7 @@ jobs:
   test-project:
     name: Linux PY ${{ matrix.python-version }}
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 5
     strategy:
       fail-fast: false
       matrix:
@@ -41,21 +41,21 @@ jobs:
     steps:
 
     - name: Checkout repository
-      uses: actions/checkout@v4.1.7
+      uses: actions/checkout@v4.2.2
 
-    - name: Setup bazel repository cache
-      uses: actions/cache@v4.0.2
+    - name: Setup Bazel
+      uses: bazel-contrib/setup-bazel@0.9.1
       with:
-        path: "~/.cache/bazel/"
-        key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel') }}
-        restore-keys: ${{ runner.os }}-bazel-
+        bazelisk-cache: true
+        disk-cache: ${{ github.workflow }}
+        repository-cache: true
 
     - name: Setup Python
-      uses: actions/setup-python@v5.1.0
+      uses: actions/setup-python@v5.3.0
       with:
         python-version: ${{ matrix.python-version }}
 
-    # Temporarily test Bazel version; currently there are no targets to actually test.
     - name: Test project
       run: |
-        bazelisk --version
+        bazelisk test //federated_language/... \
+            --@rules_python//python/config_settings:python_version="${{ matrix.python-version }}"

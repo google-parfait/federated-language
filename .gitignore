@@ -1,0 +1,19 @@
+# MacOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Python - package
+build/
+dist/
+
+# Python - sphinx
+docs/_build/
+
+# Python - environment
+venv/
+
+# Bazel
+/bazel-*

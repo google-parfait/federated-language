@@ -1,0 +1,99 @@
+# Copyright 2024 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Test Package
+
+on:  # yamllint disable-line rule:truthy
+
+  # presubmit
+  pull_request:
+    branches:
+      - main
+
+  # manual
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  build-package:
+    name: Build Package
+    runs-on: ubuntu-20.04
+    timeout-minutes: 5
+    steps:
+
+    - name: Checkout repository
+      uses: actions/checkout@v4.2.2
+      with:
+        ref: ${{ inputs.ref }}
+
+    - name: Setup Bazel
+      uses: bazel-contrib/setup-bazel@0.9.1
+      with:
+        bazelisk-cache: true
+        disk-cache: ${{ github.workflow }}
+        repository-cache: true
+
+    - name: Setup Python
+      uses: actions/setup-python@v5.3.0
+      with:
+        python-version: "3.11"
+        cache: "pip"
+
+    - name: Build package
+      run: |
+        bazelisk run //tools:build_package
+
+    - name: Upload package
+      uses: actions/upload-artifact@v4.4.3
+      with:
+        name: python-package-distributions
+        path: dist/*.whl
+
+  test-package:
+    name: Test Package
+    needs: [build-package]
+    runs-on: ubuntu-20.04
+    timeout-minutes: 5
+    steps:
+
+    - name: Checkout repository
+      uses: actions/checkout@v4.2.2
+      with:
+        ref: ${{ inputs.ref }}
+
+    - name: Setup Python
+      uses: actions/setup-python@v5.3.0
+      with:
+        python-version: "3.11"
+        cache: "pip"
+
+    - name: Download package
+      uses: actions/download-artifact@v4.1.8
+      with:
+        name: python-package-distributions
+        path: dist/
+
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+
+    - name: Test package
+      run: |
+        package="$(ls "${{ github.workspace }}/dist/"*".whl" | head -n1)"
+        pip install --upgrade "${package}"
+        python -I -c "import federated_language; print(federated_language.__version__)"

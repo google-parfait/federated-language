@@ -1,0 +1,21 @@
+# Requirements for the Federated Language development environment.
+#
+# If you add or update a dependency and it is required by the Federated Language
+# package, also add or update the dependency in the `pyproject.toml`
+# configuration.
+#
+# *   For dependencies that do have a stable release, use a version that is
+#     compatible with that release (e.g., `~=x.y`). See
+#     https://peps.python.org/pep-0440/#compatible-release for more information.
+# *   For dependencies that do not have a stable release or do not follow
+#     Semantic Versioning (https://semver.org/), use a version that matches a
+#     release that has been tested (e.g., `==x.y.z`). See
+#     https://peps.python.org/pep-0440/#version-matching for more information.
+
+absl-py~=1.0
+attrs~=23.1
+dm-tree==0.1.8
+ml_dtypes~=0.2.0
+numpy~=1.25
+protobuf~=5.28.3
+typing-extensions~=4.5.0
