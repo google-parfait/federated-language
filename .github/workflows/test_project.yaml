@@ -16,10 +16,11 @@ name: Test Project
 
 on:  # yamllint disable-line rule:truthy
 
+  # DO_NOT_SUBMIT
   # presubmit
-  pull_request:
-    branches:
-      - main
+  # pull_request:
+  #   branches:
+  #     - main
 
   # continuous
   schedule:
