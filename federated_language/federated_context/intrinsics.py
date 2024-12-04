@@ -791,16 +791,6 @@ def federated_secure_sum(value, max_input):
   Attempting to return a `value` higher than `max_input` is invalid, and will
   result in a failure at the given client.
 
-  Example:
-
-  ```python
-  value = federated_language.federated_value(1, federated_language.CLIENTS)
-  result = federated_language.federated_secure_sum(value, 1)
-
-  value = federated_language.federated_value((1, 2), federated_language.CLIENTS)
-  result = federated_language.federated_secure_sum(value, (1, 2))
-  ```
-
   Note: To sum non-integer values or to sum integers with fewer constraints and
   weaker privacy properties, consider using `federated_sum`.
 
@@ -869,20 +859,6 @@ def federated_secure_sum_bitwidth(value, bitwidth):
   bitwidth of the input `value`. The federated secure sum bitwidth (i.e., the
   bitwidth of the *sum* of the input `value`s over all clients) will be a
   function of this bitwidth and the number of participating clients.
-
-  Example:
-
-  ```python
-  value = federated_language.federated_value(1, federated_language.CLIENTS)
-  result = federated_language.federated_secure_sum_bitwidth(value, 2)
-
-  value = federated_language.federated_value([1, 1], federated_language.CLIENTS)
-  result = federated_language.federated_secure_sum_bitwidth(value, [2, 4])
-
-  value = federated_language.federated_value([1, [1, 1]],
-  federated_language.CLIENTS)
-  result = federated_language.federated_secure_sum_bitwidth(value, [2, [4, 8]])
-  ```
 
   Note: To sum non-integer values or to sum integers with fewer constraints and
   weaker privacy properties, consider using `federated_sum`.

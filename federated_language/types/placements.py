@@ -63,6 +63,7 @@ class PlacementLiteral:
     return hash(self._uri)
 
 
+#: THIS IS A TEST.
 CLIENTS = PlacementLiteral(
     'CLIENTS',
     'clients',
@@ -76,6 +77,9 @@ SERVER = PlacementLiteral(
     default_all_equal=True,
     description='The single top-level central coordinator.',
 )
+"""
+THIS IS A TEST.
+"""
 
 
 def uri_to_placement_literal(uri: str) -> PlacementLiteral:
