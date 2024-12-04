@@ -1,0 +1,5 @@
+myst-parser~=4.0.0
+# sphinx_rtd_theme~=3.0.2
+sphinx~=8.1.3
+
+.  # Install `federated-language` from the current directory.
