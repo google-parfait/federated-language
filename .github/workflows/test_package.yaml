@@ -16,7 +16,8 @@ name: Test Package
 
 on:  # yamllint disable-line rule:truthy
 
-  # presubmit
+  # DO_NOT_SUBMIT
+  presubmit
   pull_request:
     branches:
       - main
@@ -63,6 +64,10 @@ jobs:
       with:
         name: python-package-distributions
         path: dist/*.whl
+
+    - name: Output artifact URL
+      run: |
+        echo ${{ steps.artifact-upload-step.outputs.artifact-url }}
 
   test-package:
     name: Test Package
