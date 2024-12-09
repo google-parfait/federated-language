@@ -27,14 +27,14 @@ jobs:
     name: Test Package
     uses: ./.github/workflows/test_package.yaml
 
-  publish-to-testpypi:
-    name: Publish to TestPyPI
+  publish-to-pypi:
+    name: Publish to PyPI
     needs: [test-package]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     environment:
-      name: testpypi
-      url: https://test.pypi.org/p/federated-language
+      name: pypi
+      url: https://pypi.org/p/federated-language
     permissions:
       id-token: write  # Required for trusted publishing.
     steps:
@@ -47,12 +47,10 @@ jobs:
 
     - name: Publish
       uses: pypa/gh-action-pypi-publish@v1.12.3
-      with:
-        repository-url: https://test.pypi.org/legacy/
 
   release-to-github:
     name: Release to GitHub
-    needs: [publish-to-testpypi]
+    needs: [publish-to-pypi]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
