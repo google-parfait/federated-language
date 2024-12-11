@@ -16,10 +16,15 @@ name: Release
 
 on:  # yamllint disable-line rule:truthy
 
+  # presubmit
+  pull_request:
+    branches:
+      - main
+
   # postsubmit
-  push:
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
+  # push:
+  #   tags:
+  #     - 'v[0-9]+.[0-9]+.[0-9]+'
 
 jobs:
 
@@ -27,30 +32,30 @@ jobs:
     name: Test Package
     uses: ./.github/workflows/test_package.yaml
 
-  publish-to-pypi:
-    name: Publish to PyPI
-    needs: [test-package]
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    environment:
-      name: pypi
-      url: https://pypi.org/p/federated-language
-    permissions:
-      id-token: write  # Required for trusted publishing.
-    steps:
+  # publish-to-pypi:
+  #   name: Publish to PyPI
+  #   needs: [test-package]
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 5
+  #   environment:
+  #     name: pypi
+  #     url: https://pypi.org/p/federated-language
+  #   permissions:
+  #     id-token: write  # Required for trusted publishing.
+  #   steps:
 
-    - name: Download package
-      uses: actions/download-artifact@v4.1.8
-      with:
-        name: python-package-distributions
-        path: dist/
+  #   - name: Download package
+  #     uses: actions/download-artifact@v4.1.8
+  #     with:
+  #       name: python-package-distributions
+  #       path: dist/
 
-    - name: Publish
-      uses: pypa/gh-action-pypi-publish@v1.12.3
+  #   - name: Publish
+  #     uses: pypa/gh-action-pypi-publish@v1.12.3
 
   release-to-github:
     name: Release to GitHub
-    needs: [publish-to-pypi]
+    needs: [test-package]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
