@@ -17,9 +17,9 @@ name: Test Package
 on:  # yamllint disable-line rule:truthy
 
   # presubmit
-  pull_request:
-    branches:
-      - main
+  # pull_request:
+  #   branches:
+  #     - main
 
   # manual
   workflow_dispatch:
