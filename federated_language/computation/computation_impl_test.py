@@ -16,7 +16,7 @@ from absl.testing import absltest
 from federated_language.compiler import building_blocks
 from federated_language.computation import computation_impl
 from federated_language.context_stack import context_stack_impl
-from federated_language.proto import computation_pb2 as pb
+from federated_language.proto import computation_pb2
 from federated_language.types import computation_types
 from federated_language.types import type_serialization
 from federated_language.types import type_test_utils
@@ -32,11 +32,11 @@ class ConcreteComputationTest(absltest.TestCase):
     # At the moment, this should succeed, as both the computation body and the
     # type are well-formed.
     computation_impl.ConcreteComputation(
-        computation_proto=pb.Computation(**{
+        computation_proto=computation_pb2.Computation(**{
             'type': type_serialization.serialize_type(
                 computation_types.FunctionType(np.int32, np.int32)
             ),
-            'intrinsic': pb.Intrinsic(uri='whatever'),
+            'intrinsic': computation_pb2.Intrinsic(uri='whatever'),
         }),
         context_stack=context_stack_impl.context_stack,
     )
@@ -44,11 +44,12 @@ class ConcreteComputationTest(absltest.TestCase):
     # This should fail, as the proto is not well-formed.
     with self.assertRaises(NotImplementedError):
       computation_impl.ConcreteComputation(
-          computation_proto=pb.Computation(),
+          computation_proto=computation_pb2.Computation(),
           context_stack=context_stack_impl.context_stack,
       )
 
-    # This should fail, as "10" is not an instance of pb.Computation.
+    # This should fail, as "10" is not an instance of
+    # `computation_pb2.Computation`.
     with self.assertRaises(TypeError):
       computation_impl.ConcreteComputation(
           computation_proto=10,
@@ -60,9 +61,9 @@ class ConcreteComputationTest(absltest.TestCase):
         np.int32, computation_types.StructType([(None, np.int32)])
     )
     original_comp = computation_impl.ConcreteComputation(
-        computation_proto=pb.Computation(**{
+        computation_proto=computation_pb2.Computation(**{
             'type': type_serialization.serialize_type(struct_return_type),
-            'intrinsic': pb.Intrinsic(uri='whatever'),
+            'intrinsic': computation_pb2.Intrinsic(uri='whatever'),
         }),
         context_stack=context_stack_impl.context_stack,
     )
@@ -81,9 +82,9 @@ class ConcreteComputationTest(absltest.TestCase):
   def test_with_type_raises_non_assignable_type(self):
     int_return_type = computation_types.FunctionType(np.int32, np.int32)
     original_comp = computation_impl.ConcreteComputation(
-        computation_proto=pb.Computation(**{
+        computation_proto=computation_pb2.Computation(**{
             'type': type_serialization.serialize_type(int_return_type),
-            'intrinsic': pb.Intrinsic(uri='whatever'),
+            'intrinsic': computation_pb2.Intrinsic(uri='whatever'),
         }),
         context_stack=context_stack_impl.context_stack,
     )

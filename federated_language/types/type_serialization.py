@@ -17,7 +17,7 @@ from collections.abc import Mapping
 import weakref
 
 from federated_language.proto import array_pb2
-from federated_language.proto import computation_pb2 as pb
+from federated_language.proto import computation_pb2
 from federated_language.types import array_shape
 from federated_language.types import computation_types
 from federated_language.types import dtype_utils
@@ -27,13 +27,13 @@ from federated_language.types import placements
 # Manual cache used rather than `cachetools.cached` due to incompatibility
 # with `WeakKeyDictionary`. We want to use a `WeakKeyDictionary` so that
 # cache entries are destroyed once the types they index no longer exist.
-_type_serialization_cache: Mapping[computation_types.Type, pb.Type] = (
-    weakref.WeakKeyDictionary({})
-)
+_type_serialization_cache: Mapping[
+    computation_types.Type, computation_pb2.Type
+] = weakref.WeakKeyDictionary({})
 
 
-def serialize_type(type_spec: computation_types.Type) -> pb.Type:
-  """Serializes 'type_spec' as a pb.Type.
+def serialize_type(type_spec: computation_types.Type) -> computation_pb2.Type:
+  """Serializes 'type_spec' as a computation_pb2.Type.
 
   Note: Currently only serialization for tensor, named tuple, sequence, and
   function types is implemented.
@@ -42,7 +42,7 @@ def serialize_type(type_spec: computation_types.Type) -> pb.Type:
     type_spec: A `computation_types.Type`.
 
   Returns:
-    The corresponding instance of `pb.Type`.
+    The corresponding instance of `computation_pb2.Type`.
 
   Raises:
     TypeError: if the argument is of the wrong type.
@@ -56,20 +56,24 @@ def serialize_type(type_spec: computation_types.Type) -> pb.Type:
   if isinstance(type_spec, computation_types.TensorType):
     dtype = dtype_utils.to_proto(type_spec.dtype.type)
     shape = array_shape.to_proto(type_spec.shape)
-    proto = pb.Type(
-        tensor=pb.TensorType(
+    proto = computation_pb2.Type(
+        tensor=computation_pb2.TensorType(
             dtype=dtype, dims=shape.dim, unknown_rank=shape.unknown_rank
         )
     )
   elif isinstance(type_spec, computation_types.SequenceType):
-    proto = pb.Type(
-        sequence=pb.SequenceType(element=serialize_type(type_spec.element))
+    proto = computation_pb2.Type(
+        sequence=computation_pb2.SequenceType(
+            element=serialize_type(type_spec.element)
+        )
     )
   elif isinstance(type_spec, computation_types.StructType):
-    proto = pb.Type(
-        struct=pb.StructType(
+    proto = computation_pb2.Type(
+        struct=computation_pb2.StructType(
             element=[
-                pb.StructType.Element(name=e[0], value=serialize_type(e[1]))
+                computation_pb2.StructType.Element(
+                    name=e[0], value=serialize_type(e[1])
+                )
                 for e in type_spec.items()
             ]
         )
@@ -79,20 +83,20 @@ def serialize_type(type_spec: computation_types.Type) -> pb.Type:
       serialized_parameter = serialize_type(type_spec.parameter)
     else:
       serialized_parameter = None
-    proto = pb.Type(
-        function=pb.FunctionType(
+    proto = computation_pb2.Type(
+        function=computation_pb2.FunctionType(
             parameter=serialized_parameter,
             result=serialize_type(type_spec.result),
         )
     )
   elif isinstance(type_spec, computation_types.PlacementType):
-    proto = pb.Type(placement=pb.PlacementType())
+    proto = computation_pb2.Type(placement=computation_pb2.PlacementType())
   elif isinstance(type_spec, computation_types.FederatedType):
-    proto = pb.Type(
-        federated=pb.FederatedType(
+    proto = computation_pb2.Type(
+        federated=computation_pb2.FederatedType(
             member=serialize_type(type_spec.member),
-            placement=pb.PlacementSpec(
-                value=pb.Placement(uri=type_spec.placement.uri)
+            placement=computation_pb2.PlacementSpec(
+                value=computation_pb2.Placement(uri=type_spec.placement.uri)
             ),
             all_equal=type_spec.all_equal,
         )
@@ -104,14 +108,16 @@ def serialize_type(type_spec: computation_types.Type) -> pb.Type:
   return proto
 
 
-def deserialize_type(type_proto: pb.Type) -> computation_types.Type:
+def deserialize_type(
+    type_proto: computation_pb2.Type,
+) -> computation_types.Type:
   """Deserializes 'type_proto' as a `federated_language.Type`.
 
   Note: Currently only deserialization for tensor, named tuple, sequence, and
   function types is implemented.
 
   Args:
-    type_proto: A `pb.Type` to deserialize.
+    type_proto: A `computation_pb2.Type` to deserialize.
 
   Returns:
     The corresponding instance of `federated_language.Type`.

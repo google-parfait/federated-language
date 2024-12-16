@@ -14,7 +14,7 @@
 
 from absl.testing import absltest
 from absl.testing import parameterized
-from federated_language.proto import computation_pb2 as pb
+from federated_language.proto import computation_pb2
 from federated_language.proto import data_type_pb2
 from federated_language.types import array_shape
 from federated_language.types import computation_types
@@ -38,8 +38,8 @@ class TypeSerializationTest(parameterized.TestCase):
     actual_proto = type_serialization.serialize_type(type_signature)
     dtype = dtype_utils.to_proto(dtype)
     shape_pb = array_shape.to_proto(shape)
-    expected_proto = pb.Type(
-        tensor=pb.TensorType(
+    expected_proto = computation_pb2.Type(
+        tensor=computation_pb2.TensorType(
             dtype=dtype,
             dims=shape_pb.dim,
             unknown_rank=shape_pb.unknown_rank,
@@ -51,10 +51,12 @@ class TypeSerializationTest(parameterized.TestCase):
     actual_proto = type_serialization.serialize_type(
         computation_types.SequenceType(np.str_)
     )
-    expected_proto = pb.Type(
-        sequence=pb.SequenceType(
-            element=pb.Type(
-                tensor=pb.TensorType(dtype=data_type_pb2.DataType.DT_STRING)
+    expected_proto = computation_pb2.Type(
+        sequence=computation_pb2.SequenceType(
+            element=computation_pb2.Type(
+                tensor=computation_pb2.TensorType(
+                    dtype=data_type_pb2.DataType.DT_STRING
+                )
             )
         )
     )
@@ -68,36 +70,36 @@ class TypeSerializationTest(parameterized.TestCase):
         ('z', np.bool_),
     ])
     actual_proto = type_serialization.serialize_type(type_signature)
-    expected_proto = pb.Type(
-        struct=pb.StructType(
+    expected_proto = computation_pb2.Type(
+        struct=computation_pb2.StructType(
             element=[
-                pb.StructType.Element(
+                computation_pb2.StructType.Element(
                     name='x',
-                    value=pb.Type(
-                        tensor=pb.TensorType(
+                    value=computation_pb2.Type(
+                        tensor=computation_pb2.TensorType(
                             dtype=data_type_pb2.DataType.DT_INT32
                         )
                     ),
                 ),
-                pb.StructType.Element(
+                computation_pb2.StructType.Element(
                     name='y',
-                    value=pb.Type(
-                        tensor=pb.TensorType(
+                    value=computation_pb2.Type(
+                        tensor=computation_pb2.TensorType(
                             dtype=data_type_pb2.DataType.DT_STRING
                         )
                     ),
                 ),
-                pb.StructType.Element(
-                    value=pb.Type(
-                        tensor=pb.TensorType(
+                computation_pb2.StructType.Element(
+                    value=computation_pb2.Type(
+                        tensor=computation_pb2.TensorType(
                             dtype=data_type_pb2.DataType.DT_FLOAT
                         )
                     )
                 ),
-                pb.StructType.Element(
+                computation_pb2.StructType.Element(
                     name='z',
-                    value=pb.Type(
-                        tensor=pb.TensorType(
+                    value=computation_pb2.Type(
+                        tensor=computation_pb2.TensorType(
                             dtype=data_type_pb2.DataType.DT_BOOL
                         )
                     ),
@@ -113,24 +115,28 @@ class TypeSerializationTest(parameterized.TestCase):
     ])
     actual_proto = type_serialization.serialize_type(type_signature)
 
-    z_proto = pb.StructType.Element(
+    z_proto = computation_pb2.StructType.Element(
         name='z',
-        value=pb.Type(
-            tensor=pb.TensorType(dtype=data_type_pb2.DataType.DT_BOOL)
+        value=computation_pb2.Type(
+            tensor=computation_pb2.TensorType(
+                dtype=data_type_pb2.DataType.DT_BOOL
+            )
         ),
     )
-    expected_proto = pb.Type(
-        struct=pb.StructType(
+    expected_proto = computation_pb2.Type(
+        struct=computation_pb2.StructType(
             element=[
-                pb.StructType.Element(
+                computation_pb2.StructType.Element(
                     name='x',
-                    value=pb.Type(
-                        struct=pb.StructType(
+                    value=computation_pb2.Type(
+                        struct=computation_pb2.StructType(
                             element=[
-                                pb.StructType.Element(
+                                computation_pb2.StructType.Element(
                                     name='y',
-                                    value=pb.Type(
-                                        struct=pb.StructType(element=[z_proto])
+                                    value=computation_pb2.Type(
+                                        struct=computation_pb2.StructType(
+                                            element=[z_proto]
+                                        )
                                     ),
                                 )
                             ]
@@ -146,21 +152,21 @@ class TypeSerializationTest(parameterized.TestCase):
     actual_proto = type_serialization.serialize_type(
         computation_types.FunctionType((np.int32, np.int32), np.bool_)
     )
-    expected_proto = pb.Type(
-        function=pb.FunctionType(
-            parameter=pb.Type(
-                struct=pb.StructType(
+    expected_proto = computation_pb2.Type(
+        function=computation_pb2.FunctionType(
+            parameter=computation_pb2.Type(
+                struct=computation_pb2.StructType(
                     element=[
-                        pb.StructType.Element(
-                            value=pb.Type(
-                                tensor=pb.TensorType(
+                        computation_pb2.StructType.Element(
+                            value=computation_pb2.Type(
+                                tensor=computation_pb2.TensorType(
                                     dtype=data_type_pb2.DataType.DT_INT32
                                 )
                             )
                         ),
-                        pb.StructType.Element(
-                            value=pb.Type(
-                                tensor=pb.TensorType(
+                        computation_pb2.StructType.Element(
+                            value=computation_pb2.Type(
+                                tensor=computation_pb2.TensorType(
                                     dtype=data_type_pb2.DataType.DT_INT32
                                 )
                             )
@@ -168,8 +174,10 @@ class TypeSerializationTest(parameterized.TestCase):
                     ]
                 )
             ),
-            result=pb.Type(
-                tensor=pb.TensorType(dtype=data_type_pb2.DataType.DT_BOOL)
+            result=computation_pb2.Type(
+                tensor=computation_pb2.TensorType(
+                    dtype=data_type_pb2.DataType.DT_BOOL
+                )
             ),
         )
     )
@@ -179,7 +187,9 @@ class TypeSerializationTest(parameterized.TestCase):
     actual_proto = type_serialization.serialize_type(
         computation_types.PlacementType()
     )
-    expected_proto = pb.Type(placement=pb.PlacementType())
+    expected_proto = computation_pb2.Type(
+        placement=computation_pb2.PlacementType()
+    )
     self.assertEqual(actual_proto, expected_proto)
 
   def test_serialize_type_with_federated_bool(self):
@@ -187,14 +197,16 @@ class TypeSerializationTest(parameterized.TestCase):
         np.bool_, placements.CLIENTS, True
     )
     actual_proto = type_serialization.serialize_type(federated_type)
-    expected_proto = pb.Type(
-        federated=pb.FederatedType(
-            placement=pb.PlacementSpec(
-                value=pb.Placement(uri=placements.CLIENTS.uri)
+    expected_proto = computation_pb2.Type(
+        federated=computation_pb2.FederatedType(
+            placement=computation_pb2.PlacementSpec(
+                value=computation_pb2.Placement(uri=placements.CLIENTS.uri)
             ),
             all_equal=True,
-            member=pb.Type(
-                tensor=pb.TensorType(dtype=data_type_pb2.DataType.DT_BOOL)
+            member=computation_pb2.Type(
+                tensor=computation_pb2.TensorType(
+                    dtype=data_type_pb2.DataType.DT_BOOL
+                )
             ),
         )
     )

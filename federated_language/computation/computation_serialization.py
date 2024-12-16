@@ -17,13 +17,13 @@ from federated_language.common_libs import py_typecheck
 from federated_language.computation import computation_base
 from federated_language.computation import computation_impl
 from federated_language.context_stack import context_stack_impl
-from federated_language.proto import computation_pb2 as pb
+from federated_language.proto import computation_pb2
 
 
 def serialize_computation(
     computation: computation_base.Computation,
-) -> pb.Computation:
-  """Serializes 'federated_language.Computation' as a pb.Computation.
+) -> computation_pb2.Computation:
+  """Serializes 'federated_language.Computation' as a computation_pb2.Computation.
 
   Note: Currently only serialization for computation_impl.ConcreteComputation is
   implemented.
@@ -42,7 +42,7 @@ def serialize_computation(
   py_typecheck.check_type(computation, computation_base.Computation)
 
   if isinstance(computation, computation_impl.ConcreteComputation):
-    computation_proto = pb.Computation()
+    computation_proto = computation_pb2.Computation()
     computation_proto.CopyFrom(
         computation_impl.ConcreteComputation.get_proto(computation)
     )
@@ -56,9 +56,9 @@ def serialize_computation(
 
 
 def deserialize_computation(
-    computation_proto: pb.Computation,
+    computation_proto: computation_pb2.Computation,
 ) -> computation_base.Computation:
-  """Deserializes 'federated_language.Computation' as a pb.Computation.
+  """Deserializes 'federated_language.Computation' as a computation_pb2.Computation.
 
   Args:
     computation_proto: An instance of `pb.Computation`.
@@ -69,7 +69,7 @@ def deserialize_computation(
   Raises:
     TypeError: If the argument is of the wrong type.
   """
-  py_typecheck.check_type(computation_proto, pb.Computation)
+  py_typecheck.check_type(computation_proto, computation_pb2.Computation)
   return computation_impl.ConcreteComputation(
       computation_proto=computation_proto,
       context_stack=context_stack_impl.context_stack,

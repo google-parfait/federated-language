@@ -13,13 +13,13 @@
 # limitations under the License.
 """A library of construction functions for computation structures."""
 
-from federated_language.proto import computation_pb2 as pb
+from federated_language.proto import computation_pb2
 from federated_language.types import computation_types
 from federated_language.types import type_factory
 from federated_language.types import type_serialization
 
 
-def create_lambda_empty_struct() -> pb.Computation:
+def create_lambda_empty_struct() -> computation_pb2.Computation:
   """Returns a lambda computation returning an empty struct.
 
   Has the type signature:
@@ -27,25 +27,27 @@ def create_lambda_empty_struct() -> pb.Computation:
   ( -> <>)
 
   Returns:
-    An instance of `pb.Computation`.
+    An instance of `computation_pb2.Computation`.
   """
   result_type = computation_types.StructType([])
   type_signature = computation_types.FunctionType(None, result_type)
-  result = pb.Computation(
+  result = computation_pb2.Computation(
       type=type_serialization.serialize_type(result_type),
-      struct=pb.Struct(element=[]),
+      struct=computation_pb2.Struct(element=[]),
   )
-  fn = pb.Lambda(parameter_name=None, result=result)
+  fn = computation_pb2.Lambda(parameter_name=None, result=result)
   # We are unpacking the lambda argument here because `lambda` is a reserved
   # keyword in Python, but it is also the name of the parameter for a
-  # `pb.Computation`.
+  # `computation_pb2.Computation`.
   # https://developers.google.com/protocol-buffers/docs/reference/python-generated#keyword-conflicts
-  return pb.Computation(
+  return computation_pb2.Computation(
       type=type_serialization.serialize_type(type_signature), **{'lambda': fn}
   )  # pytype: disable=wrong-keyword-args
 
 
-def create_lambda_identity(type_spec: computation_types.Type) -> pb.Computation:
+def create_lambda_identity(
+    type_spec: computation_types.Type,
+) -> computation_pb2.Computation:
   """Returns a lambda computation representing an identity function.
 
   Has the type signature:
@@ -56,18 +58,18 @@ def create_lambda_identity(type_spec: computation_types.Type) -> pb.Computation:
     type_spec: A `computation_types.Type`.
 
   Returns:
-    An instance of `pb.Computation`.
+    An instance of `computation_pb2.Computation`.
   """
   type_signature = type_factory.unary_op(type_spec)
-  result = pb.Computation(
+  result = computation_pb2.Computation(
       type=type_serialization.serialize_type(type_spec),
-      reference=pb.Reference(name='a'),
+      reference=computation_pb2.Reference(name='a'),
   )
-  fn = pb.Lambda(parameter_name='a', result=result)
+  fn = computation_pb2.Lambda(parameter_name='a', result=result)
   # We are unpacking the lambda argument here because `lambda` is a reserved
   # keyword in Python, but it is also the name of the parameter for a
-  # `pb.Computation`.
+  # `computation_pb2.Computation`.
   # https://developers.google.com/protocol-buffers/docs/reference/python-generated#keyword-conflicts
-  return pb.Computation(
+  return computation_pb2.Computation(
       type=type_serialization.serialize_type(type_signature), **{'lambda': fn}
   )  # pytype: disable=wrong-keyword-args

@@ -21,7 +21,7 @@ from federated_language.computation import computation_base
 from federated_language.computation import function_utils
 from federated_language.context_stack import context_stack_base
 from federated_language.context_stack import context_stack_impl
-from federated_language.proto import computation_pb2 as pb
+from federated_language.proto import computation_pb2
 from federated_language.types import computation_types
 from federated_language.types import type_serialization
 
@@ -35,7 +35,9 @@ class ConcreteComputation(computation_base.Computation):
   """
 
   @classmethod
-  def get_proto(cls, value: 'ConcreteComputation') -> pb.Computation:
+  def get_proto(
+      cls, value: 'ConcreteComputation'
+  ) -> computation_pb2.Computation:
     py_typecheck.check_type(value, cls)
     return value._computation_proto  # pylint: disable=protected-access
 
@@ -86,7 +88,7 @@ class ConcreteComputation(computation_base.Computation):
   def __init__(
       self,
       *,
-      computation_proto: pb.Computation,
+      computation_proto: computation_pb2.Computation,
       context_stack: context_stack_base.ContextStack,
       annotated_type: Optional[computation_types.FunctionType] = None,
   ):
@@ -94,7 +96,7 @@ class ConcreteComputation(computation_base.Computation):
 
     Args:
       computation_proto: The protocol buffer that represents the computation, an
-        instance of pb.Computation.
+        instance of computation_pb2.Computation.
       context_stack: The context stack to use.
       annotated_type: Optional, type information with additional annotations
         that replaces the information in `computation_proto.type`.
@@ -104,7 +106,7 @@ class ConcreteComputation(computation_base.Computation):
         `computation_proto.type`.
       ValueError: If `computation_proto.type` is `None`.
     """
-    py_typecheck.check_type(computation_proto, pb.Computation)
+    py_typecheck.check_type(computation_proto, computation_pb2.Computation)
     py_typecheck.check_type(context_stack, context_stack_base.ContextStack)
     if computation_proto.type is None:
       raise ValueError('Expected `computation_proto.type` to not be `None`.')
