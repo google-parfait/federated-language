@@ -368,12 +368,6 @@ def federated_mean(value, weight=None):
       or if `weight` is not a federated integer or a floating-point tensor with
       the matching placement.
   """
-  # TODO: b/113112108 - Possibly relax the constraints on numeric types, and
-  # inject implicit casts where appropriate. For instance, we might want to
-  # allow `np.int32` values as the input, and automatically cast them to
-  # `np.float32`` before invoking the average, thus producing a floating-point
-  # result.
-
   # TODO: b/120439632 - Possibly allow the weight to be either structured or
   # non-scalar, e.g., for the case of averaging a convolutional layer, when
   # we would want to use a different weight for every filter, and where it

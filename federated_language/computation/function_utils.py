@@ -309,8 +309,6 @@ def _infer_unpack_needed(
   Returns:
     A `bool` indicating whether or not to unpack.
   """
-  # TODO: b/113112885 - Revisit whether the 3-way 'unpack' knob is sufficient
-  # for our needs, or more options are needed.
   if should_unpack not in [True, False, None]:
     raise TypeError(
         'The unpack argument has an unexpected value {!r}.'.format(
@@ -433,8 +431,6 @@ def wrap_as_zero_or_one_arg_callable(
     TypeError: if arguments to this call are of the wrong types, or if the
       supplied 'parameter_type' is not compatible with `fn`.
   """
-  # TODO: b/113112885 - Revisit whether the 3-way 'unpack' knob is sufficient
-  # for our needs, or more options are needed.
   signature = inspect.signature(fn)
   if parameter_type is None:
     if is_signature_compatible_with_types(signature):

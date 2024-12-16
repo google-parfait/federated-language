@@ -22,12 +22,6 @@ from federated_language.executors import executor_value_base as evb
 class Executor(metaclass=abc.ABCMeta):
   """Represents the abstract interface that all executors must implement."""
 
-  # TODO: b/134543154 - Migrate the reference executor over this new interface.
-
-  # TODO: b/134543154 - Standardize and document the kinds of values that can be
-  # embedded and must be understood by all executor implementations, possibly
-  # factoring out parts of reference executor's `to_representation_for_type()`.
-
   @abc.abstractmethod
   def close(self):
     """Release resources associated with this Executor, if any.

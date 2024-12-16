@@ -26,8 +26,6 @@ import numpy as np
 class ConcreteComputationTest(absltest.TestCase):
 
   def test_something(self):
-    # TODO: b/113112108 - Revise these tests after a more complete
-    # implementation is in place.
 
     # At the moment, this should succeed, as both the computation body and the
     # type are well-formed.

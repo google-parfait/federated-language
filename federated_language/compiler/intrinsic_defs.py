@@ -72,11 +72,6 @@ class IntrinsicDef:
     self._broadcast_kind = broadcast_kind
     _intrinsic_registry[str(uri)] = self
 
-  # TODO: b/113112885 - Add support for an optional type checking function that
-  # can verify whether this intrinsic is applicable to given kinds of arguments,
-  # e.g., to allow sum-like functions to be applied only to arguments that are
-  # composed of tensors as leaves of a possible nested structure.
-
   @property
   def name(self):
     return self._name
@@ -103,84 +98,6 @@ class IntrinsicDef:
   def __repr__(self):
     return "IntrinsicDef('{}')".format(self._uri)
 
-
-# TODO: b/113112885 - Perhaps add a way for these to get auto-registered to
-# enable things like lookup by URI, etc., similarly to how it's handled in the
-# placements.py.
-
-# TODO: b/113112885 - Define the generic equivalents of all operators below,
-# i.e., intrinsics that support arbitrary placements, to allow the federated
-# operators to be decomposed into expressions that might involve one or more
-# layers of intermediate aggregators. The type signatures of these generic
-# intrinsics are tentatively defined as follows:
-#
-# - Place an unplaced value:
-#
-#     generic_place: <T,p> -> T@p
-#
-# - Compute an aggregate using the 4-part aggregation operator interface:
-#
-#     generic_aggregate: <{T}@p,U,(<U,T>->U),(<U,U>->U),(U->R),q> -> R@q
-#
-# - Compute an unweighted average:
-#
-#     generic_average: <{T}@p,q> -> T@q
-#
-# - Broadcast an item:
-#
-#     generic_broadcast: <T@p,q> -> T@q
-#
-# - Materialize a federated value as a set of sequences at another placement,
-#   with the participants at 'q' collecting from disjoint subsets of 'p' that
-#   jointly cover all of 'p'.
-#
-#     generic_partial_collect: <{T}@p,q> -> {T*}@q
-#
-# - Materialize a federated value as a single sequence:
-#
-#     generic_collect: <{T}@p,q> -> T*@q
-#
-# - Pointwise mapping of constituents of a federated value:
-#
-#     generic_map: <(T->U),{T}@p> -> {U}@p
-#
-# - Pointwise mapping of all-equal constituents of a federated value:
-#
-#     generic_apply: <(T->U),T@p> -> U@p
-#
-# - Perform one-stage set reduction of a federated value with a given operator,
-#   with the participants at 'q' reducing over disjoint subsets of 'p' that
-#   jointly cover all of 'p'.
-#
-#     generic_partial_reduce: <{T}@p,U,(<U,T>->U),q> -> {U}@q
-#
-# - Perform complete set reduction of a federated value with a given operator:
-#
-#     generic_reduce: <{T}@p,U,(<U,T>->U),q> -> U@q
-#
-# - Select and agree on a single member consistuent of a federated value (this
-#   is technically need to project {T}@SERVER to T@SERVER in a manner that is
-#   formally consistent; a technicality that we do not expect to surface in the
-#   user API).
-#
-#     generic_only: {T}@p -> T@p
-#
-# - Compute a partial sum of a value (for values with numeric constituents):
-#
-#     generic_partial_sum: <{T}@p,q> -> {T}@q
-#
-# - Compute a simple sum of a value (for values with numeric constituents):
-#
-#     generic_sum: <{T}@p,q> -> T@q
-#
-# - Compute an average weighted by a numeric non-complex scalar:
-#
-#     generic_weighted_average: <{T}@p,{U}@p,q> -> T@q
-#
-# - Transform a pair of federated values into a federated pair (technicality we
-#   expect to bury through implicit conversions, TBD).
-#
-#     generic_zip: <{T}@p,{U}@p> -> {<T,U>}@p
 
 # Computes an aggregate of client items (the first, {T}@CLIENTS-typed parameter)
 # using a multi-stage process in which client items are first partially
@@ -599,16 +516,10 @@ FEDERATED_ZIP_AT_SERVER = IntrinsicDef(
     ),
 )
 
-# TODO: b/122728050 - Define GENERIC_DIVIDE, GENERIC_MULTIPLY, and GENERIC_ONE
-# to support intrinsic reductions (see the uses in intrinsic_bodies.py for
-# the motivation and usage in support of which we need to define semantics).
-
 # Generic plus operator that accepts a variety of types in federated computation
 # context. The range of types 'T' supported to be defined. It should work in a
 # natural manner for tensors, tuples, federated types, possibly sequences, and
 # maybe even functions (although it's unclear if such generality is desirable).
-#
-# TODO: b/113123410 - Define the range of supported computation_types.
 #
 # Type signature: <T,T> -> T
 GENERIC_PLUS = IntrinsicDef(
@@ -622,6 +533,7 @@ GENERIC_PLUS = IntrinsicDef(
 # implicit type equations. For example, dividing `int32` by `int32` in TF
 # generates a tensor of type `float64`. There is therefore more structure than
 # is suggested by the type signature `<T,T> -> U`.
+#
 # Type signature: <T,T> -> U
 GENERIC_DIVIDE = IntrinsicDef(
     'GENERIC_DIVIDE',
@@ -636,6 +548,7 @@ GENERIC_DIVIDE = IntrinsicDef(
 )
 
 # Performs pointwise TensorFlow multiplication on its arguments.
+#
 # Type signature: <T,T> -> T
 GENERIC_MULTIPLY = IntrinsicDef(
     'GENERIC_MULTIPLY',
@@ -647,8 +560,6 @@ GENERIC_MULTIPLY = IntrinsicDef(
 )
 # Generic zero operator that represents zero-filled values of diverse types (to
 # be defined, but generally similar to that supported by GENERIC_ADD).
-#
-# TODO: b/113123410 - Define the range of supported computation_types.
 #
 # Type signature: T
 GENERIC_ZERO = IntrinsicDef(
