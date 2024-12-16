@@ -130,14 +130,13 @@ def federated_aggregate(
     py_typecheck.check_type(op, value_impl.Value)
     py_typecheck.check_type(op.type_signature, computation_types.FunctionType)
 
-  if not accumulate.type_signature.parameter[0].is_assignable_from(
+  if not accumulate.type_signature.parameter[0].is_assignable_from(  # pytype: disable=attribute-error
       zero.type_signature
-  ):  # pytype: disable=attribute-error
+  ):
     raise TypeError(
-        'Expected `zero` to be assignable to type {}, '
-        'but was of incompatible type {}.'.format(
-            accumulate.type_signature.parameter[0], zero.type_signature  # pytype: disable=attribute-error
-        )
+        'Expected `zero` to be assignable to type'
+        f' {accumulate.type_signature.parameter[0]}, but was of incompatible'  # pytype: disable=attribute-error
+        f' type {zero.type_signature}.'
     )
 
   accumulate_type_expected = type_factory.reduction_op(
@@ -224,10 +223,8 @@ def federated_eval(fn, placement):
 
   if fn.type_signature.parameter is not None:  # pytype: disable=attribute-error
     raise TypeError(
-        '`federated_eval` expects a `fn` that accepts no arguments, but '
-        'the `fn` provided has a parameter of type {}.'.format(
-            fn.type_signature.parameter  # pytype: disable=attribute-error
-        )
+        '`federated_eval` expects a `fn` that accepts no arguments, but the'
+        f' `fn` provided has a parameter of type {fn.type_signature.parameter}.'  # pytype: disable=attribute-error
     )
 
   comp = building_block_factory.create_federated_eval(fn.comp, placement)

@@ -104,7 +104,6 @@ class WithContextTest(parameterized.TestCase, unittest.IsolatedAsyncioTestCase):
           ],
       ),
   )
-
   def test_installs_context_fn_sync_args(self, context, environments):
     context_fn = lambda: context
     environment_fn = None if environments is None else lambda: environments
@@ -159,7 +158,6 @@ class WithContextTest(parameterized.TestCase, unittest.IsolatedAsyncioTestCase):
           ],
       ),
   )
-
   def test_installs_context_fn_sync_kwargs(self, context, environments):
     context_fn = lambda: context
     environment_fn = None if environments is None else lambda: environments
@@ -214,7 +212,6 @@ class WithContextTest(parameterized.TestCase, unittest.IsolatedAsyncioTestCase):
           ],
       ),
   )
-
   def test_installs_context_fn_sync_return(self, context, environments):
     context_fn = lambda: context
     environment_fn = None if environments is None else lambda: environments
@@ -272,7 +269,6 @@ class WithContextTest(parameterized.TestCase, unittest.IsolatedAsyncioTestCase):
           ],
       ),
   )
-
   async def test_installs_context_fn_async(self, context, environments):
     context_fn = lambda: context
     environment_fn = None if environments is None else lambda: environments
@@ -326,7 +322,6 @@ class WithContextTest(parameterized.TestCase, unittest.IsolatedAsyncioTestCase):
           ],
       ),
   )
-
   def test_installs_context_test_case(self, context, environments):
     context_fn = lambda: context
     environment_fn = None if environments is None else lambda: environments

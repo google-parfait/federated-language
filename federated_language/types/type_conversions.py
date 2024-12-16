@@ -362,9 +362,8 @@ def type_to_py_container(value, type_spec: computation_types.Type):
     else:
       elements.append((elem_name, element))
 
-  if (
-      isinstance(container_type, py_typecheck.SupportsNamedTuple)
-      or attrs.has(container_type)
+  if isinstance(container_type, py_typecheck.SupportsNamedTuple) or attrs.has(
+      container_type
   ):
     # The namedtuple and attr.s class constructors cannot interpret a list of
     # (name, value) tuples; instead call constructor using kwargs. Note that

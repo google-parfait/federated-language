@@ -123,10 +123,8 @@ class Value(typed_object.TypedObject, metaclass=abc.ABCMeta):
     if _is_federated_struct(self.type_signature):
       if name not in structure.name_list(self.type_signature.member):  # pytype: disable=attribute-error
         raise AttributeError(
-            "There is no such attribute '{}' in this federated tuple. Valid "
-            'attributes: ({})'.format(
-                name, ', '.join(dir(self.type_signature.member))  # pytype: disable=attribute-error
-            )
+            f"There is no such attribute '{name}' in this federated tuple."
+            f" Valid attributes: ({', '.join(dir(self.type_signature.member))})"  # pytype: disable=attribute-error
         )
 
       return Value(

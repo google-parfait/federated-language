@@ -51,6 +51,7 @@ class FederatedComputationWrapperTest(absltest.TestCase):
       pass
 
     with self.assertRaises(DummyError):
+
       @federated_computation.federated_computation
       def _():
         raise DummyError()
@@ -75,6 +76,7 @@ class FederatedComputationWrapperTest(absltest.TestCase):
     )
 
     with self.assertRaises(computation_wrapper.ComputationReturnedNoneError):
+
       @federated_computation.federated_computation()
       def _():
         pass

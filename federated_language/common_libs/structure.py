@@ -293,7 +293,7 @@ def to_odict(
   """
 
   def _to_odict(
-      elements: list[tuple[Optional[str], _T]]
+      elements: list[tuple[Optional[str], _T]],
   ) -> collections.OrderedDict[str, _T]:
     for name, _ in elements:
       if name is None:
@@ -330,7 +330,7 @@ def to_odict_or_tuple(
   """
 
   def _to_odict_or_tuple(
-      elements: list[tuple[Optional[str], _T]]
+      elements: list[tuple[Optional[str], _T]],
   ) -> Union[collections.OrderedDict[str, _T], tuple[_T, ...]]:
     fields_are_named = tuple(name is not None for name, _ in elements)
     if any(fields_are_named):

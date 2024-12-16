@@ -88,24 +88,18 @@ class FederatedComputationContextTest(absltest.TestCase):
     def fn(_):
       return ()
 
-    arg = building_blocks.Struct(
-        [
-            building_blocks.Struct([
-                building_blocks.Reference(
-                    'x',
-                    computation_types.FederatedType(
-                        np.int32, placements.CLIENTS
-                    ),
-                ),
-                building_blocks.Reference(
-                    'y',
-                    computation_types.FederatedType(
-                        np.int32, placements.CLIENTS
-                    ),
-                ),
-            ])
-        ]
-    )
+    arg = building_blocks.Struct([
+        building_blocks.Struct([
+            building_blocks.Reference(
+                'x',
+                computation_types.FederatedType(np.int32, placements.CLIENTS),
+            ),
+            building_blocks.Reference(
+                'y',
+                computation_types.FederatedType(np.int32, placements.CLIENTS),
+            ),
+        ])
+    ])
 
     context = federated_computation_context.FederatedComputationContext(
         context_stack_impl.context_stack

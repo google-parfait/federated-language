@@ -1088,7 +1088,6 @@ def list_comp_names(comp):
 class ReferenceCounter(BoundVariableTracker):
   """Data container to track number References to a variable in an AST.
 
-
   Attributes:
     name: The string name representing the variable whose binding is represented
       by an instance of `ReferenceCounter`.
