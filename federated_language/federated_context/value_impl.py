@@ -266,14 +266,12 @@ def to_value(
     TFF tuple type.
 
   * Computations (constructed with either the
-  `federated_language.tensorflow.computation` or
-    with the `federated_language.federated_computation` decorator), typically
-    mapped to TFF
-    functions.
+    `federated_language.tensorflow.computation` or with the
+    `federated_language.federated_computation` decorator), typically mapped to
+    TFF functions.
 
   * Placement literals (`federated_language.CLIENTS`,
-  `federated_language.SERVER`), mapped to values of the
-    TFF placement type.
+   `federated_language.SERVER`), mapped to values of the TFF placement type.
 
   This function is also invoked when attempting to execute a TFF computation.
   All arguments supplied in the invocation are converted into TFF values prior

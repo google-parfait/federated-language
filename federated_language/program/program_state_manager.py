@@ -24,9 +24,10 @@ from federated_language.program import value_reference
 ProgramStateValue = Union[
     object,
     value_reference.MaterializableValue,
-    # `federated_language.Serializable` objects are intended to be impemented by platform
-    # authors and used by program logic authors; it should not be common for
-    # program logic authors to implement `federated_language.Serializable` objects.
+    # `federated_language.Serializable` objects are intended to be impemented by
+    # platform authors and used by program logic authors; it should not be
+    # common for program logic authors to implement
+    # `federated_language.Serializable` objects.
     serializable.Serializable,
 ]
 ProgramStateStructure = TypeVar(

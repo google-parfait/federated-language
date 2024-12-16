@@ -24,9 +24,10 @@ import tree
 
 
 T = TypeVar('T')
-# This type defines the structures supported by the `federated_language.program` API, meaning
-# values of type `T` nested in structures defined by this type. For an example
-# of how to use this type see `federated_language.program.MaterializedStructure`.
+# This type defines the structures supported by the `federated_language.program`
+# API, meaning values of type `T` nested in structures defined by this type. For
+# an example of how to use this type see
+# `federated_language.program.MaterializedStructure`.
 Structure = Union[
     T,
     Sequence['Structure[T]'],

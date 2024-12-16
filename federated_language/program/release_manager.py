@@ -77,8 +77,9 @@ class NotFilterableError(Exception):
   """Raised when the structure cannot be filtered."""
 
 
-# Sentinel object used by the `federated_language.program.FilteringReleaseManager` to indicate
-# that a subtree can be filtered when traversing structures of values and type
+# Sentinel object used by the
+# `federated_language.program.FilteringReleaseManager` to indicate that a
+# subtree can be filtered when traversing structures of values and type
 # signatures.
 _FILTERED_SUBTREE = object()
 

@@ -82,10 +82,10 @@ class FederatedContext(context_base.SyncContext):
   Arguments can be nested structures of values corresponding to the TensorFlow
   Federated type signature of the `federated_language.Computation`:
 
-  *   Server-placed values must be represented by
-      `federated_language.program.MaterializableStructure`.
-  *   Client-placed values must be represented by structures of values returned
-      by a `federated_language.program.FederatedDataSourceIterator`.
+  * Server-placed values must be represented by
+    `federated_language.program.MaterializableStructure`.
+  * Client-placed values must be represented by structures of values returned by
+    a `federated_language.program.FederatedDataSourceIterator`.
 
   Return values can be structures of
   `federated_language.program.MaterializableValueReference`s

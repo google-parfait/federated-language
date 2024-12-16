@@ -211,10 +211,10 @@ class AsyncExecutionContext(context_base.AsyncContext, Generic[_Computation]):
       )
 
     if arg is not None and self._transform_args is not None:
-      # `transform_args` is not intended to handle `federated_language.structure.Struct`.
-      # Normalize to a Python structure to make it simpler to handle; `args` is
-      # sometimes a `federated_language.structure.Struct` and sometimes it is not, other times
-      # it is a Python structure that contains a `federated_language.structure.Struct`.
+      # `transform_args` is not intended to handle `structure.Struct`. Normalize
+      # to a Python structure to make it simpler to handle; `args` is sometimes
+      # a `structure.Struct` and sometimes it is not, other times it is a Python
+      # structure that contains a `structure.Struct`.
       def _to_python(obj):
         if isinstance(obj, structure.Struct):
           return structure.to_odict_or_tuple(obj)

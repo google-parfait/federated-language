@@ -280,15 +280,15 @@ def transform_postorder_with_symbol_bindings(comp, transform, symbol_tree):
   structure to enforce. In particular, within a `transform` call the following
   invariants hold:
 
-  *  `symbol_tree.update_payload_with_name` with an argument `name` will call
-     `update` on the `BoundVariableTracker` in `symbol_tree` which tracks the
-     value of `ref` active in the current lexical scope. Will raise a
-     `NameError` if none exists.
+  * `symbol_tree.update_payload_with_name` with an argument `name` will call
+    `update` on the `BoundVariableTracker` in `symbol_tree` which tracks the
+    value of `ref` active in the current lexical scope. Will raise a
+    `NameError` if none exists.
 
-  *  `symbol_tree.get_payload_with_name` with a string argument `name` will
-     return the `BoundVariableTracker` instance from `symbol_tree` which
-     corresponds to the computation bound to the variable `name` in the current
-     lexical scope. Will raise a `NameError` if none exists.
+  * `symbol_tree.get_payload_with_name` with a string argument `name` will
+    return the `BoundVariableTracker` instance from `symbol_tree` which
+    corresponds to the computation bound to the variable `name` in the current
+    lexical scope. Will raise a `NameError` if none exists.
 
   These recursion invariants are enforced by the framework, and should be
   relied on when designing new transformations that depend on variable

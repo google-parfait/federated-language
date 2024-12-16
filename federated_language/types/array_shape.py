@@ -83,11 +83,11 @@ def is_compatible_with(target: ArrayShape, other: ArrayShape) -> bool:
 
   * `None` is compatible with all shapes.
   * `(None, None)` is compatible with all two-dimensional shapes, and also
-  `None`.
+    `None`.
   * `(2, None)` is compatible with all two-dimensional shapes with size 2 in the
-  0th dimension, and also `(None, None)` and `None`.
+    0th dimension, and also `(None, None)` and `None`.
   * `(2, 3) is compatible with itself, and also `(32, None)`, `(None, 3]),
-  `(None, None)`, and `None`.
+    `(None, None)`, and `None`.
 
   Args:
     target: A `federated_language.types.ArrayShape`.

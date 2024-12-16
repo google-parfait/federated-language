@@ -244,9 +244,10 @@ def _wrap(
 
 def _is_function(obj):
   # TFF supports passing type specifications (i.e. objects that can be turned
-  # into a `federated_language.Type`) as arguments to a computation decorator. In some cases
-  # those type specifications (e.g. np.int32) are a `type`, making them
-  # `Callable`, but they should not be treated as the function being decorated.
+  # into a `federated_language.Type`) as arguments to a computation decorator.
+  # In some cases those type specifications (e.g. np.int32) are a `type`, making
+  # them `Callable`, but they should not be treated as the function being
+  # decorated.
   if isinstance(obj, type):
     return False
   return isinstance(obj, Callable)
