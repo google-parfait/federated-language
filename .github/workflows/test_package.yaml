@@ -91,12 +91,7 @@ jobs:
         name: python-package-distributions
         path: dist/
 
-    - name: Install dependencies
-      run: |
-        pip install --upgrade pip
-
     - name: Test package
       run: |
-        package="$(ls "${{ github.workspace }}/dist/"*".whl" | head -n1)"
-        pip install --upgrade "${package}"
+        pip install --upgrade "dist/"*".whl"
         python -I -c "import federated_language; print(federated_language.__version__)"

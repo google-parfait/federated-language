@@ -45,7 +45,7 @@ jobs:
         name: python-package-distributions
         path: dist/
 
-    - name: Publish
+    - name: Publish package
       uses: pypa/gh-action-pypi-publish@v1.12.3
 
   release-to-github:
@@ -55,37 +55,32 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: write  # Required for creating GitHub Releases.
-      id-token: write  # Requried for sigstore.
     steps:
 
-    - name: Download package
-      uses: actions/download-artifact@v4.1.8
-      with:
-        name: python-package-distributions
-        path: dist/
+    - name: Download archive
+      run: |
+          tag="${{ github.ref_name }}"
+          version="${tag#v}"
+          curl \
+            --location \
+            --create-dirs \
+            --output "federated-language-${version}.#1" \
+            "https://github.com/google-parfait/federated-language/archive/refs/tags/${tag}.{tar.gz,zip}"
 
-    - name: gh-action-sigstore-python
-      uses: sigstore/gh-action-sigstore-python@v3.0.0
-      with:
-        inputs: |
-          ./dist/*.tar.gz
-          ./dist/*.whl
-
-    - name: Create GitHub Release
+    - name: Create release
       env:
         GITHUB_TOKEN: ${{ github.token }}
       run: |
         gh release create \
-            '${{ github.ref_name }}' \
+            "${{ github.ref_name }}" \
             --generate-notes \
-            --repo '${{ github.repository }}' \
-            --draft
+            --repo "${{ github.repository }}"
 
-    - name: Upload artifacts to GitHub Release
+    - name: Upload release assets
       env:
         GITHUB_TOKEN: ${{ github.token }}
       run: |
         gh release upload \
-            '${{ github.ref_name }}' \
-            dist/** \
-            --repo '${{ github.repository }}'
+            "${{ github.ref_name }}" \
+            federated-language-** \
+            --repo "${{ github.repository }}"
