@@ -31,7 +31,7 @@ jobs:
     name: Publish to PyPI
     needs: [test-package]
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     environment:
       name: pypi
       url: https://pypi.org/p/federated-language
@@ -52,7 +52,7 @@ jobs:
     name: Release to GitHub
     needs: [publish-to-pypi]
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     permissions:
       contents: write  # Required for creating GitHub Releases.
       id-token: write  # Requried for sigstore.

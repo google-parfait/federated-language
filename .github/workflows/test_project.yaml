@@ -21,6 +21,10 @@ on:  # yamllint disable-line rule:truthy
     branches:
       - main
 
+  # continuous
+  schedule:
+    - cron: '20 10 * * *'  # Every day at 10:20 UTC.
+
   # manual
   workflow_dispatch:
 
@@ -33,7 +37,7 @@ jobs:
   test-project:
     name: Linux PY ${{ matrix.python-version }}
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:

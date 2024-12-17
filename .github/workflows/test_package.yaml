@@ -21,11 +21,15 @@ on:  # yamllint disable-line rule:truthy
     branches:
       - main
 
+  # continuous
+  schedule:
+    - cron: '20 10 * * *'  # Every day at 10:20 UTC.
+
+  # workflow
+  workflow_call:
+
   # manual
   workflow_dispatch:
-
-  # other
-  workflow_call:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
@@ -36,7 +40,7 @@ jobs:
   build-package:
     name: Build Package
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
 
     - name: Checkout repository
@@ -69,7 +73,7 @@ jobs:
     name: Test Package
     needs: [build-package]
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
 
     - name: Checkout repository
