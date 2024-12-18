@@ -34,32 +34,65 @@ concurrency:
 
 jobs:
 
-  test-project:
-    name: Linux PY ${{ matrix.python-version }}
+  test-versions:
+    name: Test Versions
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.9", "3.10", "3.11"]
     steps:
 
     - name: Checkout repository
-      uses: actions/checkout@v4.2.2
+      uses: actions/checkout@v4.1.7
 
-    - name: Setup Bazel
-      uses: bazel-contrib/setup-bazel@0.9.1
-      with:
-        bazelisk-cache: true
-        disk-cache: ${{ github.workflow }}
-        repository-cache: true
-
-    - name: Setup Python
-      uses: actions/setup-python@v5.3.0
-      with:
-        python-version: ${{ matrix.python-version }}
-
-    - name: Test project
+    - name: Check version
       run: |
-        bazelisk test //federated_language/... \
-            --@rules_python//python/config_settings:python_version="${{ matrix.python-version }}"
+        tag="${{ github.ref_name }}"
+        tag="v0.1.0"
+        version="${tag#v}"
+        echo "${version}"
+
+        grep --quiet \
+            "__version__ = '${version}'" \
+            "federated_language/version.py" \
+            || exit 1
+
+        sed --quiet \
+            '/module(/,/^)$/p' \
+            "MODULE.bazel" \
+            | grep --quiet \
+            "^    version = \"${version}\"," \
+            || exit 1
+
+
+
+
+
+
+  # test-project:
+  #   name: Linux PY ${{ matrix.python-version }}
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 10
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       python-version: ["3.9", "3.10", "3.11"]
+  #   steps:
+
+  #   - name: Checkout repository
+  #     uses: actions/checkout@v4.2.2
+
+  #   - name: Setup Bazel
+  #     uses: bazel-contrib/setup-bazel@0.9.1
+  #     with:
+  #       bazelisk-cache: true
+  #       disk-cache: ${{ github.workflow }}
+  #       repository-cache: true
+
+  #   - name: Setup Python
+  #     uses: actions/setup-python@v5.3.0
+  #     with:
+  #       python-version: ${{ matrix.python-version }}
+
+  #   - name: Test project
+  #     run: |
+  #       bazelisk test //federated_language/... \
+  #           --@rules_python//python/config_settings:python_version="${{ matrix.python-version }}"
