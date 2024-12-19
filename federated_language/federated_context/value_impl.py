@@ -269,7 +269,7 @@ def to_value(
     TFF functions.
 
   * Placement literals (`federated_language.CLIENTS`,
-   `federated_language.SERVER`), mapped to values of the TFF placement type.
+    `federated_language.SERVER`), mapped to values of the TFF placement type.
 
   This function is also invoked when attempting to execute a TFF computation.
   All arguments supplied in the invocation are converted into TFF values prior
