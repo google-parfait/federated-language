@@ -85,13 +85,22 @@ jobs:
         python-version: "3.11"
         cache: "pip"
 
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip --version
+
     - name: Download package
       uses: actions/download-artifact@v4.1.8
       with:
         name: python-package-distributions
         path: dist/
 
-    - name: Test package
+    - name: Install package
       run: |
         pip install --upgrade "dist/"*".whl"
+        pip freeze
+
+    - name: Test package
+      run: |
         python -I -c "import federated_language; print(federated_language.__version__)"
