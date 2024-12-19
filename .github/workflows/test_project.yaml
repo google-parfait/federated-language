@@ -58,6 +58,7 @@ jobs:
       uses: actions/setup-python@v5.3.0
       with:
         python-version: ${{ matrix.python-version }}
+        cache: "pip"
 
     - name: Test project
       run: |
