@@ -20,7 +20,6 @@ from federated_language.context_stack import context_stack_base
 from federated_language.proto import computation_pb2
 from federated_language.types import computation_types
 from federated_language.types import type_conversions
-from federated_language.types import type_serialization
 import numpy as np
 
 
@@ -60,9 +59,7 @@ class PolymorphicComputationTest(absltest.TestCase):
         self._name = name
         self._unpack = unpack
         type_signature = computation_types.FunctionType(parameter_type, np.str_)
-        test_proto = computation_pb2.Computation(
-            type=type_serialization.serialize_type(type_signature)
-        )
+        test_proto = computation_pb2.Computation(type=type_signature.to_proto())
         super().__init__(
             computation_proto=test_proto,
             context_stack=context_stack,

@@ -66,6 +66,8 @@ py_library(
         ":placements",
         "//federated_language/common_libs:py_typecheck",
         "//federated_language/common_libs:structure",
+        "//federated_language/proto:array_py_pb2",
+        "//federated_language/proto:computation_py_pb2",
         "@pypi//attrs",
         "@pypi//numpy",
         "@pypi//typing_extensions",
@@ -94,6 +96,8 @@ py_test(
         ":placements",
         "//federated_language/common_libs:golden",
         "//federated_language/common_libs:structure",
+        "//federated_language/proto:computation_py_pb2",
+        "//federated_language/proto:data_type_py_pb2",
         "@pypi//absl_py",
         "@pypi//attrs",
         "@pypi//numpy",
@@ -220,18 +224,13 @@ py_library(
     name = "type_serialization",
     srcs = ["type_serialization.py"],
     deps = [
-        ":array_shape",
         ":computation_types",
-        ":dtype_utils",
-        ":placements",
-        "//federated_language/proto:array_py_pb2",
         "//federated_language/proto:computation_py_pb2",
     ],
 )
 
 py_test(
     name = "type_serialization_test",
-    size = "small",
     srcs = ["type_serialization_test.py"],
     deps = [
         ":array_shape",

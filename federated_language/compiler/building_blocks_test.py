@@ -25,7 +25,6 @@ from federated_language.proto import computation_pb2
 from federated_language.proto import data_type_pb2
 from federated_language.types import computation_types
 from federated_language.types import placements
-from federated_language.types import type_serialization
 import ml_dtypes
 import numpy as np
 import tree
@@ -55,7 +54,7 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
     self.assertEqual(x.compact_representation(), 'foo')
     x_proto = x.proto
     self.assertEqual(
-        type_serialization.deserialize_type(x_proto.type), x.type_signature
+        computation_types.Type.from_proto(x_proto.type), x.type_signature
     )
     self.assertEqual(x_proto.WhichOneof('computation'), 'reference')
     self.assertEqual(x_proto.reference.name, x.name)
@@ -109,7 +108,7 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
       _ = building_blocks.Selection(x, index=-1)
     y_proto = y.proto
     self.assertEqual(
-        type_serialization.deserialize_type(y_proto.type), y.type_signature
+        computation_types.Type.from_proto(y_proto.type), y.type_signature
     )
     self.assertEqual(y_proto.WhichOneof('computation'), 'selection')
     self.assertEqual(str(y_proto.selection.source), str(x.proto))
@@ -151,7 +150,7 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
     )
     z_proto = z.proto
     self.assertEqual(
-        type_serialization.deserialize_type(z_proto.type), z.type_signature
+        computation_types.Type.from_proto(z_proto.type), z.type_signature
     )
     self.assertEqual(z_proto.WhichOneof('computation'), 'struct')
     self.assertEqual([e.name for e in z_proto.struct.element], ['', 'y'])
@@ -199,7 +198,7 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
       building_blocks.Call(x, w)
     z_proto = z.proto
     self.assertEqual(
-        type_serialization.deserialize_type(z_proto.type), z.type_signature
+        computation_types.Type.from_proto(z_proto.type), z.type_signature
     )
     self.assertEqual(z_proto.WhichOneof('computation'), 'call')
     self.assertEqual(str(z_proto.call.function), str(x.proto))
@@ -256,7 +255,7 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
     self.assertEqual(x.compact_representation(), '(arg -> arg.f(arg.f(arg.x)))')
     x_proto = x.proto
     self.assertEqual(
-        type_serialization.deserialize_type(x_proto.type), x.type_signature
+        computation_types.Type.from_proto(x_proto.type), x.type_signature
     )
     self.assertEqual(x_proto.WhichOneof('computation'), 'lambda')
     self.assertEqual(getattr(x_proto, 'lambda').parameter_name, arg_name)
@@ -302,7 +301,7 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
     self.assertEqual(x.compact_representation(), '(let x=arg,y=x[0] in y)')
     x_proto = x.proto
     self.assertEqual(
-        type_serialization.deserialize_type(x_proto.type), x.type_signature
+        computation_types.Type.from_proto(x_proto.type), x.type_signature
     )
     self.assertEqual(x_proto.WhichOneof('computation'), 'block')
     self.assertEqual(str(x_proto.block.result), str(x.result.proto))
@@ -335,7 +334,7 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
     self.assertEqual(x.compact_representation(), 'add_one')
     x_proto = x.proto
     self.assertEqual(
-        type_serialization.deserialize_type(x_proto.type), x.type_signature
+        computation_types.Type.from_proto(x_proto.type), x.type_signature
     )
     self.assertEqual(x_proto.WhichOneof('computation'), 'intrinsic')
     self.assertEqual(x_proto.intrinsic.uri, x.uri)
@@ -356,7 +355,7 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
     self.assertEqual(x.uri, 'generic_plus')
     self.assertEqual(x.compact_representation(), 'generic_plus')
     x_proto = x.proto
-    deserialized_type = type_serialization.deserialize_type(x_proto.type)
+    deserialized_type = computation_types.Type.from_proto(x_proto.type)
     x.type_signature.check_assignable_from(deserialized_type)
     self.assertEqual(x_proto.WhichOneof('computation'), 'intrinsic')
     self.assertEqual(x_proto.intrinsic.uri, x.uri)
@@ -404,7 +403,7 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
     )
     concrete_federated_map_proto = concrete_federated_map.proto
     self.assertEqual(
-        type_serialization.deserialize_type(concrete_federated_map_proto.type),
+        computation_types.Type.from_proto(concrete_federated_map_proto.type),
         concrete_federated_map.type_signature,
     )
     self.assertEqual(
@@ -438,7 +437,7 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
     )
     x_proto = x.proto
     self.assertEqual(
-        type_serialization.deserialize_type(x_proto.type), x.type_signature
+        computation_types.Type.from_proto(x_proto.type), x.type_signature
     )
     self.assertEqual(x_proto.WhichOneof('computation'), 'data')
     self.assertEqual(x_proto.data.content, x.content)
@@ -494,7 +493,7 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
     self.assertEqual(x.compact_representation(), 'CLIENTS')
     x_proto = x.proto
     self.assertEqual(
-        type_serialization.deserialize_type(x_proto.type), x.type_signature
+        computation_types.Type.from_proto(x_proto.type), x.type_signature
     )
     self.assertEqual(x_proto.WhichOneof('computation'), 'placement')
     self.assertEqual(x_proto.placement.uri, x.uri)

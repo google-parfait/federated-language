@@ -185,7 +185,6 @@ py_library(
         "//federated_language/common_libs:serializable",
         "//federated_language/proto:computation_py_pb2",
         "//federated_language/types:computation_types",
-        "//federated_language/types:type_serialization",
     ],
 )
 

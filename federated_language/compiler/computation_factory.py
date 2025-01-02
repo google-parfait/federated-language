@@ -16,7 +16,6 @@
 from federated_language.proto import computation_pb2
 from federated_language.types import computation_types
 from federated_language.types import type_factory
-from federated_language.types import type_serialization
 
 
 def create_lambda_empty_struct() -> computation_pb2.Computation:
@@ -32,7 +31,7 @@ def create_lambda_empty_struct() -> computation_pb2.Computation:
   result_type = computation_types.StructType([])
   type_signature = computation_types.FunctionType(None, result_type)
   result = computation_pb2.Computation(
-      type=type_serialization.serialize_type(result_type),
+      type=result_type.to_proto(),
       struct=computation_pb2.Struct(element=[]),
   )
   fn = computation_pb2.Lambda(parameter_name=None, result=result)
@@ -41,7 +40,7 @@ def create_lambda_empty_struct() -> computation_pb2.Computation:
   # `computation_pb2.Computation`.
   # https://developers.google.com/protocol-buffers/docs/reference/python-generated#keyword-conflicts
   return computation_pb2.Computation(
-      type=type_serialization.serialize_type(type_signature), **{'lambda': fn}
+      type=type_signature.to_proto(), **{'lambda': fn}
   )  # pytype: disable=wrong-keyword-args
 
 
@@ -62,7 +61,7 @@ def create_lambda_identity(
   """
   type_signature = type_factory.unary_op(type_spec)
   result = computation_pb2.Computation(
-      type=type_serialization.serialize_type(type_spec),
+      type=type_spec.to_proto(),
       reference=computation_pb2.Reference(name='a'),
   )
   fn = computation_pb2.Lambda(parameter_name='a', result=result)
@@ -71,5 +70,5 @@ def create_lambda_identity(
   # `computation_pb2.Computation`.
   # https://developers.google.com/protocol-buffers/docs/reference/python-generated#keyword-conflicts
   return computation_pb2.Computation(
-      type=type_serialization.serialize_type(type_signature), **{'lambda': fn}
+      type=type_signature.to_proto(), **{'lambda': fn}
   )  # pytype: disable=wrong-keyword-args

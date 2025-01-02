@@ -169,7 +169,6 @@ py_library(
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
         "//federated_language/types:type_analysis",
-        "//federated_language/types:type_serialization",
         "//federated_language/types:typed_object",
         "@protobuf//:protobuf_python",
         "@pypi//numpy",
@@ -192,7 +191,6 @@ py_test(
         "//federated_language/proto:data_type_py_pb2",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
-        "//federated_language/types:type_serialization",
         "@protobuf//:protobuf_python",
         "@pypi//absl_py",
         "@pypi//dm_tree",
@@ -208,7 +206,6 @@ py_library(
         "//federated_language/proto:computation_py_pb2",
         "//federated_language/types:computation_types",
         "//federated_language/types:type_factory",
-        "//federated_language/types:type_serialization",
     ],
 )
 
@@ -220,7 +217,6 @@ py_test(
         "//federated_language/proto:computation_py_pb2",
         "//federated_language/types:computation_types",
         "//federated_language/types:type_factory",
-        "//federated_language/types:type_serialization",
         "@pypi//absl_py",
         "@pypi//numpy",
     ],

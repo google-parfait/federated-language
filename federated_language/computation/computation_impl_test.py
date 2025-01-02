@@ -18,7 +18,6 @@ from federated_language.computation import computation_impl
 from federated_language.context_stack import context_stack_impl
 from federated_language.proto import computation_pb2
 from federated_language.types import computation_types
-from federated_language.types import type_serialization
 from federated_language.types import type_test_utils
 import numpy as np
 
@@ -31,9 +30,9 @@ class ConcreteComputationTest(absltest.TestCase):
     # type are well-formed.
     computation_impl.ConcreteComputation(
         computation_proto=computation_pb2.Computation(**{
-            'type': type_serialization.serialize_type(
-                computation_types.FunctionType(np.int32, np.int32)
-            ),
+            'type': computation_types.FunctionType(
+                np.int32, np.int32
+            ).to_proto(),
             'intrinsic': computation_pb2.Intrinsic(uri='whatever'),
         }),
         context_stack=context_stack_impl.context_stack,
@@ -60,7 +59,7 @@ class ConcreteComputationTest(absltest.TestCase):
     )
     original_comp = computation_impl.ConcreteComputation(
         computation_proto=computation_pb2.Computation(**{
-            'type': type_serialization.serialize_type(struct_return_type),
+            'type': struct_return_type.to_proto(),
             'intrinsic': computation_pb2.Intrinsic(uri='whatever'),
         }),
         context_stack=context_stack_impl.context_stack,
@@ -81,7 +80,7 @@ class ConcreteComputationTest(absltest.TestCase):
     int_return_type = computation_types.FunctionType(np.int32, np.int32)
     original_comp = computation_impl.ConcreteComputation(
         computation_proto=computation_pb2.Computation(**{
-            'type': type_serialization.serialize_type(int_return_type),
+            'type': int_return_type.to_proto(),
             'intrinsic': computation_pb2.Intrinsic(uri='whatever'),
         }),
         context_stack=context_stack_impl.context_stack,

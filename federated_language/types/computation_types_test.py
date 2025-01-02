@@ -21,6 +21,8 @@ from absl.testing import parameterized
 import attrs
 from federated_language.common_libs import golden
 from federated_language.common_libs import structure
+from federated_language.proto import computation_pb2
+from federated_language.proto import data_type_pb2
 from federated_language.types import computation_types
 from federated_language.types import placements
 import numpy as np
@@ -162,6 +164,45 @@ class TensorTypeTest(parameterized.TestCase):
     type_spec = computation_types.TensorType(np.int32)
     self.assertEqual(type_spec.shape, ())
 
+  def test_from_proto_returns_type(self):
+    tensor_type_pb = computation_pb2.TensorType(
+        dtype=data_type_pb2.DataType.DT_INT32,
+        dims=[2, 3],
+        unknown_rank=False,
+    )
+    type_pb = computation_pb2.Type(tensor=tensor_type_pb)
+
+    actual_type = computation_types.TensorType.from_proto(type_pb)
+
+    expected_type = computation_types.TensorType(np.int32, [2, 3])
+    self.assertEqual(actual_type, expected_type)
+
+  def test_from_proto_raises_value_error_with_missing_field(self):
+    type_pb = computation_pb2.Type()
+    with self.assertRaises(ValueError):
+      computation_types.TensorType.from_proto(type_pb)
+
+  def test_to_proto_returns_protobuf(self):
+    type_spec = computation_types.TensorType(np.int32, [2, 3])
+
+    actual_pb = type_spec.to_proto()
+
+    tensor_type_pb = computation_pb2.TensorType(
+        dtype=data_type_pb2.DataType.DT_INT32,
+        dims=[2, 3],
+        unknown_rank=False,
+    )
+    expected_pb = computation_pb2.Type(tensor=tensor_type_pb)
+    self.assertEqual(actual_pb, expected_pb)
+
+  def test_to_proto_returns_protobuf_cached(self):
+    type_spec = computation_types.TensorType(np.int32, [2, 3])
+
+    proto_1 = type_spec.to_proto()
+    proto_2 = type_spec.to_proto()
+
+    self.assertIs(proto_1, proto_2)
+
   @parameterized.named_parameters(
       (
           'rank_unknown',
@@ -280,6 +321,141 @@ class StructTypeTest(parameterized.TestCase):
   def test_init_raises_value_error_with_reserved_name(self, name):
     with self.assertRaises(ValueError):
       computation_types.StructType([(name, np.int32)])
+
+  @parameterized.named_parameters(
+      (
+          'unnamed',
+          computation_pb2.Type(
+              struct=computation_pb2.StructType(
+                  element=[
+                      computation_pb2.StructType.Element(
+                          value=computation_pb2.Type(
+                              tensor=computation_pb2.TensorType(
+                                  dtype=data_type_pb2.DataType.DT_INT32,
+                              )
+                          ),
+                      ),
+                      computation_pb2.StructType.Element(
+                          value=computation_pb2.Type(
+                              tensor=computation_pb2.TensorType(
+                                  dtype=data_type_pb2.DataType.DT_FLOAT,
+                              )
+                          ),
+                      ),
+                  ]
+              )
+          ),
+          computation_types.StructType([np.int32, np.float32]),
+      ),
+      (
+          'named',
+          computation_pb2.Type(
+              struct=computation_pb2.StructType(
+                  element=[
+                      computation_pb2.StructType.Element(
+                          name='a',
+                          value=computation_pb2.Type(
+                              tensor=computation_pb2.TensorType(
+                                  dtype=data_type_pb2.DataType.DT_INT32,
+                              )
+                          ),
+                      ),
+                      computation_pb2.StructType.Element(
+                          name='b',
+                          value=computation_pb2.Type(
+                              tensor=computation_pb2.TensorType(
+                                  dtype=data_type_pb2.DataType.DT_FLOAT,
+                              )
+                          ),
+                      ),
+                  ]
+              )
+          ),
+          computation_types.StructType([('a', np.int32), ('b', np.float32)]),
+      ),
+      (
+          'empty',
+          computation_pb2.Type(struct=computation_pb2.StructType(element=[])),
+          computation_types.StructType([]),
+      ),
+  )
+  def test_from_proto_returns_type(self, type_pb, expected_type):
+    actual_type = computation_types.StructType.from_proto(type_pb)
+    self.assertEqual(actual_type, expected_type)
+
+  def test_from_proto_raises_value_error_with_missing_field(self):
+    type_pb = computation_pb2.Type()
+    with self.assertRaises(ValueError):
+      computation_types.StructType.from_proto(type_pb)
+
+  @parameterized.named_parameters(
+      (
+          'unnamed',
+          computation_types.StructType([np.int32, np.float32]),
+          computation_pb2.Type(
+              struct=computation_pb2.StructType(
+                  element=[
+                      computation_pb2.StructType.Element(
+                          value=computation_pb2.Type(
+                              tensor=computation_pb2.TensorType(
+                                  dtype=data_type_pb2.DataType.DT_INT32,
+                              )
+                          ),
+                      ),
+                      computation_pb2.StructType.Element(
+                          value=computation_pb2.Type(
+                              tensor=computation_pb2.TensorType(
+                                  dtype=data_type_pb2.DataType.DT_FLOAT,
+                              )
+                          ),
+                      ),
+                  ]
+              )
+          ),
+      ),
+      (
+          'named',
+          computation_types.StructType([('a', np.int32), ('b', np.float32)]),
+          computation_pb2.Type(
+              struct=computation_pb2.StructType(
+                  element=[
+                      computation_pb2.StructType.Element(
+                          name='a',
+                          value=computation_pb2.Type(
+                              tensor=computation_pb2.TensorType(
+                                  dtype=data_type_pb2.DataType.DT_INT32,
+                              )
+                          ),
+                      ),
+                      computation_pb2.StructType.Element(
+                          name='b',
+                          value=computation_pb2.Type(
+                              tensor=computation_pb2.TensorType(
+                                  dtype=data_type_pb2.DataType.DT_FLOAT,
+                              )
+                          ),
+                      ),
+                  ]
+              )
+          ),
+      ),
+      (
+          'empty',
+          computation_types.StructType([]),
+          computation_pb2.Type(struct=computation_pb2.StructType(element=[])),
+      ),
+  )
+  def test_to_proto_returns_protobuf(self, type_spec, expected_pb):
+    actual_pb = type_spec.to_proto()
+    self.assertEqual(actual_pb, expected_pb)
+
+  def test_to_proto_returns_protobuf_cached(self):
+    type_spec = computation_types.StructType([np.int32, np.float32])
+
+    proto_1 = type_spec.to_proto()
+    proto_2 = type_spec.to_proto()
+
+    self.assertIs(proto_1, proto_2)
 
   @parameterized.named_parameters(
       (
@@ -423,6 +599,112 @@ class StructWithPythonTypeTest(parameterized.TestCase):
   def test_init_raises_value_error_with_reserved_name(self, name):
     with self.assertRaises(ValueError):
       computation_types.StructWithPythonType([(name, np.int32)], list)
+
+  @parameterized.named_parameters(
+      (
+          'list_unnamed',
+          computation_pb2.Type(
+              struct=computation_pb2.StructType(
+                  element=[
+                      computation_pb2.StructType.Element(
+                          value=computation_pb2.Type(
+                              tensor=computation_pb2.TensorType(
+                                  dtype=data_type_pb2.DataType.DT_INT32,
+                              )
+                          ),
+                      ),
+                      computation_pb2.StructType.Element(
+                          value=computation_pb2.Type(
+                              tensor=computation_pb2.TensorType(
+                                  dtype=data_type_pb2.DataType.DT_FLOAT,
+                              )
+                          ),
+                      ),
+                  ]
+              )
+          ),
+          list,
+          computation_types.StructWithPythonType([np.int32, np.float32], list),
+      ),
+      (
+          'list_named',
+          computation_pb2.Type(
+              struct=computation_pb2.StructType(
+                  element=[
+                      computation_pb2.StructType.Element(
+                          name='a',
+                          value=computation_pb2.Type(
+                              tensor=computation_pb2.TensorType(
+                                  dtype=data_type_pb2.DataType.DT_INT32,
+                              )
+                          ),
+                      ),
+                      computation_pb2.StructType.Element(
+                          name='b',
+                          value=computation_pb2.Type(
+                              tensor=computation_pb2.TensorType(
+                                  dtype=data_type_pb2.DataType.DT_FLOAT,
+                              )
+                          ),
+                      ),
+                  ]
+              )
+          ),
+          list,
+          computation_types.StructWithPythonType(
+              [('a', np.int32), ('b', np.float32)], list
+          ),
+      ),
+      (
+          'list_empty',
+          computation_pb2.Type(struct=computation_pb2.StructType(element=[])),
+          list,
+          computation_types.StructWithPythonType([], list),
+      ),
+      (
+          'dict',
+          computation_pb2.Type(
+              struct=computation_pb2.StructType(
+                  element=[
+                      computation_pb2.StructType.Element(
+                          name='a',
+                          value=computation_pb2.Type(
+                              tensor=computation_pb2.TensorType(
+                                  dtype=data_type_pb2.DataType.DT_INT32,
+                              )
+                          ),
+                      ),
+                      computation_pb2.StructType.Element(
+                          name='b',
+                          value=computation_pb2.Type(
+                              tensor=computation_pb2.TensorType(
+                                  dtype=data_type_pb2.DataType.DT_FLOAT,
+                              )
+                          ),
+                      ),
+                  ]
+              )
+          ),
+          dict,
+          computation_types.StructWithPythonType(
+              [('a', np.int32), ('b', np.float32)], dict
+          ),
+      ),
+  )
+  def test_from_proto_returns_type(
+      self, type_pb, container_type, expected_type
+  ):
+    actual_type = computation_types.StructWithPythonType.from_proto(
+        type_pb, container_type=container_type
+    )
+    self.assertEqual(actual_type, expected_type)
+
+  def test_from_proto_raises_value_error_with_missing_field(self):
+    type_pb = computation_pb2.Type()
+    with self.assertRaises(ValueError):
+      computation_types.StructWithPythonType.from_proto(
+          type_pb, container_type=list
+      )
 
   @parameterized.named_parameters(
       (
@@ -670,6 +952,45 @@ class SequenceTypeTest(parameterized.TestCase):
     with self.assertRaises(ValueError):
       computation_types.SequenceType(element)
 
+  def test_from_proto_returns_type(self):
+    tensor_type_pb = computation_pb2.TensorType(
+        dtype=data_type_pb2.DataType.DT_INT32,
+    )
+    element_type_pb = computation_pb2.Type(tensor=tensor_type_pb)
+    sequence_type_pb = computation_pb2.SequenceType(element=element_type_pb)
+    type_pb = computation_pb2.Type(sequence=sequence_type_pb)
+
+    actual_type = computation_types.SequenceType.from_proto(type_pb)
+
+    expected_type = computation_types.SequenceType(np.int32)
+    self.assertEqual(actual_type, expected_type)
+
+  def test_from_proto_raises_value_error_with_missing_field(self):
+    type_pb = computation_pb2.Type()
+    with self.assertRaises(ValueError):
+      computation_types.SequenceType.from_proto(type_pb)
+
+  def test_to_proto_returns_protobuf(self):
+    type_spec = computation_types.SequenceType(np.int32)
+
+    actual_pb = type_spec.to_proto()
+
+    tensor_type_pb = computation_pb2.TensorType(
+        dtype=data_type_pb2.DataType.DT_INT32,
+    )
+    element_type_pb = computation_pb2.Type(tensor=tensor_type_pb)
+    sequence_type_pb = computation_pb2.SequenceType(element=element_type_pb)
+    expected_pb = computation_pb2.Type(sequence=sequence_type_pb)
+    self.assertEqual(actual_pb, expected_pb)
+
+  def test_to_proto_returns_protobuf_cached(self):
+    type_spec = computation_types.SequenceType(np.int32)
+
+    proto_1 = type_spec.to_proto()
+    proto_2 = type_spec.to_proto()
+
+    self.assertIs(proto_1, proto_2)
+
   @parameterized.named_parameters(
       (
           'tensor_type',
@@ -752,6 +1073,95 @@ class FunctionTypeTest(parameterized.TestCase):
     type_spec_1 = computation_types.FunctionType(np.int32, np.int32)
     type_spec_2 = computation_types.FunctionType(np.int32, np.int32)
     self.assertIs(type_spec_1, type_spec_2)
+
+  @parameterized.named_parameters(
+      (
+          'with_parameter',
+          computation_pb2.Type(
+              function=computation_pb2.FunctionType(
+                  parameter=computation_pb2.Type(
+                      tensor=computation_pb2.TensorType(
+                          dtype=data_type_pb2.DataType.DT_INT32,
+                      )
+                  ),
+                  result=computation_pb2.Type(
+                      tensor=computation_pb2.TensorType(
+                          dtype=data_type_pb2.DataType.DT_FLOAT,
+                      )
+                  ),
+              )
+          ),
+          computation_types.FunctionType(np.int32, np.float32),
+      ),
+      (
+          'without_parameter',
+          computation_pb2.Type(
+              function=computation_pb2.FunctionType(
+                  parameter=None,
+                  result=computation_pb2.Type(
+                      tensor=computation_pb2.TensorType(
+                          dtype=data_type_pb2.DataType.DT_FLOAT,
+                      )
+                  ),
+              )
+          ),
+          computation_types.FunctionType(None, np.float32),
+      ),
+  )
+  def test_from_proto_returns_type(self, type_pb, expected_type):
+    actual_type = computation_types.FunctionType.from_proto(type_pb)
+    self.assertEqual(actual_type, expected_type)
+
+  def test_from_proto_raises_value_error_with_missing_field(self):
+    type_pb = computation_pb2.Type()
+    with self.assertRaises(ValueError):
+      computation_types.FunctionType.from_proto(type_pb)
+
+  @parameterized.named_parameters(
+      (
+          'with_parameter',
+          computation_types.FunctionType(np.int32, np.float32),
+          computation_pb2.Type(
+              function=computation_pb2.FunctionType(
+                  parameter=computation_pb2.Type(
+                      tensor=computation_pb2.TensorType(
+                          dtype=data_type_pb2.DataType.DT_INT32,
+                      )
+                  ),
+                  result=computation_pb2.Type(
+                      tensor=computation_pb2.TensorType(
+                          dtype=data_type_pb2.DataType.DT_FLOAT,
+                      )
+                  ),
+              )
+          ),
+      ),
+      (
+          'without_parameter',
+          computation_types.FunctionType(None, np.float32),
+          computation_pb2.Type(
+              function=computation_pb2.FunctionType(
+                  parameter=None,
+                  result=computation_pb2.Type(
+                      tensor=computation_pb2.TensorType(
+                          dtype=data_type_pb2.DataType.DT_FLOAT,
+                      )
+                  ),
+              )
+          ),
+      ),
+  )
+  def test_to_proto_returns_protobuf(self, type_spec, expected_pb):
+    actual_pb = type_spec.to_proto()
+    self.assertEqual(actual_pb, expected_pb)
+
+  def test_to_proto_returns_protobuf_cached(self):
+    type_spec = computation_types.FunctionType(np.int32, np.float32)
+
+    proto_1 = type_spec.to_proto()
+    proto_2 = type_spec.to_proto()
+
+    self.assertIs(proto_1, proto_2)
 
   @parameterized.named_parameters(
       (
@@ -841,6 +1251,37 @@ class AbstractTypeTest(parameterized.TestCase):
     type_spec_2 = computation_types.AbstractType('T')
     self.assertIs(type_spec_1, type_spec_2)
 
+  def test_from_proto_returns_type(self):
+    abstract_type_pb = computation_pb2.AbstractType(label='T')
+    type_pb = computation_pb2.Type(abstract=abstract_type_pb)
+
+    actual_type = computation_types.AbstractType.from_proto(type_pb)
+
+    expected_type = computation_types.AbstractType('T')
+    self.assertEqual(actual_type, expected_type)
+
+  def test_from_proto_raises_value_error_with_missing_field(self):
+    type_pb = computation_pb2.Type()
+    with self.assertRaises(ValueError):
+      computation_types.AbstractType.from_proto(type_pb)
+
+  def test_to_proto_returns_protobuf(self):
+    type_spec = computation_types.AbstractType('T')
+
+    actual_pb = type_spec.to_proto()
+
+    abstract_type_pb = computation_pb2.AbstractType(label='T')
+    expected_pb = computation_pb2.Type(abstract=abstract_type_pb)
+    self.assertEqual(actual_pb, expected_pb)
+
+  def test_to_proto_returns_protobuf_cached(self):
+    type_spec = computation_types.AbstractType('T')
+
+    proto_1 = type_spec.to_proto()
+    proto_2 = type_spec.to_proto()
+
+    self.assertIs(proto_1, proto_2)
+
   def test_str(self):
     type_spec = computation_types.AbstractType('T')
     actual_str = str(type_spec)
@@ -892,6 +1333,37 @@ class PlacementTypeTest(parameterized.TestCase):
     type_spec_1 = computation_types.PlacementType()
     type_spec_2 = computation_types.PlacementType()
     self.assertIs(type_spec_1, type_spec_2)
+
+  def test_from_proto_returns_type(self):
+    placement_type_pb = computation_pb2.PlacementType()
+    type_pb = computation_pb2.Type(placement=placement_type_pb)
+
+    actual_type = computation_types.PlacementType.from_proto(type_pb)
+
+    expected_type = computation_types.PlacementType()
+    self.assertEqual(actual_type, expected_type)
+
+  def test_from_proto_raises_value_error_with_missing_field(self):
+    type_pb = computation_pb2.Type()
+    with self.assertRaises(ValueError):
+      computation_types.PlacementType.from_proto(type_pb)
+
+  def test_to_proto_returns_protobuf(self):
+    type_spec = computation_types.PlacementType()
+
+    actual_pb = type_spec.to_proto()
+
+    placement_type_pb = computation_pb2.PlacementType()
+    expected_pb = computation_pb2.Type(placement=placement_type_pb)
+    self.assertEqual(actual_pb, expected_pb)
+
+  def test_to_proto_returns_protobuf_cached(self):
+    type_spec = computation_types.PlacementType()
+
+    proto_1 = type_spec.to_proto()
+    proto_2 = type_spec.to_proto()
+
+    self.assertIs(proto_1, proto_2)
 
   def test_str(self):
     type_spec = computation_types.PlacementType()
@@ -979,6 +1451,59 @@ class FederatedTypeTest(parameterized.TestCase):
   def test_init_raises_value_error(self, member):
     with self.assertRaises(ValueError):
       computation_types.FederatedType(member, placements.CLIENTS)
+
+  def test_from_proto_returns_type(self):
+    placement_pb = computation_pb2.Placement(uri=placements.CLIENTS.uri)
+    placement_spec_pb = computation_pb2.PlacementSpec(value=placement_pb)
+    tensor_type_pb = computation_pb2.TensorType(
+        dtype=data_type_pb2.DataType.DT_INT32
+    )
+    member_type_pb = computation_pb2.Type(tensor=tensor_type_pb)
+    federated_type_pb = computation_pb2.FederatedType(
+        placement=placement_spec_pb,
+        all_equal=False,
+        member=member_type_pb,
+    )
+    type_pb = computation_pb2.Type(federated=federated_type_pb)
+
+    actual_type = computation_types.FederatedType.from_proto(type_pb)
+
+    expected_type = computation_types.FederatedType(
+        np.int32, placements.CLIENTS
+    )
+    self.assertEqual(actual_type, expected_type)
+
+  def test_from_proto_raises_value_error_with_missing_field(self):
+    type_pb = computation_pb2.Type()
+    with self.assertRaises(ValueError):
+      computation_types.FederatedType.from_proto(type_pb)
+
+  def test_to_proto_returns_protobuf(self):
+    type_spec = computation_types.FederatedType(np.int32, placements.CLIENTS)
+
+    actual_pb = type_spec.to_proto()
+
+    placement_pb = computation_pb2.Placement(uri=placements.CLIENTS.uri)
+    placement_spec_pb = computation_pb2.PlacementSpec(value=placement_pb)
+    tensor_type_pb = computation_pb2.TensorType(
+        dtype=data_type_pb2.DataType.DT_INT32,
+    )
+    member_type_pb = computation_pb2.Type(tensor=tensor_type_pb)
+    federated_type_pb = computation_pb2.FederatedType(
+        placement=placement_spec_pb,
+        all_equal=False,
+        member=member_type_pb,
+    )
+    expected_pb = computation_pb2.Type(federated=federated_type_pb)
+    self.assertEqual(actual_pb, expected_pb)
+
+  def test_to_proto_returns_protobuf_cached(self):
+    type_spec = computation_types.FederatedType(np.int32, placements.CLIENTS)
+
+    proto_1 = type_spec.to_proto()
+    proto_2 = type_spec.to_proto()
+
+    self.assertIs(proto_1, proto_2)
 
   @parameterized.named_parameters(
       (

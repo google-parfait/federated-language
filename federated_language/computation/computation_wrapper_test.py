@@ -22,7 +22,6 @@ from federated_language.context_stack import context_base
 from federated_language.context_stack import context_stack_impl
 from federated_language.proto import computation_pb2
 from federated_language.types import computation_types
-from federated_language.types import type_serialization
 import numpy as np
 
 
@@ -37,9 +36,7 @@ class WrappedForTest(computation_impl.ConcreteComputation):
   def __init__(self, fn, parameter_type, unpack, name=None):
     del name  # Unused.
     fn_type = computation_types.FunctionType(parameter_type, np.str_)
-    test_proto = computation_pb2.Computation(
-        type=type_serialization.serialize_type(fn_type)
-    )
+    test_proto = computation_pb2.Computation(type=fn_type.to_proto())
     super().__init__(
         computation_proto=test_proto,
         context_stack=context_stack_impl.context_stack,

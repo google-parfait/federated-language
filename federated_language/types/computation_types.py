@@ -21,15 +21,17 @@ import difflib
 import enum
 from typing import Optional, TypeVar, Union
 import weakref
-
 import attrs
 from federated_language.common_libs import py_typecheck
 from federated_language.common_libs import structure
+from federated_language.proto import array_pb2
+from federated_language.proto import computation_pb2
 from federated_language.types import array_shape
 from federated_language.types import dtype_utils
 from federated_language.types import placements
 import numpy as np
 from typing_extensions import TypeGuard
+
 
 T = TypeVar('T')
 
@@ -130,8 +132,39 @@ class TypesNotIdenticalError(TypeError):
     self.second_type = second_type
 
 
+def _check_type_has_field(type_pb: computation_pb2.Type, field: str):
+  if not type_pb.HasField(field):
+    raise ValueError(
+        f'Expected `type_pb` to have the field "{field}", found {type_pb}.'
+    )
+
+
 class Type(metaclass=abc.ABCMeta):
   """An abstract interface for all classes that represent TFF types."""
+
+  @classmethod
+  def from_proto(cls, type_pb: computation_pb2.Type) -> 'Type':
+    """Returns a `Type` for the `type_pb`."""
+    type_oneof = type_pb.WhichOneof('type')
+    if type_oneof == 'federated':
+      return FederatedType.from_proto(type_pb)
+    elif type_oneof == 'function':
+      return FunctionType.from_proto(type_pb)
+    elif type_oneof == 'placement':
+      return PlacementType.from_proto(type_pb)
+    elif type_oneof == 'sequence':
+      return SequenceType.from_proto(type_pb)
+    elif type_oneof == 'struct':
+      return StructType.from_proto(type_pb)
+    elif type_oneof == 'tensor':
+      return TensorType.from_proto(type_pb)
+    else:
+      raise NotImplementedError(f'Unknown type oneof {type_oneof}.')
+
+  @abc.abstractmethod
+  def to_proto(self) -> computation_pb2.Type:
+    """Returns a `computation_pb2.Type` for this type."""
+    raise NotImplementedError
 
   def compact_representation(self) -> str:
     """Returns the compact string representation of this type."""
@@ -241,7 +274,6 @@ class _Intern(abc.ABCMeta):
     raise NotImplementedError
 
   def __call__(cls, *args, **kwargs):
-
     # Convert all `Iterator`s in both `args` and `kwargs` to `list`s so they can
     # be used in both `_hashable_from_init_args` and `__init__`.
     def _normalize(obj):
@@ -374,6 +406,33 @@ class TensorType(Type, metaclass=_Intern):
     if shape is not None:
       shape = tuple(shape)
     self._shape = shape
+    self._proto = None
+
+  @classmethod
+  def from_proto(cls, type_pb: computation_pb2.Type) -> 'TensorType':
+    """Returns a `TensorType` for the `type_pb`."""
+    _check_type_has_field(type_pb, 'tensor')
+
+    dtype = dtype_utils.from_proto(type_pb.tensor.dtype)
+    shape_pb = array_pb2.ArrayShape(
+        dim=type_pb.tensor.dims,
+        unknown_rank=type_pb.tensor.unknown_rank,
+    )
+    shape = array_shape.from_proto(shape_pb)
+    return TensorType(dtype, shape)
+
+  def to_proto(self) -> computation_pb2.Type:
+    """Returns a `computation_pb2.Type` for this type."""
+    if self._proto is None:
+      dtype_pb = dtype_utils.to_proto(self.dtype.type)
+      shape_pb = array_shape.to_proto(self.shape)
+      tensor_type_pb = computation_pb2.TensorType(
+          dtype=dtype_pb,
+          dims=shape_pb.dim,
+          unknown_rank=shape_pb.unknown_rank,
+      )
+      self._proto = computation_pb2.Type(tensor=tensor_type_pb)
+    return self._proto
 
   def children(self) -> Iterator[Type]:
     return iter(())
@@ -548,6 +607,34 @@ class StructType(structure.Struct, Type, metaclass=_Intern):
       elements = _to_named_types(elements)
     structure.Struct.__init__(self, elements)
 
+    self._proto = None
+
+  @classmethod
+  def from_proto(cls, type_pb: computation_pb2.Type) -> 'StructType':
+    """Returns a `StructType` for the `type_pb`."""
+    _check_type_has_field(type_pb, 'struct')
+
+    elements = []
+    for element_pb in type_pb.struct.element:
+      name = element_pb.name if element_pb.name else None
+      element_type = Type.from_proto(element_pb.value)
+      elements.append((name, element_type))
+    return StructType(elements)
+
+  def to_proto(self) -> computation_pb2.Type:
+    """Returns a `computation_pb2.Type` for this type."""
+    if self._proto is None:
+      element_pbs = []
+      for name, element in self.items():
+        element_pb = computation_pb2.StructType.Element(
+            name=name,
+            value=element.to_proto(),
+        )
+        element_pbs.append(element_pb)
+      struct_type_pb = computation_pb2.StructType(element=element_pbs)
+      self._proto = computation_pb2.Type(struct=struct_type_pb)
+    return self._proto
+
   def children(self) -> Iterator[Type]:
     return (element for _, element in self.items())
 
@@ -614,6 +701,14 @@ class StructWithPythonType(StructType, metaclass=_Intern):
     super().__init__(elements)
     self._container_type = container_type
 
+  @classmethod
+  def from_proto(
+      cls, type_pb: computation_pb2.Type, *, container_type: type[object]
+  ) -> 'StructWithPythonType':
+    """Returns a `StructWithPythonType` for the `type_pb`."""
+    struct_type = super().from_proto(type_pb)
+    return StructWithPythonType(struct_type.items(), container_type)
+
   @property
   def python_container(self) -> type[object]:
     return self._container_type
@@ -679,6 +774,7 @@ class SequenceType(Type, metaclass=_Intern):
 
     element = to_type(element)
     self._element = convert_struct_with_list_to_struct_with_tuple(element)
+    self._proto = None
 
     children_types = _get_contained_children_types(self)
     if (
@@ -692,6 +788,22 @@ class SequenceType(Type, metaclass=_Intern):
           ' `federated_language.FunctionType`s, or'
           f' `federated_language.SequenceType`s, found {self}.'
       )
+
+  @classmethod
+  def from_proto(cls, type_pb: computation_pb2.Type) -> 'SequenceType':
+    """Returns a `SequenceType` for the `type_pb`."""
+    _check_type_has_field(type_pb, 'sequence')
+
+    element_type = Type.from_proto(type_pb.sequence.element)
+    return SequenceType(element_type)
+
+  def to_proto(self) -> computation_pb2.Type:
+    """Returns a `computation_pb2.Type` for this type."""
+    if self._proto is None:
+      element_pb = self._element.to_proto()
+      sequence_type_pb = computation_pb2.SequenceType(element=element_pb)
+      self._proto = computation_pb2.Type(sequence=sequence_type_pb)
+    return self._proto
 
   def children(self) -> Iterator[Type]:
     yield self._element
@@ -747,6 +859,33 @@ class FunctionType(Type, metaclass=_Intern):
       parameter = to_type(parameter)
     self._parameter = parameter
     self._result = to_type(result)
+    self._proto = None
+
+  @classmethod
+  def from_proto(cls, type_pb: computation_pb2.Type) -> 'FunctionType':
+    """Returns a `FunctionType` for the `type_pb`."""
+    _check_type_has_field(type_pb, 'function')
+
+    if type_pb.function.HasField('parameter'):
+      parameter_type = Type.from_proto(type_pb.function.parameter)
+    else:
+      parameter_type = None
+    result_type = Type.from_proto(type_pb.function.result)
+    return FunctionType(parameter_type, result_type)
+
+  def to_proto(self) -> computation_pb2.Type:
+    """Returns a `computation_pb2.Type` for this type."""
+    if self._proto is None:
+      if self._parameter is not None:
+        parameter_pb = self._parameter.to_proto()
+      else:
+        parameter_pb = None
+      result_pb = self._result.to_proto()
+      function_type_pb = computation_pb2.FunctionType(
+          parameter=parameter_pb, result=result_pb
+      )
+      self._proto = computation_pb2.Type(function=function_type_pb)
+    return self._proto
 
   def children(self) -> Iterator[Type]:
     if self._parameter is not None:
@@ -805,6 +944,21 @@ class AbstractType(Type, metaclass=_Intern):
         within a computation's type signature refer to the same concrete type.
     """
     self._label = label
+    self._proto = None
+
+  @classmethod
+  def from_proto(cls, type_pb: computation_pb2.Type) -> 'AbstractType':
+    """Returns a `AbstractType` for the `type_pb`."""
+    _check_type_has_field(type_pb, 'abstract')
+
+    return AbstractType(type_pb.abstract.label)
+
+  def to_proto(self) -> computation_pb2.Type:
+    """Returns a `computation_pb2.Type` for this type."""
+    if self._proto is None:
+      abstract_type_pb = computation_pb2.AbstractType(label=self._label)
+      self._proto = computation_pb2.Type(abstract=abstract_type_pb)
+    return self._proto
 
   def children(self) -> Iterator[Type]:
     return iter(())
@@ -838,9 +992,26 @@ class PlacementType(Type, metaclass=_Intern):
   """
 
   @classmethod
-  def _hashable_from_init_args(cls, *args, **kwargs) -> Hashable:
-    del args, kwargs  # Unused.
+  def _hashable_from_init_args(cls) -> Hashable:
     return ()
+
+  def __init__(self):
+    """Constructs a new instance."""
+    self._proto = None
+
+  @classmethod
+  def from_proto(cls, type_pb: computation_pb2.Type) -> 'PlacementType':
+    """Returns a `PlacementType` for the `type_pb`."""
+    _check_type_has_field(type_pb, 'placement')
+
+    return PlacementType()
+
+  def to_proto(self) -> computation_pb2.Type:
+    """Returns a `computation_pb2.Type` for this type."""
+    if self._proto is None:
+      placement_type_pb = computation_pb2.PlacementType()
+      self._proto = computation_pb2.Type(placement=placement_type_pb)
+    return self._proto
 
   def children(self) -> Iterator[Type]:
     return iter(())
@@ -902,6 +1073,7 @@ class FederatedType(Type, metaclass=_Intern):
     if all_equal is None:
       all_equal = placement.default_all_equal
     self._all_equal = all_equal
+    self._proto = None
 
     children_types = _get_contained_children_types(self)
     if children_types.federated or children_types.function:
@@ -910,6 +1082,37 @@ class FederatedType(Type, metaclass=_Intern):
           ' `federated_language.FederatedType`s or'
           f' `federated_language.FunctionType`s, found {self}.'
       )
+
+  @classmethod
+  def from_proto(cls, type_pb: computation_pb2.Type) -> 'FederatedType':
+    """Returns a `FederatedType` for the `type_pb`."""
+    _check_type_has_field(type_pb, 'federated')
+
+    placement_oneof = type_pb.federated.placement.WhichOneof('placement')
+    if placement_oneof == 'value':
+      member_type = Type.from_proto(type_pb.federated.member)
+      placement = placements.uri_to_placement_literal(
+          type_pb.federated.placement.value.uri
+      )
+      return FederatedType(member_type, placement, type_pb.federated.all_equal)
+    else:
+      raise NotImplementedError(
+          f'Placement oneof {placement_oneof} is not implemented yet.'
+      )
+
+  def to_proto(self) -> computation_pb2.Type:
+    """Returns a `computation_pb2.Type` for this type."""
+    if self._proto is None:
+      placement_pb = computation_pb2.Placement(uri=self.placement.uri)
+      placement_spec_pb = computation_pb2.PlacementSpec(value=placement_pb)
+      member_pb = self._member.to_proto()
+      federated_type_pb = computation_pb2.FederatedType(
+          placement=placement_spec_pb,
+          all_equal=self.all_equal,
+          member=member_pb,
+      )
+      self._proto = computation_pb2.Type(federated=federated_type_pb)
+    return self._proto
 
   def children(self) -> Iterator[Type]:
     yield self._member
@@ -1061,11 +1264,11 @@ class _ContainedChildrenTypes:
 
 
 # Manual cache used rather than `cachetools.cached` due to incompatibility
-# with `WeakKeyDictionary`. We want to use a `WeakKeyDictionary` so that
+# with `WeakValueDictionary`. We want to use a `WeakValueDictionary` so that
 # cache entries are destroyed once the types they index no longer exist.
 _contained_children_types_cache: MutableMapping[
     Type, _ContainedChildrenTypes
-] = weakref.WeakKeyDictionary({})
+] = weakref.WeakValueDictionary({})
 
 
 def _clear_contained_children_types_cache():

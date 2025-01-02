@@ -23,7 +23,6 @@ from federated_language.context_stack import context_stack_base
 from federated_language.context_stack import context_stack_impl
 from federated_language.proto import computation_pb2
 from federated_language.types import computation_types
-from federated_language.types import type_serialization
 
 
 class ConcreteComputation(computation_base.Computation):
@@ -110,7 +109,7 @@ class ConcreteComputation(computation_base.Computation):
     py_typecheck.check_type(context_stack, context_stack_base.ContextStack)
     if computation_proto.type is None:
       raise ValueError('Expected `computation_proto.type` to not be `None`.')
-    type_spec = type_serialization.deserialize_type(computation_proto.type)
+    type_spec = computation_types.Type.from_proto(computation_proto.type)
 
     if annotated_type is not None:
       if type_spec is None or not type_spec.is_assignable_from(annotated_type):

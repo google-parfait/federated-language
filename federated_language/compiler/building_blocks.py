@@ -28,7 +28,6 @@ from federated_language.proto import computation_pb2
 from federated_language.types import computation_types
 from federated_language.types import placements
 from federated_language.types import type_analysis
-from federated_language.types import type_serialization
 from federated_language.types import typed_object
 import numpy as np
 
@@ -97,7 +96,7 @@ class ComputationBuildingBlock(typed_object.TypedObject, metaclass=abc.ABCMeta):
     deserializer = _deserializer_dict.get(computation_oneof)
     if deserializer is not None:
       deserialized = deserializer(computation_proto)
-      type_spec = type_serialization.deserialize_type(computation_proto.type)
+      type_spec = computation_types.Type.from_proto(computation_proto.type)
       if not deserialized.type_signature.is_equivalent_to(type_spec):
         raise ValueError(
             'The type {} derived from the computation structure does not '
@@ -190,7 +189,7 @@ class Reference(ComputationBuildingBlock):
     _check_computation_oneof(computation_proto, 'reference')
     return cls(
         str(computation_proto.reference.name),
-        type_serialization.deserialize_type(computation_proto.type),
+        computation_types.Type.from_proto(computation_proto.type),
     )
 
   def __init__(self, name: str, type_spec: object, context=None):
@@ -214,7 +213,7 @@ class Reference(ComputationBuildingBlock):
 
   def _proto(self):
     return computation_pb2.Computation(
-        type=type_serialization.serialize_type(self.type_signature),
+        type=self.type_signature.to_proto(),
         reference=computation_pb2.Reference(name=self._name),
     )
 
@@ -342,7 +341,7 @@ class Selection(ComputationBuildingBlock):
         source=self._source.proto, index=self.as_index()
     )
     return computation_pb2.Computation(
-        type=type_serialization.serialize_type(self.type_signature),
+        type=self.type_signature.to_proto(),
         selection=selection,
     )
 
@@ -487,7 +486,7 @@ class Struct(ComputationBuildingBlock, structure.Struct):
         element = computation_pb2.Struct.Element(value=v.proto)
       elements.append(element)
     return computation_pb2.Computation(
-        type=type_serialization.serialize_type(self.type_signature),
+        type=self.type_signature.to_proto(),
         struct=computation_pb2.Struct(element=elements),
     )
 
@@ -599,7 +598,7 @@ class Call(ComputationBuildingBlock):
     else:
       call = computation_pb2.Call(function=self._function.proto)
     return computation_pb2.Computation(
-        type=type_serialization.serialize_type(self.type_signature), call=call
+        type=self.type_signature.to_proto(), call=call
     )
 
   def children(self) -> Iterator[ComputationBuildingBlock]:
@@ -656,7 +655,7 @@ class Lambda(ComputationBuildingBlock):
     _check_computation_oneof(computation_proto, 'lambda')
     fn: computation_pb2.Lambda = getattr(computation_proto, 'lambda')
     if computation_proto.type.function.HasField('parameter'):
-      parameter_type = type_serialization.deserialize_type(
+      parameter_type = computation_types.Type.from_proto(
           computation_proto.type.function.parameter
       )
     else:
@@ -713,7 +712,7 @@ class Lambda(ComputationBuildingBlock):
     return self._type_signature
 
   def _proto(self) -> computation_pb2.Computation:
-    type_signature = type_serialization.serialize_type(self.type_signature)
+    type_signature = self.type_signature.to_proto()
     fn = computation_pb2.Lambda(
         parameter_name=self._parameter_name, result=self._result.proto
     )
@@ -863,7 +862,7 @@ class Block(ComputationBuildingBlock):
 
   def _proto(self) -> computation_pb2.Computation:
     return computation_pb2.Computation(
-        type=type_serialization.serialize_type(self.type_signature),
+        type=self.type_signature.to_proto(),
         block=computation_pb2.Block(**{
             'local': [
                 computation_pb2.Block.Local(name=k, value=v.proto)
@@ -923,7 +922,7 @@ class Intrinsic(ComputationBuildingBlock):
     _check_computation_oneof(computation_proto, 'intrinsic')
     return cls(
         computation_proto.intrinsic.uri,
-        type_serialization.deserialize_type(computation_proto.type),
+        computation_types.Type.from_proto(computation_proto.type),
     )
 
   def __init__(self, uri: str, type_signature: computation_types.Type):
@@ -949,7 +948,7 @@ class Intrinsic(ComputationBuildingBlock):
 
   def _proto(self) -> computation_pb2.Computation:
     return computation_pb2.Computation(
-        type=type_serialization.serialize_type(self.type_signature),
+        type=self.type_signature.to_proto(),
         intrinsic=computation_pb2.Intrinsic(uri=self._uri),
     )
 
@@ -1006,7 +1005,7 @@ class Data(ComputationBuildingBlock):
     _check_computation_oneof(computation_proto, 'data')
     return cls(
         computation_proto.data.content,
-        type_serialization.deserialize_type(computation_proto.type),
+        computation_types.Type.from_proto(computation_proto.type),
     )
 
   def __init__(self, content: any_pb2.Any, type_spec: object):
@@ -1029,7 +1028,7 @@ class Data(ComputationBuildingBlock):
 
   def _proto(self) -> computation_pb2.Computation:
     return computation_pb2.Computation(
-        type=type_serialization.serialize_type(self.type_signature),
+        type=self.type_signature.to_proto(),
         data=computation_pb2.Data(content=self._content),
     )
 
@@ -1097,7 +1096,7 @@ class CompiledComputation(ComputationBuildingBlock):
     if name is not None:
       py_typecheck.check_type(name, str)
     if type_signature is None:
-      type_signature = type_serialization.deserialize_type(proto.type)
+      type_signature = computation_types.Type.from_proto(proto.type)
     py_typecheck.check_type(type_signature, computation_types.Type)
     super().__init__(type_signature)
     self._proto_representation = proto
@@ -1182,7 +1181,7 @@ class Placement(ComputationBuildingBlock):
 
   def _proto(self) -> computation_pb2.Computation:
     return computation_pb2.Computation(
-        type=type_serialization.serialize_type(self.type_signature),
+        type=self.type_signature.to_proto(),
         placement=computation_pb2.Placement(uri=self._literal.uri),
     )
 
@@ -1259,7 +1258,7 @@ class Literal(ComputationBuildingBlock):
   ) -> 'Literal':
     _check_computation_oneof(computation_proto, 'literal')
     value = array.from_proto(computation_proto.literal.value)
-    type_signature = type_serialization.deserialize_type(computation_proto.type)
+    type_signature = computation_types.Type.from_proto(computation_proto.type)
     if not isinstance(type_signature, computation_types.TensorType):
       raise ValueError(
           'Expected `type_signature` to be a `federated_language.TensorType`,'
@@ -1268,7 +1267,7 @@ class Literal(ComputationBuildingBlock):
     return cls(value, type_signature)
 
   def _proto(self) -> computation_pb2.Computation:
-    type_pb = type_serialization.serialize_type(self.type_signature)
+    type_pb = self.type_signature.to_proto()
     value_pb = array.to_proto(
         self._value, dtype_hint=self.type_signature.dtype.type
     )

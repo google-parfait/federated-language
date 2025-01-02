@@ -17,7 +17,6 @@ from federated_language.compiler import computation_factory
 from federated_language.proto import computation_pb2
 from federated_language.types import computation_types
 from federated_language.types import type_factory
-from federated_language.types import type_serialization
 import numpy as np
 
 
@@ -27,7 +26,7 @@ class CreateLambdaEmptyTupleTest(absltest.TestCase):
     proto = computation_factory.create_lambda_empty_struct()
 
     self.assertIsInstance(proto, computation_pb2.Computation)
-    actual_type = type_serialization.deserialize_type(proto.type)
+    actual_type = computation_types.Type.from_proto(proto.type)
     expected_type = computation_types.FunctionType(
         None, computation_types.StructType(())
     )
@@ -42,7 +41,7 @@ class CreateLambdaIdentityTest(absltest.TestCase):
     proto = computation_factory.create_lambda_identity(type_signature)
 
     self.assertIsInstance(proto, computation_pb2.Computation)
-    actual_type = type_serialization.deserialize_type(proto.type)
+    actual_type = computation_types.Type.from_proto(proto.type)
     expected_type = type_factory.unary_op(type_signature)
     self.assertEqual(actual_type, expected_type)
 
@@ -52,7 +51,7 @@ class CreateLambdaIdentityTest(absltest.TestCase):
     proto = computation_factory.create_lambda_identity(type_signature)
 
     self.assertIsInstance(proto, computation_pb2.Computation)
-    actual_type = type_serialization.deserialize_type(proto.type)
+    actual_type = computation_types.Type.from_proto(proto.type)
     expected_type = type_factory.unary_op(type_signature)
     self.assertEqual(actual_type, expected_type)
 
@@ -64,7 +63,7 @@ class CreateLambdaIdentityTest(absltest.TestCase):
     proto = computation_factory.create_lambda_identity(type_signature)
 
     self.assertIsInstance(proto, computation_pb2.Computation)
-    actual_type = type_serialization.deserialize_type(proto.type)
+    actual_type = computation_types.Type.from_proto(proto.type)
     expected_type = type_factory.unary_op(type_signature)
     self.assertEqual(actual_type, expected_type)
 
@@ -74,7 +73,7 @@ class CreateLambdaIdentityTest(absltest.TestCase):
     proto = computation_factory.create_lambda_identity(type_signature)
 
     self.assertIsInstance(proto, computation_pb2.Computation)
-    actual_type = type_serialization.deserialize_type(proto.type)
+    actual_type = computation_types.Type.from_proto(proto.type)
     expected_type = type_factory.unary_op(type_signature)
     self.assertEqual(actual_type, expected_type)
 
