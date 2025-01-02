@@ -1,7 +1,5 @@
 # Federated Program Guide
 
-go/federated-program-guide <!-- copybara:strip(go link) -->
-
 This documentation is for anyone who is interested in authoring
 [federated program logic](https://github.com/google-parfait/federated-language/blob/main/docs/program/overview.md#program-logic)
 or a

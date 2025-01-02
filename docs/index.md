@@ -1,7 +1,5 @@
 # Federated Language
 
-go/federated-language <!-- copybara:strip(go link) -->
-
 [TOC]
 
 ## Federated Computation

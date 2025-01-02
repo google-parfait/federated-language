@@ -1,7 +1,5 @@
 # Federated Program
 
-go/federated-program <!-- copybara:strip(go link) -->
-
 This documentation is for anyone who is interested in a high-level overview of
 federated program concepts. It assumes knowledge of Federated Language,
 especially its type system.
