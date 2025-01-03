@@ -149,6 +149,15 @@ def to_structure_with_type(
   if not tree.is_nested(obj):
     return obj
 
+  print()
+  print('--- obj')
+  print(type(obj))
+  print(obj)
+  print('--- type_spec')
+  print(type(type_spec))
+  print(type_spec)
+  print(repr(type_spec))
+
   def _get_item(
       type_spec: computation_types.Type, key: Union[str, int]
   ) -> Union[computation_types.FederatedType, computation_types.StructType]:
@@ -165,6 +174,17 @@ def to_structure_with_type(
   def _to_structure(path: tuple[Union[str, int], ...], obj: object) -> object:
     if tree.is_nested(obj):
       container_type = functools.reduce(_get_item, path, type_spec)
+
+      print()
+      print('--- obj')
+      print(type(obj))
+      print(obj)
+      print('--- path')
+      print(path)
+      print('--- container_type')
+      print(container_type)
+      print(repr(container_type))
+
       if isinstance(container_type, computation_types.FederatedType):
         container_type = container_type.member
       if not isinstance(container_type, computation_types.StructType):
