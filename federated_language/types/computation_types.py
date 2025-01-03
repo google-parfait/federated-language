@@ -1159,50 +1159,6 @@ class FederatedType(Type, metaclass=_Intern):
 def to_type(obj: object) -> Type:
   """Converts the argument into an instance of `federated_language.Type`.
 
-  Examples of arguments convertible to tensor types:
-
-  ```python
-  np.int32
-  (np.int32, [10])
-  (np.int32, [None])
-  ```
-
-  Examples of arguments convertible to flat named tuple types:
-
-  ```python
-  [np.int32, np.bool]
-  (np.int32, np.bool)
-  [('a', np.int32), ('b', np.bool)]
-  ('a', np.int32)
-  collections.OrderedDict([('a', np.int32), ('b', np.bool)])
-  ```
-
-  Examples of arguments convertible to nested named tuple types:
-
-  ```python
-  (np.int32, (np.float32, np.bool))
-  (np.int32, (('x', np.float32), np.bool))
-  ((np.int32, [1]), (('x', (np.float32, [2])), (np.bool, [3])))
-  ```
-
-  `attr.s` class instances can also be used to describe TFF types by populating
-  the fields with the corresponding types:
-
-  ```python
-  @attr.s(auto_attribs=True)
-  class MyDataClass:
-    int_scalar
-    string_array
-
-  obj = MyDataClass(...)
-  type_spec = federated_language.types.to_type(obj)
-
-  @federated_language.tensorflow.computation(type_spec)
-  def work(my_data):
-    assert isinstance(my_data, MyDataClass)
-    ...
-  ```
-
   Args:
     obj: Either an instance of `federated_language.Type`, or an argument
       convertible to `federated_language.Type`.
