@@ -146,8 +146,17 @@ def to_structure_with_type(
     ValueError: If `obj` and `type_spec` do not match or a container does not
       have either all named or unnamed elements.
   """
+
+  print('--- obj')
+  print(obj)
+  print(type(obj))
+  print('--- type_spec')
+  print(type_spec)
+
   if not tree.is_nested(obj):
     return obj
+
+  print('--- is nested')
 
   def _get_item(
       type_spec: computation_types.Type, key: Union[str, int]
@@ -163,8 +172,19 @@ def to_structure_with_type(
     return type_spec[key]
 
   def _to_structure(path: tuple[Union[str, int], ...], obj: object) -> object:
+
+    print()
+    print('--- _to_structure')
+    print('--- obj')
+    print(obj)
+    print(type(obj))
+
     if tree.is_nested(obj):
+      print('--- is nested')
       container_type = functools.reduce(_get_item, path, type_spec)
+      print('--- container_type')
+      print(container_type)
+
       if isinstance(container_type, computation_types.FederatedType):
         container_type = container_type.member
       if not isinstance(container_type, computation_types.StructType):
