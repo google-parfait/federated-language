@@ -221,31 +221,6 @@ py_test(
 )
 
 py_library(
-    name = "type_serialization",
-    srcs = ["type_serialization.py"],
-    deps = [
-        ":computation_types",
-        "//federated_language/proto:computation_py_pb2",
-    ],
-)
-
-py_test(
-    name = "type_serialization_test",
-    srcs = ["type_serialization_test.py"],
-    deps = [
-        ":array_shape",
-        ":computation_types",
-        ":dtype_utils",
-        ":placements",
-        ":type_serialization",
-        "//federated_language/proto:computation_py_pb2",
-        "//federated_language/proto:data_type_py_pb2",
-        "@pypi//absl_py",
-        "@pypi//numpy",
-    ],
-)
-
-py_library(
     name = "type_test_utils",
     srcs = ["type_test_utils.py"],
     deps = [":computation_types"],
