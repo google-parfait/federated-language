@@ -156,7 +156,6 @@ from federated_language.types.placements import PlacementLiteral
 from federated_language.types.placements import uri_to_placement_literal
 from federated_language.types.type_analysis import check_concrete_instance_of
 from federated_language.types.type_analysis import check_is_structure_of_integers
-from federated_language.types.type_analysis import check_tensorflow_compatible_type
 from federated_language.types.type_analysis import contains as type_contains
 from federated_language.types.type_analysis import contains_federated_types
 from federated_language.types.type_analysis import contains_only as type_contains_only
@@ -168,7 +167,6 @@ from federated_language.types.type_analysis import is_single_integer_or_matches_
 from federated_language.types.type_analysis import is_structure_of_floats
 from federated_language.types.type_analysis import is_structure_of_integers
 from federated_language.types.type_analysis import is_structure_of_tensors
-from federated_language.types.type_analysis import is_tensorflow_compatible_type
 from federated_language.types.type_analysis import preorder_types
 from federated_language.types.type_conversions import infer_type
 from federated_language.types.type_conversions import to_structure_with_type

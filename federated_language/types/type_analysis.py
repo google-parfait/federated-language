@@ -107,24 +107,6 @@ def check_type(value: object, type_spec: computation_types.Type):
     )
 
 
-def is_tensorflow_compatible_type(type_spec):
-  """Checks `type_spec` against an explicit list of `tf_computation`."""
-  if type_spec is None:
-    return True
-
-  def _predicate(type_spec: computation_types.Type) -> bool:
-    return isinstance(
-        type_spec,
-        (
-            computation_types.SequenceType,
-            computation_types.StructType,
-            computation_types.TensorType,
-        ),
-    )
-
-  return contains_only(type_spec, _predicate)
-
-
 def is_structure_of_tensors(type_spec: computation_types.Type) -> bool:
   def _predicate(type_spec: computation_types.Type) -> bool:
     return isinstance(
@@ -136,14 +118,6 @@ def is_structure_of_tensors(type_spec: computation_types.Type) -> bool:
     )
 
   return contains_only(type_spec, _predicate)
-
-
-def check_tensorflow_compatible_type(type_spec):
-  if not is_tensorflow_compatible_type(type_spec):
-    raise TypeError(
-        'Expected type to be compatible with TensorFlow (i.e. tensor, '
-        'sequence, or tuple types), found {}.'.format(type_spec)
-    )
 
 
 def is_generic_op_compatible_type(type_spec):
