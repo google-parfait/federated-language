@@ -38,7 +38,7 @@ class ConcreteComputation(computation_base.Computation):
       cls, value: 'ConcreteComputation'
   ) -> computation_pb2.Computation:
     py_typecheck.check_type(value, cls)
-    return value._computation_proto  # pylint: disable=protected-access
+    return value._proto  # pylint: disable=protected-access
 
   @classmethod
   def with_type(
@@ -52,7 +52,7 @@ class ConcreteComputation(computation_base.Computation):
     value.type_signature.check_assignable_from(type_spec)
     # pylint: disable=protected-access
     return cls(
-        computation_proto=value._computation_proto,
+        computation_proto=value._proto,
         context_stack=value._context_stack,
         annotated_type=type_spec,
     )
@@ -75,13 +75,11 @@ class ConcreteComputation(computation_base.Computation):
   def to_building_block(self):
     # TODO: b/161560999 - currently destroys annotated type.
     # This should perhaps be fixed by adding `type_parameter` to `from_proto`.
-    return building_blocks.ComputationBuildingBlock.from_proto(
-        self._computation_proto
-    )
+    return building_blocks.ComputationBuildingBlock.from_proto(self._proto)
 
   def to_compiled_building_block(self):
     return building_blocks.CompiledComputation(
-        self._computation_proto, type_signature=self.type_signature
+        self._proto, type_signature=self.type_signature
     )
 
   def __init__(
@@ -128,14 +126,28 @@ class ConcreteComputation(computation_base.Computation):
 
     self._type_signature = type_spec
     self._context_stack = context_stack
-    self._computation_proto = computation_proto
+    self._proto = computation_proto
+
+  @classmethod
+  def from_proto(
+      cls, computation_pb: computation_pb2.Computation
+  ) -> 'ConcreteComputation':
+    """Returns a `ConcreteComputation` for the `computation_pb`."""
+    return ConcreteComputation(
+        computation_proto=computation_pb,
+        context_stack=context_stack_impl.context_stack,
+    )
+
+  def to_proto(self) -> computation_pb2.Computation:
+    """Returns a `computation_pb2.Computation` for this computation."""
+    return self._proto
 
   def __eq__(self, other: object) -> bool:
     if self is other:
       return True
     elif not isinstance(other, ConcreteComputation):
       return NotImplemented
-    return self._computation_proto == other._computation_proto
+    return self._proto == other._proto
 
   @property
   def type_signature(self) -> computation_types.FunctionType:
@@ -147,4 +159,4 @@ class ConcreteComputation(computation_base.Computation):
     return result
 
   def __hash__(self) -> int:
-    return hash(self._computation_proto.SerializeToString(deterministic=True))
+    return hash(self._proto.SerializeToString(deterministic=True))
