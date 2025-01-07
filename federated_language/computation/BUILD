@@ -75,33 +75,7 @@ py_test(
     ],
 )
 
-py_library(
-    name = "computation_serialization",
-    srcs = ["computation_serialization.py"],
-    deps = [
-        ":computation_base",
-        ":computation_impl",
-        "//federated_language/common_libs:py_typecheck",
-        "//federated_language/context_stack:context_stack_impl",
-        "//federated_language/proto:computation_py_pb2",
-    ],
-)
-
-py_test(
-    name = "computation_serialization_test",
-    size = "small",
-    srcs = ["computation_serialization_test.py"],
-    deps = [
-        ":computation_base",
-        ":computation_impl",
-        ":computation_serialization",
-        "//federated_language/compiler:computation_factory",
-        "//federated_language/context_stack:context_stack_impl",
-        "//federated_language/types:computation_types",
-        "@pypi//absl_py",
-        "@pypi//numpy",
-    ],
-)
+py_library(name = "computation_serialization")
 
 py_library(
     name = "computation_wrapper",

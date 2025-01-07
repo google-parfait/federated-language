@@ -38,7 +38,6 @@ py_library(
         "//federated_language/compiler:tree_analysis",
         "//federated_language/computation:computation_base",
         "//federated_language/computation:computation_impl",
-        "//federated_language/computation:computation_serialization",
         "//federated_language/computation:computation_wrapper",
         "//federated_language/computation:function_utils",
         "//federated_language/computation:polymorphic_computation",
