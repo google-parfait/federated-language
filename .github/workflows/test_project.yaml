@@ -34,8 +34,8 @@ concurrency:
 
 jobs:
 
-  test-project:
-    name: Linux PY ${{ matrix.python-version }}
+  test-python:
+    name: Test PY ${{ matrix.python-version }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
@@ -60,7 +60,27 @@ jobs:
         python-version: ${{ matrix.python-version }}
         cache: "pip"
 
-    - name: Test project
+    - name: Test python
       run: |
         bazelisk test //federated_language/... \
             --@rules_python//python/config_settings:python_version="${{ matrix.python-version }}"
+
+  test-requirements:
+    name: Test Requirements
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+
+    - name: Checkout repository
+      uses: actions/checkout@v4.2.2
+
+    - name: Setup Bazel
+      uses: bazel-contrib/setup-bazel@0.9.1
+      with:
+        bazelisk-cache: true
+        disk-cache: ${{ github.workflow }}
+        repository-cache: true
+
+    - name: Test requirements
+      run: |
+        bazelisk test //tools/...
