@@ -120,7 +120,6 @@ from federated_language.context_stack.context_base import AsyncContext
 from federated_language.context_stack.context_base import ContextError
 from federated_language.context_stack.context_base import SyncContext
 from federated_language.context_stack.context_stack_base import ContextStack
-from federated_language.context_stack.context_stack_impl import context_stack as global_context_stack
 from federated_language.context_stack.context_stack_test_utils import with_context
 from federated_language.context_stack.context_stack_test_utils import with_contexts
 from federated_language.context_stack.get_context_stack import get_context_stack
