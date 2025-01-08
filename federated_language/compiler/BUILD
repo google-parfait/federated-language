@@ -55,7 +55,8 @@ py_test(
         ":array",
         "//federated_language/proto:array_py_pb2",
         "//federated_language/proto:data_type_py_pb2",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
         "@pypi//ml_dtypes",
         "@pypi//numpy",
     ],
@@ -137,7 +138,8 @@ py_test(
         "//federated_language/types:placements",
         "//federated_language/types:type_analysis",
         "//federated_language/types:type_test_utils",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
         "@pypi//numpy",
     ],
 )
@@ -192,7 +194,8 @@ py_test(
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
         "@protobuf//:protobuf_python",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
         "@pypi//dm_tree",
         "@pypi//ml_dtypes",
         "@pypi//numpy",
@@ -217,7 +220,7 @@ py_test(
         "//federated_language/proto:computation_py_pb2",
         "//federated_language/types:computation_types",
         "//federated_language/types:type_factory",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
         "@pypi//numpy",
     ],
 )
@@ -240,7 +243,8 @@ py_test(
     srcs = ["intrinsic_defs_test.py"],
     deps = [
         ":intrinsic_defs",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
     ],
 )
 
@@ -267,7 +271,8 @@ py_test(
         "//federated_language/proto:computation_py_pb2",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
         "@pypi//numpy",
     ],
 )
@@ -298,7 +303,8 @@ py_test(
         ":tree_analysis",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
         "@pypi//numpy",
     ],
 )

@@ -62,7 +62,7 @@ py_test(
     deps = [
         ":async_execution_context",
         "//federated_language/executors:executors_errors",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
     ],
 )
 
@@ -82,7 +82,7 @@ py_test(
     deps = [
         ":compiler_pipeline",
         "//federated_language/computation:computation_base",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
     ],
 )
 

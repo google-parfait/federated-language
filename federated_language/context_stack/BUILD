@@ -63,7 +63,7 @@ py_test(
     deps = [
         ":context_stack_impl",
         ":context_stack_test_utils",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
     ],
 )
 
@@ -73,7 +73,7 @@ py_library(
     deps = [
         ":context_base",
         ":context_stack_impl",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:parameterized",
     ],
 )
 
@@ -83,7 +83,8 @@ py_test(
     deps = [
         ":context_stack_impl",
         ":context_stack_test_utils",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
     ],
 )
 
@@ -100,7 +101,7 @@ py_test(
     deps = [
         ":context_stack_impl",
         ":get_context_stack",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
     ],
 )
 
@@ -127,7 +128,7 @@ py_test(
         ":context_stack_impl",
         ":context_stack_test_utils",
         ":set_default_context",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
     ],
 )
 
