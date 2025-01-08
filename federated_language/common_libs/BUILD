@@ -37,7 +37,7 @@ py_library(
     name = "golden",
     testonly = True,
     srcs = ["golden.py"],
-    deps = ["@pypi//absl_py"],
+    deps = ["@pypi//absl_pyflags"],
 )
 
 py_test(
@@ -59,7 +59,8 @@ py_test(
     ],
     deps = [
         ":golden",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:flagsaver",
     ],
 )
 
@@ -78,7 +79,8 @@ py_test(
     srcs = ["py_typecheck_test.py"],
     deps = [
         ":py_typecheck",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
     ],
 )
 
@@ -96,7 +98,7 @@ py_test(
     srcs = ["retrying_test.py"],
     deps = [
         ":retrying",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
     ],
 )
 
@@ -121,7 +123,8 @@ py_test(
     srcs = ["structure_test.py"],
     deps = [
         ":structure",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
         "@pypi//attrs",
     ],
 )
@@ -131,7 +134,7 @@ py_library(
     srcs = ["tracing.py"],
     deps = [
         ":py_typecheck",
-        "@pypi//absl_py",
+        "@pypi//absl_pylogging",
     ],
 )
 
@@ -141,6 +144,7 @@ py_test(
     srcs = ["tracing_test.py"],
     deps = [
         ":tracing",
-        "@pypi//absl_py",
+        "@pypi//absl_pylogging",
+        "@pypi//absl_pytesting:absltest",
     ],
 )

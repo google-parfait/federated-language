@@ -51,7 +51,7 @@ py_test(
         "//federated_language/common_libs:structure",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
         "@pypi//numpy",
     ],
 )

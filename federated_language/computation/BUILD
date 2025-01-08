@@ -70,7 +70,7 @@ py_test(
         "//federated_language/proto:computation_py_pb2",
         "//federated_language/types:computation_types",
         "//federated_language/types:type_test_utils",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
         "@pypi//numpy",
     ],
 )
@@ -102,7 +102,7 @@ py_test(
         "//federated_language/context_stack:context_stack_impl",
         "//federated_language/proto:computation_py_pb2",
         "//federated_language/types:computation_types",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
         "@pypi//numpy",
     ],
 )
@@ -128,7 +128,8 @@ py_test(
         ":function_utils",
         "//federated_language/common_libs:structure",
         "//federated_language/types:computation_types",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
         "@pypi//numpy",
     ],
 )
@@ -154,7 +155,7 @@ py_test(
         "//federated_language/proto:computation_py_pb2",
         "//federated_language/types:computation_types",
         "//federated_language/types:type_conversions",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
         "@pypi//numpy",
     ],
 )

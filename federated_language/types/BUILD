@@ -53,7 +53,8 @@ py_test(
     deps = [
         ":array_shape",
         "//federated_language/proto:array_py_pb2",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
     ],
 )
 
@@ -98,7 +99,8 @@ py_test(
         "//federated_language/common_libs:structure",
         "//federated_language/proto:computation_py_pb2",
         "//federated_language/proto:data_type_py_pb2",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
         "@pypi//attrs",
         "@pypi//numpy",
     ],
@@ -119,7 +121,8 @@ py_test(
     srcs = ["dtype_utils_test.py"],
     deps = [
         ":dtype_utils",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
         "@pypi//ml_dtypes",
         "@pypi//numpy",
     ],
@@ -136,7 +139,7 @@ py_test(
     srcs = ["placements_test.py"],
     deps = [
         ":placements",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
     ],
 )
 
@@ -165,7 +168,8 @@ py_test(
         ":placements",
         ":type_analysis",
         "//federated_language/common_libs:structure",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
         "@pypi//ml_dtypes",
         "@pypi//numpy",
     ],
@@ -196,7 +200,8 @@ py_test(
         ":type_conversions",
         ":typed_object",
         "//federated_language/common_libs:structure",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
         "@pypi//attrs",
         "@pypi//numpy",
     ],
@@ -215,7 +220,7 @@ py_test(
     deps = [
         ":computation_types",
         ":type_factory",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
         "@pypi//numpy",
     ],
 )
@@ -243,7 +248,8 @@ py_test(
         ":computation_types",
         ":placements",
         ":type_transformations",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
         "@pypi//numpy",
     ],
 )

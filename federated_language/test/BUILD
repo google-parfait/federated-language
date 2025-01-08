@@ -47,6 +47,6 @@ py_test(
         "//federated_language/federated_context:federated_computation",
         "//federated_language/federated_context:intrinsics",
         "//federated_language/types:placements",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
     ],
 )

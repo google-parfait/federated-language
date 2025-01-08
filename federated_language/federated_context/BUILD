@@ -58,7 +58,7 @@ py_test(
         "//federated_language/context_stack:get_context_stack",
         "//federated_language/context_stack:runtime_error_context",
         "//federated_language/types:computation_types",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
         "@pypi//numpy",
     ],
 )
@@ -91,7 +91,7 @@ py_test(
         "//federated_language/context_stack:context_stack_impl",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
         "@pypi//numpy",
     ],
 )
@@ -121,7 +121,8 @@ py_test(
         "//federated_language/computation:function_utils",
         "//federated_language/context_stack:context_stack_impl",
         "//federated_language/types:computation_types",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
         "@pypi//numpy",
     ],
 )
@@ -162,7 +163,8 @@ py_test(
         "//federated_language/context_stack:context_stack_test_utils",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
         "@pypi//numpy",
     ],
 )
@@ -204,7 +206,8 @@ py_test(
         "//federated_language/context_stack:context_stack_impl",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
         "@pypi//attrs",
         "@pypi//numpy",
     ],
@@ -236,7 +239,8 @@ py_test(
         "//federated_language/context_stack:context_stack_impl",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
         "@pypi//numpy",
     ],
 )

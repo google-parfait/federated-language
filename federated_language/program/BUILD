@@ -72,7 +72,8 @@ py_test(
         "//federated_language/context_stack:context_stack_impl",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
         "@pypi//numpy",
     ],
 )
@@ -83,7 +84,7 @@ py_library(
     deps = [
         ":release_manager",
         ":value_reference",
-        "@pypi//absl_py",
+        "@pypi//absl_pylogging",
     ],
 )
 
@@ -93,7 +94,8 @@ py_test(
     deps = [
         ":logging_release_manager",
         ":program_test_utils",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
         "@pypi//dm_tree",
         "@pypi//numpy",
     ],
@@ -114,7 +116,8 @@ py_test(
     deps = [
         ":memory_release_manager",
         ":program_test_utils",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
         "@pypi//dm_tree",
         "@pypi//numpy",
     ],
@@ -135,7 +138,7 @@ py_test(
     srcs = ["program_state_manager_test.py"],
     deps = [
         ":program_state_manager",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
     ],
 )
 
@@ -172,7 +175,8 @@ py_test(
     deps = [
         ":program_test_utils",
         ":release_manager",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
         "@pypi//dm_tree",
         "@pypi//numpy",
     ],
@@ -195,7 +199,8 @@ py_test(
         ":program_test_utils",
         ":serialization_utils",
         "//federated_language/types:computation_types",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
         "@pypi//numpy",
     ],
 )
@@ -216,7 +221,8 @@ py_test(
     deps = [
         ":program_test_utils",
         ":structure_utils",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
         "@pypi//dm_tree",
         "@pypi//numpy",
     ],
@@ -239,7 +245,8 @@ py_test(
     deps = [
         ":program_test_utils",
         ":value_reference",
-        "@pypi//absl_py",
+        "@pypi//absl_pytesting:absltest",
+        "@pypi//absl_pytesting:parameterized",
         "@pypi//dm_tree",
         "@pypi//numpy",
     ],
