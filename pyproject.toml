@@ -37,8 +37,8 @@ dependencies = [
   'dm-tree==0.1.8',
   'ml_dtypes~=0.2.0',
   'numpy~=1.25',
-  'protobuf>=4.25.0,<=5.28.3',
-  'typing-extensions~=4.5.0',
+  'protobuf~=4.22',
+  'typing-extensions~=4.5',
 ]
 dynamic = ["version"]
 
