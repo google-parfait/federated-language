@@ -46,8 +46,7 @@ dynamic = ["version"]
 Homepage = "https://github.com/google-parfait/federated-language"
 Issues = "https://github.com/google-parfait/federated-language/issues"
 Releases = "https://github.com/google-parfait/federated-language/releases"
-# TODO: b/382090466 - Add documentation.
-# Documentation = ""
+Documentation = "https://federated-language.readthedocs.io/en/latest/"
 
 [tool.setuptools.dynamic]
 version = {attr = "federated_language.version.__version__"}
