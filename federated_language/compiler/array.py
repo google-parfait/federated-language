@@ -396,10 +396,8 @@ def is_compatible_dtype(value: Array, dtype: type[np.generic]) -> bool:
 
   # Check dtype size.
   if isinstance(value, (np.ndarray, np.generic)):
-    # `np.can_cast` does not does not apply value-based logic to `np.ndarray` or
-    # numpy scalars (since version 2.0). Testing the `dtype` of the value rather
-    # the the value aligns how `np.ndarray` and `np.generic` types are handled
-    # across different versions of numpy. See
+    # `np.can_cast` does not support Python scalars and does not does not apply
+    # value-based logic to `np.ndarray` or numpy scalars. See
     # https://numpy.org/doc/stable/reference/generated/numpy.can_cast.html for
     # more information.
     return np.can_cast(value.dtype, dtype)
