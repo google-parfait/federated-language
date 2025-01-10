@@ -17,7 +17,5 @@ attrs~=23.1
 dm-tree==0.1.8
 ml_dtypes~=0.2.0
 numpy~=1.25
-# The lower bound is required to allow for compatibility with projects that
-# require an older version of protobuf (e.g., `tensorflow`).
-protobuf>=4.25.0,<=5.28.3
-typing-extensions~=4.5.0
+protobuf~=4.22
+typing-extensions~=4.5
