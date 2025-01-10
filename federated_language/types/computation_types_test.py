@@ -55,7 +55,7 @@ class TypeMismatchErrorMessageTest(absltest.TestCase):
 
   def test_short_compact_repr(self):
     first = computation_types.TensorType(np.int32)
-    second = computation_types.TensorType(np.bool_)
+    second = computation_types.TensorType(np.bool)
     actual = computation_types.type_mismatch_error_message(
         first, second, computation_types.TypeRelation.EQUIVALENT
     )
@@ -130,7 +130,7 @@ class TypeTest(parameterized.TestCase):
       (
           'tensor_type_different_dtype',
           computation_types.TensorType(np.int32),
-          computation_types.TensorType(np.bool_),
+          computation_types.TensorType(np.bool),
       ),
       (
           'tensor_type_different_shape',
@@ -255,7 +255,7 @@ class TensorTypeTest(parameterized.TestCase):
       (
           'different_dtype',
           computation_types.TensorType(np.int32),
-          computation_types.TensorType(np.bool_),
+          computation_types.TensorType(np.bool),
           False,
       ),
       (
@@ -279,7 +279,7 @@ class TensorTypeTest(parameterized.TestCase):
       (
           'different_dtype',
           computation_types.TensorType(np.int32),
-          computation_types.TensorType(np.bool_),
+          computation_types.TensorType(np.bool),
           False,
       ),
       (
@@ -309,8 +309,8 @@ class TensorTypeTest(parameterized.TestCase):
 class StructTypeTest(parameterized.TestCase):
 
   def test_interned(self):
-    type_spec_1 = computation_types.StructType([np.int32, np.bool_])
-    type_spec_2 = computation_types.StructType([np.int32, np.bool_])
+    type_spec_1 = computation_types.StructType([np.int32, np.bool])
+    type_spec_2 = computation_types.StructType([np.int32, np.bool])
     self.assertIs(type_spec_1, type_spec_2)
 
   @parameterized.named_parameters(
@@ -460,12 +460,12 @@ class StructTypeTest(parameterized.TestCase):
   @parameterized.named_parameters(
       (
           'unnamed',
-          computation_types.StructType([np.int32, np.bool_]),
+          computation_types.StructType([np.int32, np.bool]),
           '<int32,bool>',
       ),
       (
           'named',
-          computation_types.StructType([('a', np.int32), ('b', np.bool_)]),
+          computation_types.StructType([('a', np.int32), ('b', np.bool)]),
           '<a=int32,b=bool>',
       ),
   )
@@ -476,19 +476,18 @@ class StructTypeTest(parameterized.TestCase):
   @parameterized.named_parameters(
       (
           'unnamed',
-          computation_types.StructType([np.int32, np.bool_]),
-          'StructType([TensorType(np.int32), TensorType(np.bool_)])',
+          computation_types.StructType([np.int32, np.bool]),
+          'StructType([TensorType(np.int32), TensorType(np.bool)])',
       ),
       (
           'named',
-          computation_types.StructType([('a', np.int32), ('b', np.bool_)]),
+          computation_types.StructType([('a', np.int32), ('b', np.bool)]),
           (
               'StructType(['
               "('a', TensorType(np.int32)), "
-              "('b', TensorType(np.bool_))"
+              "('b', TensorType(np.bool))"
               '])'
-          )
-          ,
+          ),
       ),
   )
   def test_repr(self, type_spec, expected_repr):
@@ -498,14 +497,14 @@ class StructTypeTest(parameterized.TestCase):
   @parameterized.named_parameters(
       (
           'same_elements_unnamed',
-          computation_types.StructType([np.int32, np.bool_]),
-          computation_types.StructType([np.int32, np.bool_]),
+          computation_types.StructType([np.int32, np.bool]),
+          computation_types.StructType([np.int32, np.bool]),
           True,
       ),
       (
           'same_elements_named',
-          computation_types.StructType([('a', np.int32), ('b', np.bool_)]),
-          computation_types.StructType([('a', np.int32), ('b', np.bool_)]),
+          computation_types.StructType([('a', np.int32), ('b', np.bool)]),
+          computation_types.StructType([('a', np.int32), ('b', np.bool)]),
           True,
       ),
       (
@@ -1940,7 +1939,7 @@ class RepresentationTest(absltest.TestCase):
 
   def test_returns_string_for_named_tuple_type_nested(self):
     type_spec_1 = computation_types.StructType((np.int32, np.float32))
-    type_spec_2 = computation_types.StructType((type_spec_1, np.bool_))
+    type_spec_2 = computation_types.StructType((type_spec_1, np.bool))
     type_spec_3 = computation_types.StructType((type_spec_2, np.str_))
     type_spec = type_spec_3
 

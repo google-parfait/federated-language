@@ -18,7 +18,7 @@ module(
     compatibility_level = 0,
 )
 
-bazel_dep(name = "protobuf", version = "28.3")
+bazel_dep(name = "protobuf", version = "29.3")
 bazel_dep(name = "rules_license", version = "1.0.0")
 bazel_dep(name = "rules_python", version = "0.38.0")
 
