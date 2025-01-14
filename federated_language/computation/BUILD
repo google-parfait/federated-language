@@ -114,7 +114,6 @@ py_library(
         "//federated_language/common_libs:py_typecheck",
         "//federated_language/common_libs:structure",
         "//federated_language/types:computation_types",
-        "//federated_language/types:type_analysis",
         "//federated_language/types:type_conversions",
         "//federated_language/types:typed_object",
     ],

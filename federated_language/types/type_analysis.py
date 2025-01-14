@@ -18,7 +18,6 @@ from collections.abc import Callable
 from typing import Optional
 
 from federated_language.common_libs import py_typecheck
-from federated_language.common_libs import structure
 from federated_language.types import array_shape
 from federated_language.types import computation_types
 from federated_language.types import placements
@@ -538,12 +537,6 @@ def is_min_max_compatible(type_spec: computation_types.Type) -> bool:
     return is_min_max_compatible(type_spec.member)
   else:
     return False
-
-
-def is_struct_with_py_container(value, type_spec):
-  return isinstance(value, structure.Struct) and isinstance(
-      type_spec, computation_types.StructWithPythonType
-  )
 
 
 class NotConcreteTypeError(TypeError):

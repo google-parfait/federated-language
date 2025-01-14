@@ -15,7 +15,6 @@ import collections
 
 from absl.testing import absltest
 from absl.testing import parameterized
-from federated_language.common_libs import structure
 from federated_language.types import computation_types
 from federated_language.types import placements
 from federated_language.types import type_analysis
@@ -529,32 +528,6 @@ class IsSingleIntegerOrMatchesStructure(parameterized.TestCase):
         type_analysis.is_single_integer_or_matches_structure(
             type_sig, shape_type
         )
-    )
-
-
-class IsAnonTupleWithPyContainerTest(absltest.TestCase):
-
-  def test_returns_true(self):
-    value = structure.Struct([('a', 0.0)])
-    type_spec = computation_types.StructWithPythonType(
-        [('a', np.float32)], dict
-    )
-    self.assertTrue(type_analysis.is_struct_with_py_container(value, type_spec))
-
-  def test_returns_false_with_none_value(self):
-    value = None
-    type_spec = computation_types.StructWithPythonType(
-        [('a', np.float32)], dict
-    )
-    self.assertFalse(
-        type_analysis.is_struct_with_py_container(value, type_spec)
-    )
-
-  def test_returns_false_with_named_tuple_type_spec(self):
-    value = structure.Struct([('a', 0.0)])
-    type_spec = computation_types.StructType([('a', np.float32)])
-    self.assertFalse(
-        type_analysis.is_struct_with_py_container(value, type_spec)
     )
 
 

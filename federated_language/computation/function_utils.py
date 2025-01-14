@@ -21,7 +21,6 @@ from typing import Optional
 from federated_language.common_libs import py_typecheck
 from federated_language.common_libs import structure
 from federated_language.types import computation_types
-from federated_language.types import type_analysis
 from federated_language.types import type_conversions
 from federated_language.types import typed_object
 
@@ -457,6 +456,12 @@ def wrap_as_zero_or_one_arg_callable(
     return lambda arg: _call(fn, parameter_type, arg, unpack)
 
 
+def _is_struct_with_py_container(value, type_spec):
+  return isinstance(value, structure.Struct) and isinstance(
+      type_spec, computation_types.StructWithPythonType
+  )
+
+
 def _unpack_arg(
     arg_types, kwarg_types, arg
 ) -> tuple[list[object], dict[str, object]]:
@@ -472,7 +477,7 @@ def _unpack_arg(
   kwargs = {}
   for name, expected_type in kwarg_types.items():
     element_value = getattr(arg, name)
-    if type_analysis.is_struct_with_py_container(element_value, expected_type):
+    if _is_struct_with_py_container(element_value, expected_type):
       element_value = type_conversions.type_to_py_container(
           element_value, expected_type
       )
@@ -484,7 +489,7 @@ def _ensure_arg_type(
     parameter_type, arg
 ) -> tuple[list[object], dict[str, object]]:
   """Ensures that `arg` matches `parameter_type` before returning it."""
-  if type_analysis.is_struct_with_py_container(arg, parameter_type):
+  if _is_struct_with_py_container(arg, parameter_type):
     arg = type_conversions.type_to_py_container(arg, parameter_type)
   return [arg], {}
 
