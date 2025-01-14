@@ -165,7 +165,6 @@ from federated_language.types.type_analysis import is_structure_of_tensors
 from federated_language.types.type_analysis import preorder_types
 from federated_language.types.type_conversions import infer_type
 from federated_language.types.type_conversions import to_structure_with_type
-from federated_language.types.type_conversions import type_to_non_all_equal
 from federated_language.types.type_conversions import type_to_py_container
 from federated_language.types.type_test_utils import assert_type_assignable_from
 from federated_language.types.type_test_utils import assert_types_equivalent
