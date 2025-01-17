@@ -121,17 +121,6 @@ class TypesNotEquivalentError(TypeError):
     self.second_type = second_type
 
 
-class TypesNotIdenticalError(TypeError):
-
-  def __init__(self, first_type, second_type):
-    self.message = type_mismatch_error_message(
-        first_type, second_type, TypeRelation.IDENTICAL
-    )
-    super().__init__(self.message)
-    self.first_type = first_type
-    self.second_type = second_type
-
-
 def _check_type_has_field(type_pb: computation_pb2.Type, field: str):
   if not type_pb.HasField(field):
     raise ValueError(
@@ -234,11 +223,6 @@ class Type(metaclass=abc.ABCMeta):
   def is_equivalent_to(self, other: 'Type') -> bool:
     """Returns whether values of `other` can be cast to and from this type."""
     return self.is_assignable_from(other) and other.is_assignable_from(self)
-
-  def check_identical_to(self, other: 'Type') -> None:
-    """Raises if `other` and `Type` are not exactly identical."""
-    if not self.is_identical_to(other):
-      raise TypesNotIdenticalError(self, other)
 
   def is_identical_to(self, other: 'Type') -> bool:
     """Returns whether or not `self` and `other` are exactly identical."""

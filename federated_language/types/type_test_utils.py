@@ -36,14 +36,3 @@ def assert_types_equivalent(first_type, second_type):
     message = e.message
   if message is not None:
     raise AssertionError(message)
-
-
-def assert_types_identical(first_type, second_type):
-  """Asserts that the types are identical."""
-  message = None
-  try:
-    first_type.check_identical_to(second_type)
-  except computation_types.TypesNotIdenticalError as e:
-    message = e.message
-  if message is not None:
-    raise AssertionError(message)

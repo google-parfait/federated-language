@@ -145,7 +145,6 @@ from federated_language.test.static_assert import assert_not_contains_secure_agg
 from federated_language.test.static_assert import assert_not_contains_unsecure_aggregation
 from federated_language.types.computation_types import TypeNotAssignableError
 from federated_language.types.computation_types import TypesNotEquivalentError
-from federated_language.types.computation_types import TypesNotIdenticalError
 from federated_language.types.computation_types import UnexpectedTypeError
 from federated_language.types.placements import PlacementLiteral
 from federated_language.types.placements import uri_to_placement_literal
@@ -168,6 +167,5 @@ from federated_language.types.type_conversions import to_structure_with_type
 from federated_language.types.type_conversions import type_to_py_container
 from federated_language.types.type_test_utils import assert_type_assignable_from
 from federated_language.types.type_test_utils import assert_types_equivalent
-from federated_language.types.type_test_utils import assert_types_identical
 from federated_language.types.type_transformations import transform_type_postorder
 # pylint: enable=g-importing-member

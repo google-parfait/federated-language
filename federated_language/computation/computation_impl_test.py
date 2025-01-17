@@ -18,7 +18,6 @@ from federated_language.computation import computation_impl
 from federated_language.context_stack import context_stack_impl
 from federated_language.proto import computation_pb2
 from federated_language.types import computation_types
-from federated_language.types import type_test_utils
 import numpy as np
 
 
@@ -72,9 +71,7 @@ class ConcreteComputationTest(absltest.TestCase):
     fn_with_annotated_type = computation_impl.ConcreteComputation.with_type(
         original_comp, list_return_type
     )
-    type_test_utils.assert_types_identical(
-        list_return_type, fn_with_annotated_type.type_signature
-    )
+    self.assertEqual(list_return_type, fn_with_annotated_type.type_signature)
 
   def test_with_type_raises_non_assignable_type(self):
     int_return_type = computation_types.FunctionType(np.int32, np.int32)

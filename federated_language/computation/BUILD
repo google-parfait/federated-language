@@ -69,7 +69,6 @@ py_test(
         "//federated_language/context_stack:context_stack_impl",
         "//federated_language/proto:computation_py_pb2",
         "//federated_language/types:computation_types",
-        "//federated_language/types:type_test_utils",
         "@pypi//absl_py",
         "@pypi//numpy",
     ],
