@@ -16,17 +16,6 @@
 from federated_language.types import computation_types
 
 
-def assert_type_assignable_from(target_type, source_type):
-  """Asserts that `target_type` is assignable from `source_type`."""
-  message = None
-  try:
-    target_type.check_assignable_from(source_type)
-  except computation_types.TypeNotAssignableError as e:
-    message = e.message
-  if message is not None:
-    raise AssertionError(message)
-
-
 def assert_types_equivalent(first_type, second_type):
   """Asserts that the types are equivalent."""
   message = None
