@@ -219,12 +219,6 @@ py_test(
 )
 
 py_library(
-    name = "type_test_utils",
-    srcs = ["type_test_utils.py"],
-    deps = [":computation_types"],
-)
-
-py_library(
     name = "type_transformations",
     srcs = ["type_transformations.py"],
     deps = [

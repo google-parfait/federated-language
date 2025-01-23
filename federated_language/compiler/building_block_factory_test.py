@@ -23,7 +23,6 @@ from federated_language.compiler import building_blocks
 from federated_language.types import computation_types
 from federated_language.types import placements
 from federated_language.types import type_analysis
-from federated_language.types import type_test_utils
 import numpy as np
 
 
@@ -1110,9 +1109,7 @@ class CreateFederatedZipTest(parameterized.TestCase, absltest.TestCase):
     self.assertEqual(
         comp.formatted_representation(), 'federated_zip_at_clients(v)'
     )
-    type_test_utils.assert_types_equivalent(
-        expected_zipped_type, comp.type_signature
-    )
+    self.assertTrue(expected_zipped_type.is_equivalent_to(comp.type_signature))
 
   @parameterized.named_parameters([
       (
@@ -1162,9 +1159,7 @@ class CreateFederatedZipTest(parameterized.TestCase, absltest.TestCase):
     self.assertEqual(
         comp.formatted_representation(), 'federated_zip_at_server(v)'
     )
-    type_test_utils.assert_types_equivalent(
-        expected_zipped_type, comp.type_signature
-    )
+    self.assertTrue(expected_zipped_type.is_equivalent_to(comp.type_signature))
 
   def test_flat_raises_type_error_with_inconsistent_placement(self):
     client_type = computation_types.FederatedType(
@@ -1389,11 +1384,15 @@ class SelectOutputFromLambdaTest(absltest.TestCase):
     input_type = computation_types.StructType([np.int32, np.float32])
     lam = identity_for_type(input_type)
     zero_selected = building_block_factory.select_output_from_lambda(lam, 0)
-    type_test_utils.assert_types_equivalent(
-        zero_selected.type_signature.parameter, lam.type_signature.parameter
+    self.assertTrue(
+        zero_selected.type_signature.parameter.is_equivalent_to(
+            lam.type_signature.parameter
+        )
     )
-    type_test_utils.assert_types_equivalent(
-        zero_selected.type_signature.result, lam.type_signature.result[0]
+    self.assertTrue(
+        zero_selected.type_signature.result.is_equivalent_to(
+            lam.type_signature.result[0]
+        )
     )
     self.assertEqual(str(zero_selected), '(x -> x[0])')
 
@@ -1401,11 +1400,13 @@ class SelectOutputFromLambdaTest(absltest.TestCase):
     input_type = computation_types.StructType([('a', np.int32)])
     lam = identity_for_type(input_type)
     selected = building_block_factory.select_output_from_lambda(lam, 'a')
-    type_test_utils.assert_types_equivalent(
-        selected.type_signature,
-        computation_types.FunctionType(
-            lam.parameter_type, lam.type_signature.result['a']
-        ),
+
+    self.assertTrue(
+        selected.type_signature.is_equivalent_to(
+            computation_types.FunctionType(
+                lam.parameter_type, lam.type_signature.result['a']
+            )
+        )
     )
 
   def test_selects_from_struct_by_removing_struct_wrapper(self):
@@ -1415,8 +1416,10 @@ class SelectOutputFromLambdaTest(absltest.TestCase):
         building_blocks.Struct([building_blocks.Reference('x', np.int32)]),
     )
     selected = building_block_factory.select_output_from_lambda(lam, 0)
-    type_test_utils.assert_types_equivalent(
-        selected.type_signature.result, computation_types.TensorType(np.int32)
+    self.assertTrue(
+        selected.type_signature.result.is_equivalent_to(
+            computation_types.TensorType(np.int32)
+        )
     )
     self.assertEqual(str(selected), '(x -> x)')
 
@@ -1426,14 +1429,17 @@ class SelectOutputFromLambdaTest(absltest.TestCase):
     tuple_selected = building_block_factory.select_output_from_lambda(
         lam, [0, 1]
     )
-    type_test_utils.assert_types_equivalent(
-        tuple_selected.type_signature.parameter, lam.type_signature.parameter
+    self.assertTrue(
+        tuple_selected.type_signature.parameter.is_equivalent_to(
+            lam.type_signature.parameter
+        )
     )
-    type_test_utils.assert_types_equivalent(
-        tuple_selected.type_signature.result,
-        computation_types.StructType(
-            [lam.type_signature.result[0], lam.type_signature.result[1]]
-        ),
+    self.assertTrue(
+        tuple_selected.type_signature.result.is_equivalent_to(
+            computation_types.StructType(
+                [lam.type_signature.result[0], lam.type_signature.result[1]]
+            )
+        )
     )
     self.assertEqual(
         str(tuple_selected), '(x -> (let _var1=x in <_var1[0],_var1[1]>))'
@@ -1445,14 +1451,15 @@ class SelectOutputFromLambdaTest(absltest.TestCase):
     )
     lam = identity_for_type(input_type)
     selected = building_block_factory.select_output_from_lambda(lam, ['a', 'b'])
-    type_test_utils.assert_types_equivalent(
-        selected.type_signature,
-        computation_types.FunctionType(
-            lam.parameter_type,
-            computation_types.StructType(
-                [lam.type_signature.result.a, lam.type_signature.result.b]
-            ),
-        ),
+    self.assertTrue(
+        selected.type_signature.is_equivalent_to(
+            computation_types.FunctionType(
+                lam.parameter_type,
+                computation_types.StructType(
+                    [lam.type_signature.result.a, lam.type_signature.result.b]
+                ),
+            )
+        )
     )
 
   def test_selects_nested_federated_outputs(self):
@@ -1464,14 +1471,17 @@ class SelectOutputFromLambdaTest(absltest.TestCase):
     tuple_selected = building_block_factory.select_output_from_lambda(
         lam, [('a', 'inner'), 'b']
     )
-    type_test_utils.assert_types_equivalent(
-        tuple_selected.type_signature.parameter, lam.type_signature.parameter
+    self.assertTrue(
+        tuple_selected.type_signature.parameter.is_equivalent_to(
+            lam.type_signature.parameter
+        )
     )
-    type_test_utils.assert_types_equivalent(
-        tuple_selected.type_signature.result,
-        computation_types.StructType(
-            [lam.type_signature.result.a.inner, lam.type_signature.result.b]
-        ),
+    self.assertTrue(
+        tuple_selected.type_signature.result.is_equivalent_to(
+            computation_types.StructType(
+                [lam.type_signature.result.a.inner, lam.type_signature.result.b]
+            )
+        )
     )
     self.assertEqual(
         str(tuple_selected), '(x -> (let _var1=x in <_var1.a.inner,_var1.b>))'
@@ -1498,9 +1508,7 @@ class ZipUpToTest(absltest.TestCase):
     zipped = building_block_factory.zip_to_match_type(
         comp_to_zip=comp, target_type=zippable_type
     )
-    type_test_utils.assert_types_equivalent(
-        zipped.type_signature, zippable_type
-    )
+    self.assertTrue(zipped.type_signature.is_equivalent_to(zippable_type))
 
   def test_does_not_zip_different_placement_target(self):
     comp = building_blocks.Struct([
@@ -1545,9 +1553,7 @@ class ZipUpToTest(absltest.TestCase):
     zipped = building_block_factory.zip_to_match_type(
         comp_to_zip=comp, target_type=zippable_type
     )
-    type_test_utils.assert_types_equivalent(
-        zipped.type_signature, zippable_type
-    )
+    self.assertTrue(zipped.type_signature.is_equivalent_to(zippable_type))
 
   def test_assignability_with_names(self):
     # This would correspond to an implicit downcast in TFF's typesystem; the
@@ -1602,9 +1608,7 @@ class ZipUpToTest(absltest.TestCase):
 
     self.assertIsNone(not_zipped)
 
-    type_test_utils.assert_types_equivalent(
-        zipped.type_signature, named_zippable_type
-    )
+    self.assertTrue(zipped.type_signature.is_equivalent_to(named_zippable_type))
 
   def test_does_not_zip_under_function(self):
     result_comp = building_blocks.Struct([

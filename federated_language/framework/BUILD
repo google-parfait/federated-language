@@ -63,7 +63,6 @@ py_library(
         "//federated_language/types:placements",
         "//federated_language/types:type_analysis",
         "//federated_language/types:type_conversions",
-        "//federated_language/types:type_test_utils",
         "//federated_language/types:type_transformations",
     ],
 )

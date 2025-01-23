@@ -136,7 +136,6 @@ py_test(
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
         "//federated_language/types:type_analysis",
-        "//federated_language/types:type_test_utils",
         "@pypi//absl_py",
         "@pypi//numpy",
     ],
