@@ -16,7 +16,7 @@
 import abc
 from typing import Optional
 
-from federated_language.executors import executor_value_base as evb
+from federated_language.executors import executor_value_base
 
 
 class Executor(metaclass=abc.ABCMeta):
@@ -32,7 +32,9 @@ class Executor(metaclass=abc.ABCMeta):
     raise NotImplementedError
 
   @abc.abstractmethod
-  async def create_value(self, value, type_spec=None) -> evb.ExecutorValue:
+  async def create_value(
+      self, value, type_spec=None
+  ) -> executor_value_base.ExecutorValue:
     """A coroutine that creates embedded value from `value` of type `type_spec`.
 
     This function is used to embed a value within the executor. The argument
@@ -55,8 +57,10 @@ class Executor(metaclass=abc.ABCMeta):
 
   @abc.abstractmethod
   async def create_call(
-      self, comp: evb.ExecutorValue, arg: Optional[evb.ExecutorValue] = None
-  ) -> evb.ExecutorValue:
+      self,
+      comp: executor_value_base.ExecutorValue,
+      arg: Optional[executor_value_base.ExecutorValue] = None,
+  ) -> executor_value_base.ExecutorValue:
     """A coroutine that creates a call to `comp` with optional argument `arg`.
 
     Args:
@@ -72,7 +76,7 @@ class Executor(metaclass=abc.ABCMeta):
     raise NotImplementedError
 
   @abc.abstractmethod
-  async def create_struct(self, elements) -> evb.ExecutorValue:
+  async def create_struct(self, elements) -> executor_value_base.ExecutorValue:
     """A coroutine that creates a tuple of `elements`.
 
     Args:
@@ -87,7 +91,9 @@ class Executor(metaclass=abc.ABCMeta):
     raise NotImplementedError
 
   @abc.abstractmethod
-  async def create_selection(self, source, index) -> evb.ExecutorValue:
+  async def create_selection(
+      self, source, index
+  ) -> executor_value_base.ExecutorValue:
     """A coroutine that creates a selection from `source`.
 
     Args:
