@@ -18,7 +18,7 @@ import abc
 from federated_language.types import computation_types
 
 
-class TypedObject(metaclass=abc.ABCMeta):
+class TypedObject(abc.ABC):
   """An abstract interface for things that possess TFF type signatures."""
 
   @property

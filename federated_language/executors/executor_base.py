@@ -19,7 +19,7 @@ from typing import Optional
 from federated_language.executors import executor_value_base
 
 
-class Executor(metaclass=abc.ABCMeta):
+class Executor(abc.ABC):
   """Represents the abstract interface that all executors must implement."""
 
   @abc.abstractmethod
