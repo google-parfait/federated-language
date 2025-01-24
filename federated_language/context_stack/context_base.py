@@ -36,7 +36,7 @@ class ContextError(RuntimeError):
   pass
 
 
-class SyncContext(metaclass=abc.ABCMeta):
+class SyncContext(abc.ABC):
   """A synchronous context to evaluate of computations."""
 
   @abc.abstractmethod
@@ -60,7 +60,7 @@ class SyncContext(metaclass=abc.ABCMeta):
     raise NotImplementedError
 
 
-class AsyncContext(metaclass=abc.ABCMeta):
+class AsyncContext(abc.ABC):
   """An asynchronous context to evaluate of computations."""
 
   @abc.abstractmethod

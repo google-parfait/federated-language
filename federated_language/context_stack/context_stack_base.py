@@ -17,7 +17,7 @@ import abc
 import contextlib
 
 
-class ContextStack(metaclass=abc.ABCMeta):
+class ContextStack(abc.ABC):
   """An interface to a context stack for the API to run against."""
 
   @property
