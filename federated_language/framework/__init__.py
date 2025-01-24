@@ -124,7 +124,6 @@ from federated_language.context_stack.context_base import ContextError
 from federated_language.context_stack.context_base import SyncContext
 from federated_language.context_stack.context_stack_base import ContextStack
 from federated_language.context_stack.context_stack_test_utils import with_context
-from federated_language.context_stack.context_stack_test_utils import with_contexts
 from federated_language.context_stack.get_context_stack import get_context_stack
 from federated_language.context_stack.runtime_error_context import RuntimeErrorContext
 from federated_language.context_stack.set_default_context import set_default_context

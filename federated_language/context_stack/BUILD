@@ -73,7 +73,6 @@ py_library(
     deps = [
         ":context_base",
         ":context_stack_impl",
-        "@pypi//absl_py",
     ],
 )
 
