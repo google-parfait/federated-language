@@ -24,7 +24,6 @@ package(
         "//federated_language/federated_context:__subpackages__",
         "//federated_language/framework:__subpackages__",
         "//federated_language/program:__subpackages__",
-        "//federated_language/test:__subpackages__",
     ],
 )
 
@@ -64,7 +63,10 @@ py_test(
 py_library(
     name = "building_block_analysis",
     srcs = ["building_block_analysis.py"],
-    deps = [":building_blocks"],
+    deps = [
+        ":building_blocks",
+        ":intrinsic_defs",
+    ],
 )
 
 py_library(

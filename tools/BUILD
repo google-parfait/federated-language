@@ -41,7 +41,6 @@ sh_binary(
         "//federated_language/framework",
         "//federated_language/program",
         "//federated_language/proto",
-        "//federated_language/test",
         "//federated_language/types",
     ],
 )

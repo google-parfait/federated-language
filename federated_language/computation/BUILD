@@ -23,7 +23,6 @@ package(
         "//federated_language/federated_context:__subpackages__",
         "//federated_language/framework:__subpackages__",
         "//federated_language/program:__subpackages__",
-        "//federated_language/test:__subpackages__",
     ],
 )
 
@@ -33,6 +32,18 @@ py_library(
     name = "computation",
     srcs = ["__init__.py"],
     visibility = ["//tools:__subpackages__"],
+)
+
+py_library(
+    name = "computation_analysis",
+    srcs = ["computation_analysis.py"],
+    deps = [
+        ":computation_impl",
+        "//federated_language/compiler:building_block_analysis",
+        "//federated_language/compiler:building_blocks",
+        "//federated_language/compiler:intrinsic_defs",
+        "//federated_language/compiler:tree_analysis",
+    ],
 )
 
 py_library(

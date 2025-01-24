@@ -14,6 +14,7 @@
 """A library of static analysis functions for building blocks."""
 
 from federated_language.compiler import building_blocks
+from federated_language.compiler import intrinsic_defs
 
 
 def is_called_intrinsic(comp, uri=None):
@@ -34,6 +35,17 @@ def is_called_intrinsic(comp, uri=None):
       isinstance(comp, building_blocks.Call)
       and isinstance(comp.function, building_blocks.Intrinsic)
       and (uri is None or comp.function.uri in uri)
+  )
+
+
+def is_called_aggregation(
+    building_block: building_blocks.ComputationBuildingBlock,
+    kind: intrinsic_defs.AggregationKind,
+):
+  return (
+      isinstance(building_block, building_blocks.Call)
+      and isinstance(building_block.function, building_blocks.Intrinsic)
+      and building_block.function.intrinsic_def().aggregation_kind is kind
   )
 
 

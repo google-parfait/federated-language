@@ -26,7 +26,6 @@ package(
         "//federated_language/federated_context:__subpackages__",
         "//federated_language/framework:__subpackages__",
         "//federated_language/program:__subpackages__",
-        "//federated_language/test:__subpackages__",
     ],
 )
 
