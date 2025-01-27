@@ -81,7 +81,7 @@ TraceResult = Union[TracedSpan, TracedFunctionReturned, TracedFunctionThrew]
 T = TypeVar('T')
 
 
-class TracingProvider(Generic[T], metaclass=abc.ABCMeta):
+class TracingProvider(Generic[T], abc.ABC):
   """Abstract base class for tracers."""
 
   @abc.abstractmethod

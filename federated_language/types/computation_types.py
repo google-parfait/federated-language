@@ -128,7 +128,7 @@ def _check_type_has_field(type_pb: computation_pb2.Type, field: str):
     )
 
 
-class Type(metaclass=abc.ABCMeta):
+class Type(abc.ABC):
   """An abstract interface for all classes that represent TFF types."""
 
   @classmethod

@@ -19,7 +19,7 @@ from federated_language.types import computation_types
 from federated_language.types import typed_object
 
 
-class Computation(typed_object.TypedObject, metaclass=abc.ABCMeta):
+class Computation(typed_object.TypedObject, abc.ABC):
   """An abstract interface for all classes that represent computations."""
 
   @property

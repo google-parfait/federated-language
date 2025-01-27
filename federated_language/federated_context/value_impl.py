@@ -74,7 +74,7 @@ def _bind_computation_to_reference(comp, op: str):
   return context.bind_computation_to_reference(comp)
 
 
-class Value(typed_object.TypedObject, metaclass=abc.ABCMeta):
+class Value(typed_object.TypedObject, abc.ABC):
   """A generic base class for values that appear in TFF computations.
 
   If the value in this class is of `StructType` or `FederatedType` containing a

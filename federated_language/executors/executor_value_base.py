@@ -18,7 +18,7 @@ import abc
 from federated_language.types import typed_object
 
 
-class ExecutorValue(abc.ABC, typed_object.TypedObject):
+class ExecutorValue(typed_object.TypedObject, abc.ABC):
   """Represents the abstract interface for values embedded within executors.
 
   The embedded values may represent computations in-flight that may materialize

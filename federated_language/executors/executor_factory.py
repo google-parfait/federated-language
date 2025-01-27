@@ -22,7 +22,7 @@ from federated_language.types import placements
 CardinalitiesType = MutableMapping[placements.PlacementLiteral, int]
 
 
-class ExecutorFactory(metaclass=abc.ABCMeta):
+class ExecutorFactory(abc.ABC):
   """Interface defining executor factories.
 
   `ExecutorFactory` should be considered to own the executors it creates; it

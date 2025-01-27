@@ -453,7 +453,7 @@ def transform_postorder_with_symbol_bindings(comp, transform, symbol_tree):
   )
 
 
-class BoundVariableTracker(metaclass=abc.ABCMeta):
+class BoundVariableTracker(abc.ABC):
   """Abstract class representing a mutable variable binding."""
 
   def __init__(self, name, value):
@@ -1227,7 +1227,7 @@ def get_map_of_unbound_references(
   return references
 
 
-class TransformSpec(metaclass=abc.ABCMeta):
+class TransformSpec(abc.ABC):
   """Base class to express the should_transform/transform interface."""
 
   def __init__(self, global_transform=False):

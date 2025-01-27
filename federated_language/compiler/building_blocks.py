@@ -60,7 +60,7 @@ class UnexpectedBlockError(TypeError):
     self.expected = expected
 
 
-class ComputationBuildingBlock(typed_object.TypedObject, metaclass=abc.ABCMeta):
+class ComputationBuildingBlock(typed_object.TypedObject, abc.ABC):
   """The abstract base class for abstractions in the TFF's internal language.
 
   Instances of this class correspond roughly one-to-one to the abstractions

@@ -59,7 +59,7 @@ MaterializableValue = Union[
 MaterializableStructure = structure_utils.Structure[MaterializableValue]
 
 
-class MaterializableValueReference(abc.ABC, typed_object.TypedObject):
+class MaterializableValueReference(typed_object.TypedObject, abc.ABC):
   """An abstract interface representing references to server-placed values."""
 
   @property
