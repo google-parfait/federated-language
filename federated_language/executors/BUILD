@@ -76,8 +76,3 @@ py_library(
     srcs = ["executor_value_base.py"],
     deps = ["//federated_language/types:typed_object"],
 )
-
-py_library(
-    name = "executors_errors",
-    srcs = ["executors_errors.py"],
-)

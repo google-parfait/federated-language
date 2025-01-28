@@ -56,7 +56,6 @@ py_library(
         "//federated_language/executors:executor_base",
         "//federated_language/executors:executor_factory",
         "//federated_language/executors:executor_value_base",
-        "//federated_language/executors:executors_errors",
         "//federated_language/federated_context:federated_computation_context",
         "//federated_language/federated_context:value_utils",
         "//federated_language/types:computation_types",

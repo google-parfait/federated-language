@@ -30,7 +30,6 @@ from federated_language.executors import cardinalities_utils
 from federated_language.executors import executor_base
 from federated_language.executors import executor_factory
 from federated_language.executors import executor_value_base
-from federated_language.executors import executors_errors
 from federated_language.types import computation_types
 from federated_language.types import type_conversions
 from federated_language.types import typed_object
@@ -41,7 +40,7 @@ _Computation = TypeVar('_Computation', bound=computation_base.Computation)
 
 
 def _is_retryable_error(exception):
-  return isinstance(exception, executors_errors.RetryableError)
+  return isinstance(exception, executor_base.RetryableError)
 
 
 class AsyncExecutionContextValue(typed_object.TypedObject):

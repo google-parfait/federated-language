@@ -13,16 +13,23 @@
 # limitations under the License.
 
 from absl.testing import absltest
+from federated_language.context_stack import context_base
 from federated_language.context_stack import context_stack_impl
-from federated_language.context_stack import context_stack_test_utils
+
+
+class _TestContext(context_base.SyncContext):
+  """A test context."""
+
+  def invoke(self, comp, arg):
+    raise AssertionError
 
 
 class ContextStackTest(absltest.TestCase):
 
   def test_set_default_context_with_context(self):
-    default_context = context_stack_test_utils.TestContext()
+    default_context = _TestContext()
     context_stack = context_stack_impl.ContextStackImpl(default_context)
-    context = context_stack_test_utils.TestContext()
+    context = _TestContext()
     self.assertIsNot(context_stack.current, context)
 
     context_stack.set_default_context(context)
@@ -30,22 +37,22 @@ class ContextStackTest(absltest.TestCase):
     self.assertIs(context_stack.current, context)
 
   def test_set_default_context_raises_type_error_with_none(self):
-    default_context = context_stack_test_utils.TestContext()
+    default_context = _TestContext()
     context_stack = context_stack_impl.ContextStackImpl(default_context)
 
     with self.assertRaises(TypeError):
       context_stack.set_default_context(None)
 
   def test_install_pushes_context_on_stack(self):
-    default_context = context_stack_test_utils.TestContext()
+    default_context = _TestContext()
     context_stack = context_stack_impl.ContextStackImpl(default_context)
     self.assertIs(context_stack.current, default_context)
 
-    context_two = context_stack_test_utils.TestContext()
+    context_two = _TestContext()
     with context_stack.install(context_two):
       self.assertIs(context_stack.current, context_two)
 
-      context_three = context_stack_test_utils.TestContext()
+      context_three = _TestContext()
       with context_stack.install(context_three):
         self.assertIs(context_stack.current, context_three)
 

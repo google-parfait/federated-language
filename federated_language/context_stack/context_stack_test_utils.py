@@ -26,18 +26,6 @@ _Context = Union[context_base.AsyncContext, context_base.SyncContext]
 _ContextFactory = Callable[[], _Context]
 
 
-class TestContext(context_base.SyncContext):
-  """A test context."""
-
-  def invoke(self, comp, arg):
-    return NotImplementedError
-
-
-@contextlib.contextmanager
-def test_environment():
-  yield None
-
-
 def with_context(context_fn: _ContextFactory):
   """Returns a decorator for running a test in a context.
 

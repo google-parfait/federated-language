@@ -14,13 +14,13 @@
 
 from absl.testing import absltest
 from federated_language.execution_contexts import async_execution_context
-from federated_language.executors import executors_errors
+from federated_language.executors import executor_base
 
 
 class RetryableErrorTest(absltest.TestCase):
 
   def test_is_retryable_error(self):
-    retryable_error = executors_errors.RetryableError()
+    retryable_error = executor_base.RetryableError()
     self.assertTrue(
         async_execution_context._is_retryable_error(retryable_error)
     )

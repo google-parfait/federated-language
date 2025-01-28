@@ -61,8 +61,8 @@ py_test(
     size = "small",
     srcs = ["context_stack_impl_test.py"],
     deps = [
+        ":context_base",
         ":context_stack_impl",
-        ":context_stack_test_utils",
         "@pypi//absl_py",
     ],
 )
@@ -80,6 +80,7 @@ py_test(
     name = "context_stack_test_utils_test",
     srcs = ["context_stack_test_utils_test.py"],
     deps = [
+        ":context_base",
         ":context_stack_impl",
         ":context_stack_test_utils",
         "@pypi//absl_py",
@@ -123,8 +124,8 @@ py_test(
     size = "small",
     srcs = ["set_default_context_test.py"],
     deps = [
+        ":context_base",
         ":context_stack_impl",
-        ":context_stack_test_utils",
         ":set_default_context",
         "@pypi//absl_py",
     ],

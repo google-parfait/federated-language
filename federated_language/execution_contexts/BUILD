@@ -47,7 +47,6 @@ py_library(
         "//federated_language/executors:executor_base",
         "//federated_language/executors:executor_factory",
         "//federated_language/executors:executor_value_base",
-        "//federated_language/executors:executors_errors",
         "//federated_language/types:computation_types",
         "//federated_language/types:type_conversions",
         "//federated_language/types:typed_object",
@@ -61,7 +60,7 @@ py_test(
     srcs = ["async_execution_context_test.py"],
     deps = [
         ":async_execution_context",
-        "//federated_language/executors:executors_errors",
+        "//federated_language/executors:executor_base",
         "@pypi//absl_py",
     ],
 )

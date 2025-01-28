@@ -19,14 +19,22 @@ from unittest import mock
 
 from absl.testing import absltest
 from absl.testing import parameterized
+from federated_language.context_stack import context_base
 from federated_language.context_stack import context_stack_impl
 from federated_language.context_stack import context_stack_test_utils
+
+
+class _TestContext(context_base.SyncContext):
+  """A test context."""
+
+  def invoke(self, comp, arg):
+    raise AssertionError
 
 
 class WithContextTest(parameterized.TestCase, unittest.IsolatedAsyncioTestCase):
 
   def test_installs_context_fn_sync_no_arg(self):
-    context = context_stack_test_utils.TestContext()
+    context = _TestContext()
     context_fn = lambda: context
 
     @context_stack_test_utils.with_context(context_fn)
@@ -46,7 +54,7 @@ class WithContextTest(parameterized.TestCase, unittest.IsolatedAsyncioTestCase):
       self.assertNotEqual(context_stack_impl.context_stack.current, context)
 
   def test_installs_context_fn_sync_args(self):
-    context = context_stack_test_utils.TestContext()
+    context = _TestContext()
     context_fn = lambda: context
 
     @context_stack_test_utils.with_context(context_fn)
@@ -67,7 +75,7 @@ class WithContextTest(parameterized.TestCase, unittest.IsolatedAsyncioTestCase):
       self.assertNotEqual(context_stack_impl.context_stack.current, context)
 
   def test_installs_context_fn_sync_kwargs(self):
-    context = context_stack_test_utils.TestContext()
+    context = _TestContext()
     context_fn = lambda: context
 
     @context_stack_test_utils.with_context(context_fn)
@@ -88,7 +96,7 @@ class WithContextTest(parameterized.TestCase, unittest.IsolatedAsyncioTestCase):
       self.assertNotEqual(context_stack_impl.context_stack.current, context)
 
   def test_installs_context_fn_sync_return(self):
-    context = context_stack_test_utils.TestContext()
+    context = _TestContext()
     context_fn = lambda: context
 
     @context_stack_test_utils.with_context(context_fn)
@@ -112,7 +120,7 @@ class WithContextTest(parameterized.TestCase, unittest.IsolatedAsyncioTestCase):
       self.assertEqual(x, 1)
 
   async def test_installs_context_fn_async(self):
-    context = context_stack_test_utils.TestContext()
+    context = _TestContext()
     context_fn = lambda: context
 
     @context_stack_test_utils.with_context(context_fn)
@@ -132,7 +140,7 @@ class WithContextTest(parameterized.TestCase, unittest.IsolatedAsyncioTestCase):
       self.assertNotEqual(context_stack_impl.context_stack.current, context)
 
   def test_installs_context_test_case(self):
-    context = context_stack_test_utils.TestContext()
+    context = _TestContext()
     context_fn = lambda: context
 
     class _FooTest(absltest.TestCase, unittest.IsolatedAsyncioTestCase):

@@ -13,9 +13,16 @@
 # limitations under the License.
 
 from absl.testing import absltest
+from federated_language.context_stack import context_base
 from federated_language.context_stack import context_stack_impl
-from federated_language.context_stack import context_stack_test_utils
 from federated_language.context_stack import set_default_context
+
+
+class _TestContext(context_base.SyncContext):
+  """A test context."""
+
+  def invoke(self, comp, arg):
+    raise AssertionError
 
 
 class SetDefaultContextTest(absltest.TestCase):
@@ -25,11 +32,11 @@ class SetDefaultContextTest(absltest.TestCase):
     # In these tests we are setting the default context of the
     # `context_stack_impl.context_stack`, so here we reset that context back to
     # some known state.
-    self.context = context_stack_test_utils.TestContext()
+    self.context = _TestContext()
     context_stack_impl.context_stack.set_default_context(self.context)
 
   def test_with_context(self):
-    context = context_stack_test_utils.TestContext()
+    context = _TestContext()
     context_stack = context_stack_impl.context_stack
     self.assertIsNot(context_stack.current, context)
 

@@ -47,14 +47,12 @@ class FederatedComputationWrapperTest(absltest.TestCase):
     )
 
   def test_stackframes_in_errors(self):
-    class DummyError(RuntimeError):
-      pass
 
-    with self.assertRaises(DummyError):
+    with self.assertRaises(RuntimeError):
 
       @federated_computation.federated_computation
       def _():
-        raise DummyError()
+        raise RuntimeError()
 
   def test_empty_tuple_arg(self):
 
