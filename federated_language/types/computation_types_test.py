@@ -19,7 +19,6 @@ from typing import NamedTuple
 from absl.testing import absltest
 from absl.testing import parameterized
 import attrs
-from federated_language.common_libs import golden
 from federated_language.common_libs import structure
 from federated_language.proto import computation_pb2
 from federated_language.proto import data_type_pb2
@@ -49,34 +48,6 @@ class TestAttrs:
 class TestNamedTuple(NamedTuple):
   a: int = 1
   b: bool = True
-
-
-class TypeMismatchErrorMessageTest(absltest.TestCase):
-
-  def test_short_compact_repr(self):
-    first = computation_types.TensorType(np.int32)
-    second = computation_types.TensorType(np.bool_)
-    actual = computation_types.type_mismatch_error_message(
-        first, second, computation_types.TypeRelation.EQUIVALENT
-    )
-    golden.check_string('short_compact_repr.expected', actual)
-
-  def test_long_formatted_with_diff(self):
-    int32 = computation_types.TensorType(np.int32)
-    first = computation_types.StructType([(None, int32)] * 20)
-    second = computation_types.StructType([(None, int32)] * 21)
-    actual = computation_types.type_mismatch_error_message(
-        first, second, computation_types.TypeRelation.EQUIVALENT
-    )
-    golden.check_string('long_formatted_with_diff.expected', actual)
-
-  def test_container_types_full_repr(self):
-    first = computation_types.StructWithPythonType([], list)
-    second = computation_types.StructWithPythonType([], tuple)
-    actual = computation_types.type_mismatch_error_message(
-        first, second, computation_types.TypeRelation.EQUIVALENT
-    )
-    golden.check_string('container_types_full_repr.expected', actual)
 
 
 class InternTest(parameterized.TestCase):

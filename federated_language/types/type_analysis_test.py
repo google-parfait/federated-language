@@ -329,13 +329,6 @@ class IsMinMaxCompatibleTest(parameterized.TestCase):
     self.assertFalse(type_analysis.is_min_max_compatible(type_spec))
 
 
-class CheckTypeTest(absltest.TestCase):
-
-  def test_raises_type_error(self):
-    type_analysis.check_type(10, computation_types.TensorType(np.int32))
-    self.assertRaises(TypeError, type_analysis.check_type, 10, np.bool_)
-
-
 class CheckFederatedTypeTest(absltest.TestCase):
 
   def test_passes_or_raises_type_error(self):

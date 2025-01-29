@@ -604,13 +604,7 @@ def _select_parameter_mismatch(
     raise TypeError(f'{message}, found value of type {param_type}')
   else:
     raise TypeError(
-        f'{message}:\n'
-        + computation_types.type_mismatch_error_message(
-            param_type,
-            expected_type,
-            computation_types.TypeRelation.ASSIGNABLE,
-            second_is_expected=True,
-        )
+        f'{message}, {param_type} is not assignable to {expected_type}.'
     )
 
 

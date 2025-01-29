@@ -19,7 +19,7 @@ from federated_language.context_stack import context_stack_base
 from federated_language.context_stack import symbol_binding_context
 from federated_language.federated_context import value_impl
 from federated_language.types import computation_types
-from federated_language.types import type_analysis
+from federated_language.types import type_conversions
 
 
 class FederatedComputationContext(
@@ -108,27 +108,27 @@ class FederatedComputationContext(
 
   def invoke(self, comp, arg):
     fn = value_impl.to_value(comp, type_spec=None)
-    tys = fn.type_signature
-    py_typecheck.check_type(tys, computation_types.FunctionType)
-    if arg is not None:
-      if tys.parameter is None:  # pytype: disable=attribute-error
-        raise ValueError(
-            'A computation of type {} does not expect any arguments, but got '
-            'an argument {}.'.format(tys, arg)
-        )
-      arg = value_impl.to_value(
-          arg,
-          type_spec=tys.parameter,  # pytype: disable=attribute-error
-          zip_if_needed=True,
+    type_spec = fn.type_signature
+    if not isinstance(type_spec, computation_types.FunctionType):
+      raise ValueError(
+          f'Expected {type_spec} to be a `federated_language.FunctionType`.'
       )
-      type_analysis.check_type(arg, tys.parameter)  # pytype: disable=attribute-error
-      ret_val = fn(arg)
+    if arg is not None:
+      if type_spec.parameter is None:
+        raise ValueError(f'Expected no arguments, found {arg}.')
+      arg = value_impl.to_value(
+          arg, type_spec=type_spec.parameter, zip_if_needed=True
+      )
+      result = fn(arg)
     else:
-      if tys.parameter is not None:  # pytype: disable=attribute-error
+      if type_spec.parameter is not None:
         raise ValueError(
-            'A computation of type {} expects an argument of type {}, but got '
-            ' no argument.'.format(tys, tys.parameter)  # pytype: disable=attribute-error
+            f'Expected an argument of type {type_spec.parameter}, found none.'
         )
-      ret_val = fn()
-    type_analysis.check_type(ret_val, tys.result)  # pytype: disable=attribute-error
-    return ret_val
+      result = fn()
+
+    value_type = type_conversions.infer_type(result)
+    if not type_spec.result.is_assignable_from(value_type):
+      raise computation_types.TypeNotAssignableError(value_type, type_spec)
+
+    return result

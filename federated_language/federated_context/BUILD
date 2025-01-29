@@ -72,7 +72,7 @@ py_library(
         "//federated_language/context_stack:context_stack_base",
         "//federated_language/context_stack:symbol_binding_context",
         "//federated_language/types:computation_types",
-        "//federated_language/types:type_analysis",
+        "//federated_language/types:type_conversions",
     ],
 )
 

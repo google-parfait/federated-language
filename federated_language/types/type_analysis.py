@@ -21,7 +21,6 @@ from federated_language.common_libs import py_typecheck
 from federated_language.types import array_shape
 from federated_language.types import computation_types
 from federated_language.types import placements
-from federated_language.types import type_conversions
 from federated_language.types import type_transformations
 import ml_dtypes
 import numpy as np
@@ -80,30 +79,6 @@ def contains_only(
 ) -> bool:
   """Checks if `type_signature` contains only types that pass `predicate`."""
   return not contains(type_signature, lambda t: not predicate(t))
-
-
-def check_type(value: object, type_spec: computation_types.Type):
-  """Checks whether `val` is of TFF type `type_spec`.
-
-  Args:
-    value: The object to check.
-    type_spec: A `computation_types.Type`, the type that `value` is checked
-      against.
-
-  Raises:
-    TypeError: If the inferred type of `value` is not assignable to `type_spec`.
-  """
-  py_typecheck.check_type(type_spec, computation_types.Type)
-  value_type = type_conversions.infer_type(value)
-  if not type_spec.is_assignable_from(value_type):
-    raise TypeError(
-        computation_types.type_mismatch_error_message(
-            value_type,
-            type_spec,
-            computation_types.TypeRelation.ASSIGNABLE,
-            second_is_expected=True,
-        )
-    )
 
 
 def is_structure_of_tensors(type_spec: computation_types.Type) -> bool:

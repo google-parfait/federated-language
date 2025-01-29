@@ -17,8 +17,6 @@ import abc
 import atexit
 import collections
 from collections.abc import Hashable, Iterable, Iterator, Mapping, MutableMapping, Sequence
-import difflib
-import enum
 from typing import Optional, TypeVar, Union
 import weakref
 import attrs
@@ -39,86 +37,23 @@ T = TypeVar('T')
 class UnexpectedTypeError(TypeError):
 
   def __init__(self, expected: type['Type'], actual: 'Type'):
-    message = f'Expected type of kind {expected}, found type {actual}'
-    super().__init__(message)
-    self.actual = actual
-    self.expected = expected
-
-
-# Prevent wrapping on a 100-character terminal.
-MAX_LINE_LEN = 100
-
-
-@enum.unique
-class TypeRelation(enum.Enum):
-  EQUIVALENT = 'equivalent'
-  IDENTICAL = 'identical'
-  ASSIGNABLE = 'assignable'
-
-
-def type_mismatch_error_message(
-    first: 'Type',
-    second: 'Type',
-    relation: TypeRelation,
-    second_is_expected: bool = False,
-) -> str:
-  """Returns an error message describing the mismatch between two types."""
-  maybe_expected = 'expected ' if second_is_expected else ''
-  first_str = first.compact_representation()
-  second_str = second.compact_representation()
-  diff = None
-  if first_str == second_str:
-    # The two only differ in container types or some other property not
-    # visible via the compact representation, so show `repr` instead.
-    # No diff is used because `repr` prints to a single line.
-    first_str = repr(first)
-    second_str = repr(second)
-    diff = None
-  elif len(first_str) > MAX_LINE_LEN or len(second_str) > MAX_LINE_LEN:
-    # The types are large structures, and so the formatted representation is
-    # used and a summary diff is added. The logic here is that large types
-    # may be easier to diff visually with a more structured representation,
-    # and logical line breaks are required to make diff output useful.
-    first_str = first.formatted_representation()
-    second_str = second.formatted_representation()
-    split_first = first_str.split('\n')
-    split_second = second_str.split('\n')
-    diff = '\n'.join(difflib.unified_diff(split_first, split_second))
-  message = [
-      'Type',
-      f'`{first_str}`',
-      f'is not {relation.value} to {maybe_expected}type',
-      f'`{second_str}`',
-  ]
-  if diff:
-    message += [f'\nDiff:\n{diff}']
-  single_line = ' '.join(message)
-  if len(single_line) > MAX_LINE_LEN or '\n' in single_line:
-    return '\n'.join(message)
-  else:
-    return single_line
+    super().__init__(f'Expected type of kind {expected}, found type {actual}.')
 
 
 class TypeNotAssignableError(TypeError):
 
   def __init__(self, source_type, target_type):
-    self.message = type_mismatch_error_message(
-        source_type, target_type, TypeRelation.ASSIGNABLE
+    super().__init__(
+        f'Expected {source_type} to be assignable to {target_type}.'
     )
-    super().__init__(self.message)
-    self.source_type = source_type
-    self.target_type = target_type
 
 
 class TypesNotEquivalentError(TypeError):
 
   def __init__(self, first_type, second_type):
-    self.message = type_mismatch_error_message(
-        first_type, second_type, TypeRelation.EQUIVALENT
+    super().__init__(
+        f'Expected {first_type} to be equivalent to {second_type}.'
     )
-    super().__init__(self.message)
-    self.first_type = first_type
-    self.second_type = second_type
 
 
 def _check_type_has_field(type_pb: computation_pb2.Type, field: str):
