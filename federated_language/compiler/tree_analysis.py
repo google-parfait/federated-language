@@ -582,21 +582,3 @@ def find_aggregations_in_tree(
 
   visit_postorder(comp, record_intrinsic_calls)
   return aggregation_calls
-
-
-def find_secure_aggregation_in_tree(
-    comp: building_blocks.ComputationBuildingBlock,
-) -> list[building_blocks.Call]:
-  """See documentation on `tree_contains_aggregation` for details."""
-  return find_aggregations_in_tree(
-      comp, lambda kind: kind == intrinsic_defs.AggregationKind.SECURE
-  )
-
-
-def find_unsecure_aggregation_in_tree(
-    comp: building_blocks.ComputationBuildingBlock,
-) -> list[building_blocks.Call]:
-  """See documentation on `tree_contains_aggregation` for details."""
-  return find_aggregations_in_tree(
-      comp, lambda kind: kind == intrinsic_defs.AggregationKind.DEFAULT
-  )

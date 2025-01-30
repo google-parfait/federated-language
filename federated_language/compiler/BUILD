@@ -265,7 +265,6 @@ py_test(
         ":computation_factory",
         ":transformation_utils",
         "//federated_language/common_libs:py_typecheck",
-        "//federated_language/proto:computation_py_pb2",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
         "@pypi//absl_py",

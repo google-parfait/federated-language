@@ -132,7 +132,6 @@ py_library(
         ":array_shape",
         ":computation_types",
         ":placements",
-        ":type_transformations",
         "//federated_language/common_libs:py_typecheck",
         "@pypi//ml_dtypes",
         "@pypi//numpy",
