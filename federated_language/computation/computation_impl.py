@@ -67,7 +67,7 @@ class ConcreteComputation(computation_base.Computation):
         building_block, building_blocks.ComputationBuildingBlock
     )
     return cls(
-        computation_proto=building_block.proto,
+        computation_proto=building_block.to_proto(),
         context_stack=context_stack_impl.context_stack,
         annotated_type=building_block.type_signature,  # pytype: disable=wrong-arg-types
     )

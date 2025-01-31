@@ -173,6 +173,7 @@ py_library(
         "//federated_language/types:typed_object",
         "@protobuf//:protobuf_python",
         "@pypi//numpy",
+        "@pypi//typing_extensions",
     ],
 )
 

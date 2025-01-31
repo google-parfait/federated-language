@@ -30,6 +30,7 @@ from federated_language.types import placements
 from federated_language.types import type_analysis
 from federated_language.types import typed_object
 import numpy as np
+import typing_extensions
 
 from google.protobuf import any_pb2
 
@@ -143,6 +144,12 @@ class ComputationBuildingBlock(typed_object.TypedObject, abc.ABC):
     return _structural_representation(self)
 
   @property
+  # TODO: b/318378631 - `typing_extensions.deprecated` is not supported by
+  # pytype.
+  @typing_extensions.deprecated(
+      '`ComputationBuildingBlock.proto is deprecated,'
+      ' use ComputationBuildingBlock.to_proto() instead.'
+  )  # pytype: disable=not-supported-yet
   def proto(self):
     """Returns a serialized form of this object as a computation_pb2.Computation instance."""
     return self.to_proto()
