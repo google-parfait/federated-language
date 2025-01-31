@@ -52,7 +52,7 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
     self.assertEqual(str(x.type_signature), 'int32')
     self.assertEqual(repr(x), "Reference('foo', TensorType(np.int32))")
     self.assertEqual(x.compact_representation(), 'foo')
-    x_proto = x.proto
+    x_proto = x.to_proto()
     self.assertEqual(
         computation_types.Type.from_proto(x_proto.type), x.type_signature
     )
@@ -106,12 +106,12 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
       _ = building_blocks.Selection(x, index=2)
     with self.assertRaises(ValueError):
       _ = building_blocks.Selection(x, index=-1)
-    y_proto = y.proto
+    y_proto = y.to_proto()
     self.assertEqual(
         computation_types.Type.from_proto(y_proto.type), y.type_signature
     )
     self.assertEqual(y_proto.WhichOneof('computation'), 'selection')
-    self.assertEqual(str(y_proto.selection.source), str(x.proto))
+    self.assertEqual(str(y_proto.selection.source), str(x.to_proto()))
     # Our serialized representation only uses indices.
     self.assertEqual(y_proto.selection.index, 0)
     self._serialize_deserialize_roundtrip_test(y)
@@ -148,7 +148,7 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
     self.assertEqual(
         ','.join(e.compact_representation() for e in iter(z)), 'foo,bar'
     )
-    z_proto = z.proto
+    z_proto = z.to_proto()
     self.assertEqual(
         computation_types.Type.from_proto(z_proto.type), z.type_signature
     )
@@ -196,13 +196,13 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
     w = building_blocks.Reference('bak', np.float32)
     with self.assertRaises(TypeError):
       building_blocks.Call(x, w)
-    z_proto = z.proto
+    z_proto = z.to_proto()
     self.assertEqual(
         computation_types.Type.from_proto(z_proto.type), z.type_signature
     )
     self.assertEqual(z_proto.WhichOneof('computation'), 'call')
-    self.assertEqual(str(z_proto.call.function), str(x.proto))
-    self.assertEqual(str(z_proto.call.argument), str(y.proto))
+    self.assertEqual(str(z_proto.call.function), str(x.to_proto()))
+    self.assertEqual(str(z_proto.call.argument), str(y.to_proto()))
     self._serialize_deserialize_roundtrip_test(z)
 
   def test_call_children_with_no_arg_yields_function(self):
@@ -253,14 +253,14 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
         "Selection(Reference('arg', {0}), name='x'))))".format(arg_type_repr),
     )
     self.assertEqual(x.compact_representation(), '(arg -> arg.f(arg.f(arg.x)))')
-    x_proto = x.proto
+    x_proto = x.to_proto()
     self.assertEqual(
         computation_types.Type.from_proto(x_proto.type), x.type_signature
     )
     self.assertEqual(x_proto.WhichOneof('computation'), 'lambda')
     self.assertEqual(getattr(x_proto, 'lambda').parameter_name, arg_name)
     self.assertEqual(
-        str(getattr(x_proto, 'lambda').result), str(x.result.proto)
+        str(getattr(x_proto, 'lambda').result), str(x.result.to_proto())
     )
     self._serialize_deserialize_roundtrip_test(x)
 
@@ -299,16 +299,16 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
         ),
     )
     self.assertEqual(x.compact_representation(), '(let x=arg,y=x[0] in y)')
-    x_proto = x.proto
+    x_proto = x.to_proto()
     self.assertEqual(
         computation_types.Type.from_proto(x_proto.type), x.type_signature
     )
     self.assertEqual(x_proto.WhichOneof('computation'), 'block')
-    self.assertEqual(str(x_proto.block.result), str(x.result.proto))
+    self.assertEqual(str(x_proto.block.result), str(x.result.to_proto()))
     for idx, loc_proto in enumerate(x_proto.block.local):
       loc_name, loc_value = x.locals[idx]
       self.assertEqual(loc_proto.name, loc_name)
-      self.assertEqual(str(loc_proto.value), str(loc_value.proto))
+      self.assertEqual(str(loc_proto.value), str(loc_value.to_proto()))
       self._serialize_deserialize_roundtrip_test(x)
 
   def test_block_children_returns_locals_then_result(self):
@@ -332,7 +332,7 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
         ),
     )
     self.assertEqual(x.compact_representation(), 'add_one')
-    x_proto = x.proto
+    x_proto = x.to_proto()
     self.assertEqual(
         computation_types.Type.from_proto(x_proto.type), x.type_signature
     )
@@ -354,7 +354,7 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
     self.assertEqual(str(x.type_signature), '(<int32,int32> -> int32)')
     self.assertEqual(x.uri, 'generic_plus')
     self.assertEqual(x.compact_representation(), 'generic_plus')
-    x_proto = x.proto
+    x_proto = x.to_proto()
     deserialized_type = computation_types.Type.from_proto(x_proto.type)
     x.type_signature.check_assignable_from(deserialized_type)
     self.assertEqual(x_proto.WhichOneof('computation'), 'intrinsic')
@@ -401,7 +401,7 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
     self.assertEqual(
         concrete_federated_map.compact_representation(), 'federated_map'
     )
-    concrete_federated_map_proto = concrete_federated_map.proto
+    concrete_federated_map_proto = concrete_federated_map.to_proto()
     self.assertEqual(
         computation_types.Type.from_proto(concrete_federated_map_proto.type),
         concrete_federated_map.type_signature,
@@ -435,7 +435,7 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
         x.compact_representation(),
         as_id_string,
     )
-    x_proto = x.proto
+    x_proto = x.to_proto()
     self.assertEqual(
         computation_types.Type.from_proto(x_proto.type), x.type_signature
     )
@@ -460,7 +460,7 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
     self.assertEqual(
         x.type_signature.compact_representation(), '(int32 -> int32)'
     )
-    self.assertIsInstance(x.proto, computation_pb2.Computation)
+    self.assertIsInstance(x.to_proto(), computation_pb2.Computation)
     self.assertEqual(x.name, 'a')
     self.assertTrue(
         repr(x),
@@ -491,7 +491,7 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
     self.assertEqual(x.uri, 'clients')
     self.assertEqual(repr(x), "Placement('clients')")
     self.assertEqual(x.compact_representation(), 'CLIENTS')
-    x_proto = x.proto
+    x_proto = x.to_proto()
     self.assertEqual(
         computation_types.Type.from_proto(x_proto.type), x.type_signature
     )
@@ -510,11 +510,11 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
       target: An instane of ComputationBuildingBlock to serialize-deserialize.
     """
     self.assertIsInstance(target, building_blocks.ComputationBuildingBlock)
-    serialized = target.proto
+    serialized = target.to_proto()
     deserialized = building_blocks.ComputationBuildingBlock.from_proto(
         serialized
     )
-    reserialized = deserialized.proto
+    reserialized = deserialized.to_proto()
     self.assertEqual(str(serialized), str(reserialized))
     # Note: This is not an equality comparison because ser/de is not an identity
     # transform: it will drop the container from `StructWithPythonType`.
@@ -1943,7 +1943,7 @@ class LiteralTest(parameterized.TestCase):
   def test_to_proto_returns_value(self):
     literal = building_blocks.Literal(1, computation_types.TensorType(np.int32))
 
-    actual_value = literal._proto()
+    actual_value = literal.to_proto()
 
     expected_value = computation_pb2.Computation(
         type=computation_pb2.Type(

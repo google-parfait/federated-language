@@ -34,16 +34,13 @@ import numpy as np
 from google.protobuf import any_pb2
 
 
-def _check_computation_oneof(
-    computation_proto: computation_pb2.Computation,
-    expected_oneof: str,
+def _check_computation_has_field(
+    computation_pb: computation_pb2.Computation, field: str
 ):
-  """Checks that `computation_proto` is a oneof of the expected variant."""
-  computation_oneof = computation_proto.WhichOneof('computation')
-  if computation_oneof != expected_oneof:
+  if not computation_pb.HasField(field):
     raise ValueError(
-        f'Expected the computation to be a {expected_oneof}, found'
-        f' {computation_oneof}.'
+        f'Expected `computation_pb` to have the field "{field}", found'
+        f' {computation_pb}.'
     )
 
 
@@ -61,68 +58,68 @@ class UnexpectedBlockError(TypeError):
 
 
 class ComputationBuildingBlock(typed_object.TypedObject, abc.ABC):
-  """The abstract base class for abstractions in the TFF's internal language.
+  """The abstract base class for abstractions in the internal language.
 
   Instances of this class correspond roughly one-to-one to the abstractions
   defined in the `Computation` message in TFF's `computation.proto`, and are
   intended primarily for the ease of manipulating the abstract syntax trees
-  (AST) of federated computations as they are transformed by TFF's compiler
+  (AST) of federated computations as they are transformed by the compiler
   pipeline to mold into the needs of a particular execution backend. The only
   abstraction that does not have a dedicated Python equivalent is a section
   of TensorFlow code (it's represented by
   `federated_language.framework.CompiledComputation`).
   """
 
+  def __init__(self, type_signature):
+    """Constructs a computation building block with the given type.
+
+    Args:
+      type_signature: An instance of types.Type, or something convertible to it
+        via types.to_type().
+    """
+    self._type_signature = computation_types.to_type(type_signature)
+    self._hash = None
+    self._proto = None
+
   @classmethod
   def from_proto(
-      cls, computation_proto: computation_pb2.Computation
+      cls, computation_pb: computation_pb2.Computation
   ) -> 'ComputationBuildingBlock':
-    """Returns an instance of a derived class based on 'computation_proto'.
-
-    Args:
-      computation_proto: An instance of computation_pb2.Computation.
-
-    Returns:
-      An instance of a class that implements 'ComputationBuildingBlock' and
-      that contains the deserialized logic from in 'computation_proto'.
-
-    Raises:
-      NotImplementedError: if computation_proto contains a kind of computation
-        for which deserialization has not been implemented yet.
-      ValueError: if deserialization failed due to the argument being invalid.
-    """
-    py_typecheck.check_type(computation_proto, computation_pb2.Computation)
-    computation_oneof = computation_proto.WhichOneof('computation')
-    deserializer = _deserializer_dict.get(computation_oneof)
-    if deserializer is not None:
-      deserialized = deserializer(computation_proto)
-      type_spec = computation_types.Type.from_proto(computation_proto.type)
-      if not deserialized.type_signature.is_equivalent_to(type_spec):
-        raise ValueError(
-            'The type {} derived from the computation structure does not '
-            'match the type {} declared in its signature'.format(
-                deserialized.type_signature, type_spec
-            )
-        )
-      return deserialized
+    """Returns a `ComputationBuildingBlock` for the `computation_pb`."""
+    computation_oneof = computation_pb.WhichOneof('computation')
+    if computation_oneof == 'block':
+      return Block.from_proto(computation_pb)
+    elif computation_oneof == 'call':
+      return Call.from_proto(computation_pb)
+    elif computation_oneof == 'data':
+      return Data.from_proto(computation_pb)
+    elif computation_oneof == 'intrinsic':
+      return Intrinsic.from_proto(computation_pb)
+    elif computation_oneof == 'lambda':
+      return Lambda.from_proto(computation_pb)
+    elif computation_oneof == 'literal':
+      return Literal.from_proto(computation_pb)
+    elif computation_oneof == 'placement':
+      return Placement.from_proto(computation_pb)
+    elif computation_oneof == 'reference':
+      return Reference.from_proto(computation_pb)
+    elif computation_oneof == 'selection':
+      return Selection.from_proto(computation_pb)
+    elif computation_oneof == 'struct':
+      return Struct.from_proto(computation_pb)
+    elif computation_oneof == 'tensorflow':
+      return CompiledComputation.from_proto(computation_pb)
+    elif computation_oneof == 'xla':
+      return CompiledComputation.from_proto(computation_pb)
     else:
       raise NotImplementedError(
-          'Deserialization for computations of type {} has not been '
-          'implemented yet.'.format(computation_oneof)
+          f'Unexpected computation found: {computation_oneof}.'
       )
-    return deserializer(computation_proto)
 
-  def __init__(self, type_spec):
-    """Constructs a computation building block with the given TFF type.
-
-    Args:
-      type_spec: An instance of types.Type, or something convertible to it via
-        types.to_type().
-    """
-    type_signature = computation_types.to_type(type_spec)
-    self._type_signature = type_signature
-    self._cached_hash = None
-    self._cached_proto = None
+  @abc.abstractmethod
+  def to_proto(self):
+    """Returns a `computation_pb2.Computation` for this building block."""
+    raise NotImplementedError
 
   @property
   def type_signature(self) -> computation_types.Type:
@@ -148,27 +145,18 @@ class ComputationBuildingBlock(typed_object.TypedObject, abc.ABC):
   @property
   def proto(self):
     """Returns a serialized form of this object as a computation_pb2.Computation instance."""
-    if self._cached_proto is None:
-      self._cached_proto = self._proto()
-    return self._cached_proto
+    return self.to_proto()
 
-  @abc.abstractmethod
-  def _proto(self):
-    """Uncached, internal version of `proto`."""
-    raise NotImplementedError
+  def __str__(self):
+    return self.compact_representation()
 
   @abc.abstractmethod
   def __repr__(self):
-    """Returns a full-form representation of this computation building block."""
     raise NotImplementedError
-
-  def __str__(self):
-    """Returns a concise representation of this computation building block."""
-    return self.compact_representation()
 
 
 class Reference(ComputationBuildingBlock):
-  """A reference to a name defined earlier in TFF's internal language.
+  """A reference to a name defined earlier in the internal language.
 
   Names are defined by lambda expressions (which have formal named parameters),
   and block structures (which can have one or more locals). The reference
@@ -182,22 +170,12 @@ class Reference(ComputationBuildingBlock):
   that must have been defined somewhere in the surrounding context.
   """
 
-  @classmethod
-  def from_proto(
-      cls, computation_proto: computation_pb2.Computation
-  ) -> 'Reference':
-    _check_computation_oneof(computation_proto, 'reference')
-    return cls(
-        str(computation_proto.reference.name),
-        computation_types.Type.from_proto(computation_proto.type),
-    )
-
-  def __init__(self, name: str, type_spec: object, context=None):
-    """Creates a reference to 'name' of type 'type_spec' in context 'context'.
+  def __init__(self, name: str, type_signature: object, context=None):
+    """Creates a reference to 'name' of type 'type_signature' in context 'context'.
 
     Args:
       name: The name of the referenced entity.
-      type_spec: The type spec of the referenced entity.
+      type_signature: The type spec of the referenced entity.
       context: The optional context in which the referenced entity is defined.
         This class does not prescribe what Python type the 'context' needs to be
         and merely exposes it as a property (see below). The only requirement is
@@ -206,16 +184,30 @@ class Reference(ComputationBuildingBlock):
     Raises:
       TypeError: if the arguments are of the wrong types.
     """
-    py_typecheck.check_type(name, str)
-    super().__init__(type_spec)
+    super().__init__(type_signature)
     self._name = name
     self._context = context
 
-  def _proto(self):
-    return computation_pb2.Computation(
-        type=self.type_signature.to_proto(),
-        reference=computation_pb2.Reference(name=self._name),
-    )
+  @classmethod
+  def from_proto(
+      cls, computation_pb: computation_pb2.Computation
+  ) -> 'Reference':
+    """Returns a `Reference` for the `computation_pb`."""
+    _check_computation_has_field(computation_pb, 'reference')
+
+    type_signature = computation_types.Type.from_proto(computation_pb.type)
+    return Reference(computation_pb.reference.name, type_signature)
+
+  def to_proto(self) -> computation_pb2.Computation:
+    """Returns a `computation_pb2.Computation` for this building block."""
+    if self._proto is None:
+      type_pb = self._type_signature.to_proto()
+      reference_pb = computation_pb2.Reference(name=self._name)
+      self._proto = computation_pb2.Computation(
+          type=type_pb,
+          reference=reference_pb,
+      )
+    return self._proto
 
   def children(self) -> Iterator[ComputationBuildingBlock]:
     del self
@@ -241,35 +233,27 @@ class Reference(ComputationBuildingBlock):
     return False
 
   def __hash__(self):
-    if self._cached_hash is None:
-      self._cached_hash = hash((self._name, self._type_signature))
-    return self._cached_hash
+    if self._hash is None:
+      self._hash = hash((self._name, self._type_signature))
+    return self._hash
 
   def __repr__(self):
-    return "Reference('{}', {!r}{})".format(
-        self._name,
-        self.type_signature,
-        ', {!r}'.format(self._context) if self._context is not None else '',
-    )
+    if self._context is not None:
+      return (
+          f'Reference({self._name!r}, {self._type_signature!r},'
+          f' {self._context!r})'
+      )
+    else:
+      return f'Reference({self._name!r}, {self._type_signature!r})'
 
 
 class Selection(ComputationBuildingBlock):
-  """A selection by name or index from a struct-typed value in TFF's language.
+  """A selection by name or index from a struct-typed value in the language.
 
   The concise syntax for selections is `foo.bar` (selecting a named `bar` from
   the value of expression `foo`), and `foo[n]` (selecting element at index `n`
   from the value of `foo`).
   """
-
-  @classmethod
-  def from_proto(
-      cls, computation_proto: computation_pb2.Computation
-  ) -> 'Selection':
-    _check_computation_oneof(computation_proto, 'selection')
-    selection = ComputationBuildingBlock.from_proto(
-        computation_proto.selection.source
-    )
-    return cls(selection, index=computation_proto.selection.index)
 
   def __init__(
       self,
@@ -293,13 +277,12 @@ class Selection(ComputationBuildingBlock):
         is not compatible with the type signature of the source, or neither or
         both are defined (not None).
     """
-    py_typecheck.check_type(source, ComputationBuildingBlock)
     source_type = source.type_signature
     # TODO: b/224484886 - Downcasting to all handled types.
     source_type = typing.cast(Union[computation_types.StructType], source_type)
     if not isinstance(source_type, computation_types.StructType):
       raise TypeError(
-          'Expected the source of selection to be a TFF struct, '
+          'Expected the source of selection to be a `StructType`, '
           'instead found it to be of type {}.'.format(source_type)
       )
     if name is not None and index is not None:
@@ -307,7 +290,6 @@ class Selection(ComputationBuildingBlock):
           'Cannot simultaneously specify a name and an index, choose one.'
       )
     if name is not None:
-      py_typecheck.check_type(name, str)
       if not name:
         raise ValueError('The name of the selected element cannot be empty.')
       # Normalize, in case we are dealing with a Unicode type or some such.
@@ -319,7 +301,6 @@ class Selection(ComputationBuildingBlock):
         )
       type_signature = source_type[name]
     elif index is not None:
-      py_typecheck.check_type(index, int)
       length = len(source_type)
       if index < 0 or index >= length:
         raise ValueError(
@@ -336,14 +317,32 @@ class Selection(ComputationBuildingBlock):
     self._name = name
     self._index = index
 
-  def _proto(self):
-    selection = computation_pb2.Selection(
-        source=self._source.proto, index=self.as_index()
+  @classmethod
+  def from_proto(
+      cls, computation_pb: computation_pb2.Computation
+  ) -> 'Selection':
+    """Returns a `Selection` for the `computation_pb`."""
+    _check_computation_has_field(computation_pb, 'selection')
+
+    source = ComputationBuildingBlock.from_proto(
+        computation_pb.selection.source
     )
-    return computation_pb2.Computation(
-        type=self.type_signature.to_proto(),
-        selection=selection,
-    )
+    return Selection(source, index=computation_pb.selection.index)
+
+  def to_proto(self) -> computation_pb2.Computation:
+    """Returns a `computation_pb2.Computation` for this building block."""
+    if self._proto is None:
+      type_pb = self._type_signature.to_proto()
+      source_pb = self._source.to_proto()
+      selection_pb = computation_pb2.Selection(
+          source=source_pb,
+          index=self.as_index(),
+      )
+      return computation_pb2.Computation(
+          type=type_pb,
+          selection=selection_pb,
+      )
+    return self._proto
 
   def children(self) -> Iterator[ComputationBuildingBlock]:
     yield self._source
@@ -364,7 +363,7 @@ class Selection(ComputationBuildingBlock):
     if self._index is not None:
       return self._index
     else:
-      field_to_index = structure.name_to_index_map(self.source.type_signature)  # pytype: disable=wrong-arg-types
+      field_to_index = structure.name_to_index_map(self._source.type_signature)  # pytype: disable=wrong-arg-types
       return field_to_index[self._name]
 
   def __eq__(self, other: object) -> bool:
@@ -383,19 +382,19 @@ class Selection(ComputationBuildingBlock):
     )
 
   def __hash__(self):
-    if self._cached_hash is None:
-      self._cached_hash = hash((self._source, self._name, self._index))
-    return self._cached_hash
+    if self._hash is None:
+      self._hash = hash((self._source, self._name, self._index))
+    return self._hash
 
   def __repr__(self):
     if self._name is not None:
-      return "Selection({!r}, name='{}')".format(self._source, self._name)
+      return f'Selection({self._source!r}, name={self._name!r})'
     else:
-      return 'Selection({!r}, index={})'.format(self._source, self._index)
+      return f'Selection({self._source!r}, index={self._index!r})'
 
 
 class Struct(ComputationBuildingBlock, structure.Struct):
-  """A struct with named or unnamed elements in TFF's internal language.
+  """A struct with named or unnamed elements in the internal language.
 
   The concise notation for structs is `<name_1=value_1, ...., name_n=value_n>`
   for structs with named elements, `<value_1, ..., value_n>` for structs with
@@ -406,25 +405,6 @@ class Struct(ComputationBuildingBlock, structure.Struct):
   For example, a lambda expression that applies `fn` to elements of 2-structs
   pointwise could be represented as `(arg -> <fn(arg[0]),fn(arg[1])>)`.
   """
-
-  @classmethod
-  def from_proto(
-      cls, computation_proto: computation_pb2.Computation
-  ) -> 'Struct':
-    _check_computation_oneof(computation_proto, 'struct')
-
-    def _element(
-        proto: computation_pb2.Struct.Element,
-    ) -> tuple[Optional[str], ComputationBuildingBlock]:
-      if proto.name:
-        name = str(proto.name)
-      else:
-        name = None
-      element = ComputationBuildingBlock.from_proto(proto.value)
-      return (name, element)
-
-    elements = [_element(x) for x in computation_proto.struct.element]
-    return cls(elements)
 
   def __init__(self, elements, container_type=None):
     """Constructs a struct from the given list of elements.
@@ -473,25 +453,48 @@ class Struct(ComputationBuildingBlock, structure.Struct):
     structure.Struct.__init__(self, elements)
     self._type_signature = type_signature
 
+  @classmethod
+  def from_proto(cls, computation_pb: computation_pb2.Computation) -> 'Struct':
+    """Returns a `Struct` for the `computation_pb`."""
+    _check_computation_has_field(computation_pb, 'struct')
+    elements = []
+    for element_pb in computation_pb.struct.element:
+      if element_pb.name:
+        name = element_pb.name
+      else:
+        name = None
+      element = ComputationBuildingBlock.from_proto(element_pb.value)
+      elements.append((name, element))
+    return Struct(elements)
+
+  def to_proto(self) -> computation_pb2.Computation:
+    """Returns a `computation_pb2.Computation` for this building block."""
+    if self._proto is None:
+      type_pb = self._type_signature.to_proto()
+      element_pbs = []
+      for name, element in self.items():
+        value_pb = element.to_proto()
+        element_pb = computation_pb2.Struct.Element(
+            name=name,
+            value=value_pb,
+        )
+        element_pbs.append(element_pb)
+      struct_pb = computation_pb2.Struct(element=element_pbs)
+      self._proto = computation_pb2.Computation(
+          type=type_pb,
+          struct=struct_pb,
+      )
+    return self._proto
+
   @property
   def type_signature(self) -> computation_types.StructType:
     return self._type_signature
 
-  def _proto(self):
-    elements = []
-    for k, v in structure.iter_elements(self):
-      if k is not None:
-        element = computation_pb2.Struct.Element(name=k, value=v.proto)
-      else:
-        element = computation_pb2.Struct.Element(value=v.proto)
-      elements.append(element)
-    return computation_pb2.Computation(
-        type=self.type_signature.to_proto(),
-        struct=computation_pb2.Struct(element=elements),
-    )
-
   def children(self) -> Iterator[ComputationBuildingBlock]:
     return (element for _, element in structure.iter_elements(self))
+
+  def items(self) -> Iterator[tuple[Optional[str], ComputationBuildingBlock]]:
+    return structure.iter_elements(self)
 
   def __eq__(self, other: object) -> bool:
     if self is other:
@@ -503,46 +506,29 @@ class Struct(ComputationBuildingBlock, structure.Struct):
     return structure.Struct.__eq__(self, other)
 
   def __hash__(self):
-    if self._cached_hash is None:
-      self._cached_hash = hash((
+    if self._hash is None:
+      self._hash = hash((
           structure.Struct.__hash__(self),
           self._type_signature,
       ))
-    return self._cached_hash
+    return self._hash
 
   def __repr__(self):
-    def _element_repr(element):
-      name, value = element
-      name_repr = "'{}'".format(name) if name is not None else 'None'
-      return '({}, {!r})'.format(name_repr, value)
-
-    return 'Struct([{}])'.format(
-        ', '.join(_element_repr(e) for e in structure.iter_elements(self))
-    )
+    elements = list(self.items())
+    return f'Struct({elements!r})'
 
 
 class Call(ComputationBuildingBlock):
-  """A representation of a function invocation in TFF's internal language.
+  """A representation of a function invocation in the internal language.
 
   The call construct takes an argument struct with two elements, the first being
   the function to invoke (represented as a computation with a functional result
   type), and the second being the argument to feed to that function. Typically,
-  the function is either a TFF instrinsic, or a lambda expression.
+  the function is either an intrinsic, or a lambda expression.
 
   The concise notation for calls is `foo(bar)`, where `foo` is the function,
   and `bar` is the argument.
   """
-
-  @classmethod
-  def from_proto(cls, computation_proto: computation_pb2.Computation) -> 'Call':
-    _check_computation_oneof(computation_proto, 'call')
-    fn = ComputationBuildingBlock.from_proto(computation_proto.call.function)
-    arg_proto = computation_proto.call.argument
-    if arg_proto.WhichOneof('computation') is not None:
-      arg = ComputationBuildingBlock.from_proto(arg_proto)
-    else:
-      arg = None
-    return cls(fn, arg)
 
   def __init__(
       self,
@@ -559,9 +545,6 @@ class Call(ComputationBuildingBlock):
     Raises:
       TypeError: if the arguments are of the wrong types.
     """
-    py_typecheck.check_type(fn, ComputationBuildingBlock)
-    if arg is not None:
-      py_typecheck.check_type(arg, ComputationBuildingBlock)
     function_type = fn.type_signature
     # TODO: b/224484886 - Downcasting to all handled types.
     function_type = typing.cast(
@@ -590,16 +573,37 @@ class Call(ComputationBuildingBlock):
     self._function = fn
     self._argument = arg
 
-  def _proto(self):
-    if self._argument is not None:
-      call = computation_pb2.Call(
-          function=self._function.proto, argument=self._argument.proto
-      )
+  @classmethod
+  def from_proto(cls, computation_pb: computation_pb2.Computation) -> 'Call':
+    """Returns a `Call` for the `computation_pb`."""
+    _check_computation_has_field(computation_pb, 'call')
+
+    fn = ComputationBuildingBlock.from_proto(computation_pb.call.function)
+    arg_proto = computation_pb.call.argument
+    if arg_proto.WhichOneof('computation') is not None:
+      arg = ComputationBuildingBlock.from_proto(arg_proto)
     else:
-      call = computation_pb2.Call(function=self._function.proto)
-    return computation_pb2.Computation(
-        type=self.type_signature.to_proto(), call=call
-    )
+      arg = None
+    return Call(fn, arg)
+
+  def to_proto(self) -> computation_pb2.Computation:
+    """Returns a `computation_pb2.Computation` for this building block."""
+    if self._proto is None:
+      type_pb = self._type_signature.to_proto()
+      function_pb = self._function.to_proto()
+      if self._argument is not None:
+        argument_pb = self._argument.to_proto()
+      else:
+        argument_pb = None
+      call_pb = computation_pb2.Call(
+          function=function_pb,
+          argument=argument_pb,
+      )
+      self._proto = computation_pb2.Computation(
+          type=type_pb,
+          call=call_pb,
+      )
+    return self._proto
 
   def children(self) -> Iterator[ComputationBuildingBlock]:
     yield self._function
@@ -628,40 +632,25 @@ class Call(ComputationBuildingBlock):
     )
 
   def __hash__(self):
-    if self._cached_hash is None:
-      self._cached_hash = hash((self._function, self._argument))
-    return self._cached_hash
+    if self._hash is None:
+      self._hash = hash((self._function, self._argument))
+    return self._hash
 
   def __repr__(self):
     if self._argument is not None:
-      return 'Call({!r}, {!r})'.format(self._function, self._argument)
+      return f'Call({self._function!r}, {self._argument!r})'
     else:
-      return 'Call({!r})'.format(self._function)
+      return f'Call({self._function!r})'
 
 
 class Lambda(ComputationBuildingBlock):
-  """A representation of a lambda expression in TFF's internal language.
+  """A representation of a lambda expression in the internal language.
 
   A lambda expression consists of a string formal parameter name, and a result
   expression that can contain references by name to that formal parameter. A
   concise notation for lambdas is `(foo -> bar)`, where `foo` is the name of
   the formal parameter, and `bar` is the result expression.
   """
-
-  @classmethod
-  def from_proto(
-      cls, computation_proto: computation_pb2.Computation
-  ) -> 'Lambda':
-    _check_computation_oneof(computation_proto, 'lambda')
-    fn: computation_pb2.Lambda = getattr(computation_proto, 'lambda')
-    if computation_proto.type.function.HasField('parameter'):
-      parameter_type = computation_types.Type.from_proto(
-          computation_proto.type.function.parameter
-      )
-    else:
-      parameter_type = None
-    result = ComputationBuildingBlock.from_proto(fn.result)
-    return cls(fn.parameter_name, parameter_type, result)
 
   def __init__(
       self,
@@ -695,9 +684,7 @@ class Lambda(ComputationBuildingBlock):
           )
       )
     if parameter_name is not None:
-      py_typecheck.check_type(parameter_name, str)
       parameter_type = computation_types.to_type(parameter_type)
-    py_typecheck.check_type(result, ComputationBuildingBlock)
     type_signature = computation_types.FunctionType(
         parameter_type, result.type_signature
     )
@@ -707,20 +694,41 @@ class Lambda(ComputationBuildingBlock):
     self._result = result
     self._type_signature = type_signature
 
+  @classmethod
+  def from_proto(cls, computation_pb: computation_pb2.Computation) -> 'Lambda':
+    """Returns a `Lambda` for the `computation_pb`."""
+    _check_computation_has_field(computation_pb, 'lambda')
+
+    fn_pb: computation_pb2.Lambda = getattr(computation_pb, 'lambda')
+    if computation_pb.type.function.HasField('parameter'):
+      parameter_type = computation_types.Type.from_proto(
+          computation_pb.type.function.parameter
+      )
+    else:
+      parameter_type = None
+    result = ComputationBuildingBlock.from_proto(fn_pb.result)
+    return Lambda(fn_pb.parameter_name, parameter_type, result)
+
+  def to_proto(self) -> computation_pb2.Computation:
+    """Returns a `computation_pb2.Computation` for this building block."""
+    if self._proto is None:
+      type_pb = self._type_signature.to_proto()
+      result_pb = self._result.to_proto()
+      fn_pb = computation_pb2.Lambda(
+          parameter_name=self._parameter_name,
+          result=result_pb,
+      )
+      # We are unpacking the lambda argument here because `lambda` is a reserved
+      # keyword in Python, but it is also the name of the parameter for a
+      # `computation_pb2.Computation`.
+      self._proto = computation_pb2.Computation(
+          type=type_pb, **{'lambda': fn_pb}
+      )
+    return self._proto
+
   @property
   def type_signature(self) -> computation_types.FunctionType:
     return self._type_signature
-
-  def _proto(self) -> computation_pb2.Computation:
-    type_signature = self.type_signature.to_proto()
-    fn = computation_pb2.Lambda(
-        parameter_name=self._parameter_name, result=self._result.proto
-    )
-    # We are unpacking the lambda argument here because `lambda` is a reserved
-    # keyword in Python, but it is also the name of the parameter for a
-    # `computation_pb2.Computation`.
-    # https://developers.google.com/protocol-buffers/docs/reference/python-generated#keyword-conflicts
-    return computation_pb2.Computation(type=type_signature, **{'lambda': fn})  # pytype: disable=wrong-keyword-args
 
   def children(self) -> Iterator[ComputationBuildingBlock]:
     yield self._result
@@ -753,22 +761,23 @@ class Lambda(ComputationBuildingBlock):
     )
 
   def __hash__(self):
-    if self._cached_hash is None:
-      self._cached_hash = hash((
+    if self._hash is None:
+      self._hash = hash((
           self._parameter_name,
           self._parameter_type,
           self._result,
       ))
-    return self._cached_hash
+    return self._hash
 
   def __repr__(self) -> str:
-    return "Lambda('{}', {!r}, {!r})".format(
-        self._parameter_name, self._parameter_type, self._result
+    return (
+        f'Lambda({self._parameter_name!r}, {self._parameter_type!r},'
+        f' {self._result!r})'
     )
 
 
 class Block(ComputationBuildingBlock):
-  """A representation of a block of code in TFF's internal language.
+  """A representation of a block of code in the internal language.
 
   A block is a syntactic structure that consists of a sequence of local name
   bindings followed by a result. The bindings are interpreted sequentially,
@@ -808,19 +817,6 @@ class Block(ComputationBuildingBlock):
   ```
   """
 
-  @classmethod
-  def from_proto(
-      cls, computation_proto: computation_pb2.Computation
-  ) -> 'Block':
-    _check_computation_oneof(computation_proto, 'block')
-    return cls(
-        [
-            (str(loc.name), ComputationBuildingBlock.from_proto(loc.value))
-            for loc in computation_proto.block.local
-        ],
-        ComputationBuildingBlock.from_proto(computation_proto.block.result),
-    )
-
   def __init__(
       self,
       local_symbols: Iterable[tuple[str, ComputationBuildingBlock]],
@@ -853,33 +849,59 @@ class Block(ComputationBuildingBlock):
         )
       name = element[0]
       value = element[1]
-      py_typecheck.check_type(value, ComputationBuildingBlock)
       updated_locals.append((name, value))
-    py_typecheck.check_type(result, ComputationBuildingBlock)
     super().__init__(result.type_signature)
-    self._locals = updated_locals
+    self._local_symbols = updated_locals
     self._result = result
 
-  def _proto(self) -> computation_pb2.Computation:
-    return computation_pb2.Computation(
-        type=self.type_signature.to_proto(),
-        block=computation_pb2.Block(**{
-            'local': [
-                computation_pb2.Block.Local(name=k, value=v.proto)
-                for k, v in self._locals
-            ],
-            'result': self._result.proto,
-        }),
-    )
+  @classmethod
+  def from_proto(cls, computation_pb: computation_pb2.Computation) -> 'Block':
+    """Returns a `Block` for the `computation_pb`."""
+    _check_computation_has_field(computation_pb, 'block')
+
+    local_symbols = []
+    for local_symbol_pb in computation_pb.block.local:
+      if local_symbol_pb.name:
+        name = local_symbol_pb.name
+      else:
+        name = None
+      symbol = ComputationBuildingBlock.from_proto(local_symbol_pb.value)
+      local_symbols.append((name, symbol))
+    result = ComputationBuildingBlock.from_proto(computation_pb.block.result)
+    return Block(local_symbols, result)
+
+  def to_proto(self) -> computation_pb2.Computation:
+    """Returns a `computation_pb2.Computation` for this building block."""
+    if self._proto is None:
+      type_pb = self._type_signature.to_proto()
+
+      local_symbol_pbs = []
+      for name, local_symbol in self._local_symbols:
+        value_pb = local_symbol.to_proto()
+        local_symbol_pb = computation_pb2.Block.Local(
+            name=name,
+            value=value_pb,
+        )
+        local_symbol_pbs.append(local_symbol_pb)
+      result_pb = self._result.to_proto()
+      block_pb = computation_pb2.Block(
+          **{'local': local_symbol_pbs},
+          result=result_pb,
+      )
+      self._proto = computation_pb2.Computation(
+          type=type_pb,
+          block=block_pb,
+      )
+    return self._proto
 
   def children(self) -> Iterator[ComputationBuildingBlock]:
-    for _, value in self._locals:
+    for _, value in self._local_symbols:
       yield value
     yield self._result
 
   @property
   def locals(self) -> list[tuple[str, ComputationBuildingBlock]]:
-    return list(self._locals)
+    return list(self._local_symbols)
 
   @property
   def result(self) -> ComputationBuildingBlock:
@@ -890,40 +912,33 @@ class Block(ComputationBuildingBlock):
       return True
     elif not isinstance(other, Block):
       return NotImplemented
-    return (self._locals, self._result) == (other._locals, other._result)
+    return (
+        self._local_symbols,
+        self._result,
+    ) == (
+        other._local_symbols,
+        other._result,
+    )
 
   def __hash__(self):
-    if self._cached_hash is None:
-      self._cached_hash = hash((tuple(self._locals), self._result))
-    return self._cached_hash
+    if self._hash is None:
+      self._hash = hash((tuple(self._local_symbols), self._result))
+    return self._hash
 
   def __repr__(self) -> str:
-    return 'Block([{}], {!r})'.format(
-        ', '.join("('{}', {!r})".format(k, v) for k, v in self._locals),
-        self._result,
-    )
+    return f'Block({self._local_symbols!r}, {self._result!r})'
 
 
 class Intrinsic(ComputationBuildingBlock):
-  """A representation of an intrinsic in TFF's internal language.
+  """A representation of an intrinsic in the internal language.
 
-  An instrinsic is a symbol known to the TFF's compiler pipeline, represented
+  An intrinsic is a symbol known to the compiler pipeline, represented
   as a known URI. It generally appears in expressions with a concrete type,
   although all intrinsic are defined with template types. This class does not
   deal with parsing intrinsic URIs and verifying their types, it is only a
   container. Parsing and type analysis are a responsibility of the components
   that manipulate ASTs. See intrinsic_defs.py for the list of known intrinsics.
   """
-
-  @classmethod
-  def from_proto(
-      cls, computation_proto: computation_pb2.Computation
-  ) -> 'Intrinsic':
-    _check_computation_oneof(computation_proto, 'intrinsic')
-    return cls(
-        computation_proto.intrinsic.uri,
-        computation_types.Type.from_proto(computation_proto.type),
-    )
 
   def __init__(self, uri: str, type_signature: computation_types.Type):
     """Creates an intrinsic.
@@ -935,8 +950,6 @@ class Intrinsic(ComputationBuildingBlock):
     Raises:
       TypeError: if the arguments are of the wrong types.
     """
-    py_typecheck.check_type(uri, str)
-    py_typecheck.check_type(type_signature, computation_types.Type)
     intrinsic_def = intrinsic_defs.uri_to_intrinsic_def(uri)
     if intrinsic_def is not None:
       # Note: this is really expensive.
@@ -946,11 +959,26 @@ class Intrinsic(ComputationBuildingBlock):
     super().__init__(type_signature)
     self._uri = uri
 
-  def _proto(self) -> computation_pb2.Computation:
-    return computation_pb2.Computation(
-        type=self.type_signature.to_proto(),
-        intrinsic=computation_pb2.Intrinsic(uri=self._uri),
-    )
+  @classmethod
+  def from_proto(
+      cls, computation_pb: computation_pb2.Computation
+  ) -> 'Intrinsic':
+    """Returns a `Intrinsic` for the `computation_pb`."""
+    _check_computation_has_field(computation_pb, 'intrinsic')
+
+    type_signature = computation_types.Type.from_proto(computation_pb.type)
+    return Intrinsic(computation_pb.intrinsic.uri, type_signature)
+
+  def to_proto(self) -> computation_pb2.Computation:
+    """Returns a `computation_pb2.Computation` for this building block."""
+    if self._proto is None:
+      type_pb = self._type_signature.to_proto()
+      intrinsic_pb = computation_pb2.Intrinsic(uri=self._uri)
+      self._proto = computation_pb2.Computation(
+          type=type_pb,
+          intrinsic=intrinsic_pb,
+      )
+    return self._proto
 
   def intrinsic_def(self) -> intrinsic_defs.IntrinsicDef:
     intrinsic_def = intrinsic_defs.uri_to_intrinsic_def(self._uri)
@@ -984,12 +1012,12 @@ class Intrinsic(ComputationBuildingBlock):
     )
 
   def __hash__(self):
-    if self._cached_hash is None:
-      self._cached_hash = hash((self._uri, self._type_signature))
-    return self._cached_hash
+    if self._hash is None:
+      self._hash = hash((self._uri, self._type_signature))
+    return self._hash
 
   def __repr__(self) -> str:
-    return "Intrinsic('{}', {!r})".format(self._uri, self.type_signature)
+    return f'Intrinsic({self._uri!r}, {self._type_signature!r})'
 
 
 class Data(ComputationBuildingBlock):
@@ -1000,37 +1028,35 @@ class Data(ComputationBuildingBlock):
   or a component external to this module.
   """
 
-  @classmethod
-  def from_proto(cls, computation_proto: computation_pb2.Computation) -> 'Data':
-    _check_computation_oneof(computation_proto, 'data')
-    return cls(
-        computation_proto.data.content,
-        computation_types.Type.from_proto(computation_proto.type),
-    )
-
-  def __init__(self, content: any_pb2.Any, type_spec: object):
+  def __init__(self, content: any_pb2.Any, type_signature: object):
     """Creates a representation of data.
 
     Args:
       content: The proto that characterizes the data.
-      type_spec: Either the types.Type that represents the type of this data, or
-        something convertible to it by types.to_type().
-
-    Raises:
-      TypeError: if the arguments are of the wrong types.
-      ValueError: if the user tries to specify an empty URI.
+      type_signature: Either the types.Type that represents the type of this
+        data, or something convertible to it by types.to_type().
     """
-    if type_spec is None:
-      raise TypeError('Expected `type_spec` to not be `None`.')
-    type_spec = computation_types.to_type(type_spec)
-    super().__init__(type_spec)
+    super().__init__(type_signature)
     self._content = content
 
-  def _proto(self) -> computation_pb2.Computation:
-    return computation_pb2.Computation(
-        type=self.type_signature.to_proto(),
-        data=computation_pb2.Data(content=self._content),
-    )
+  @classmethod
+  def from_proto(cls, computation_pb: computation_pb2.Computation) -> 'Data':
+    """Returns a `Data` for the `computation_pb`."""
+    _check_computation_has_field(computation_pb, 'data')
+
+    type_signature = computation_types.Type.from_proto(computation_pb.type)
+    return Data(computation_pb.data.content, type_signature)
+
+  def to_proto(self) -> computation_pb2.Computation:
+    """Returns a `computation_pb2.Computation` for this building block."""
+    if self._proto is None:
+      type_pb = self._type_signature.to_proto()
+      data_pb = computation_pb2.Data(content=self._content)
+      self._proto = computation_pb2.Computation(
+          type=type_pb,
+          data=data_pb,
+      )
+    return self._proto
 
   def children(self) -> Iterator[ComputationBuildingBlock]:
     del self
@@ -1054,12 +1080,12 @@ class Data(ComputationBuildingBlock):
     )
 
   def __hash__(self):
-    if self._cached_hash is None:
-      self._cached_hash = hash((str(self._content), self._type_signature))
-    return self._cached_hash
+    if self._hash is None:
+      self._hash = hash((str(self._content), self._type_signature))
+    return self._hash
 
   def __repr__(self) -> str:
-    return 'Data({!r}, {!r})'.format(self._content, self.type_signature)
+    return f'Data({self._content!r}, {self._type_signature!r})'
 
 
 class CompiledComputation(ComputationBuildingBlock):
@@ -1088,27 +1114,24 @@ class CompiledComputation(ComputationBuildingBlock):
         autogenerated as a hexadecimal string from the hash of the proto.
       type_signature: An optional type signature to associate with this
         computation rather than the serialized one.
-
-    Raises:
-      TypeError: if the arguments are of the wrong types.
     """
-    py_typecheck.check_type(proto, computation_pb2.Computation)
-    if name is not None:
-      py_typecheck.check_type(name, str)
     if type_signature is None:
       type_signature = computation_types.Type.from_proto(proto.type)
-    py_typecheck.check_type(type_signature, computation_types.Type)
     super().__init__(type_signature)
-    self._proto_representation = proto
-    if name is not None:
-      self._name = name
-    else:
-      self._name = '{:x}'.format(
-          zlib.adler32(self._proto_representation.SerializeToString())
-      )
+    self._proto = proto
+    if name is None:
+      name = '{:x}'.format(zlib.adler32(self._proto.SerializeToString()))
+    self._name = name
 
-  def _proto(self) -> computation_pb2.Computation:
-    return self._proto_representation
+  @classmethod
+  def from_proto(
+      cls, computation_pb: computation_pb2.Computation
+  ) -> 'CompiledComputation':
+    """Returns a `CompiledComputation` for the `computation_pb`."""
+    return CompiledComputation(computation_pb)
+
+  def to_proto(self) -> computation_pb2.Computation:
+    return self._proto
 
   def children(self) -> Iterator[ComputationBuildingBlock]:
     del self
@@ -1124,47 +1147,34 @@ class CompiledComputation(ComputationBuildingBlock):
     elif not isinstance(other, CompiledComputation):
       return NotImplemented
     return (
-        self._proto_representation,
+        self._proto,
         self._name,
         self._type_signature,
     ) == (
-        other._proto_representation,
+        other._proto,
         other._name,
         other._type_signature,
     )
 
   def __hash__(self):
-    if self._cached_hash is None:
-      self._cached_hash = hash((
-          self._proto_representation.SerializeToString(),
+    if self._hash is None:
+      self._hash = hash((
+          self._proto.SerializeToString(),
           self._name,
           self._type_signature,
       ))
-    return self._cached_hash
+    return self._hash
 
   def __repr__(self) -> str:
-    return "CompiledComputation('{}', {!r})".format(
-        self._name, self.type_signature
-    )
+    return f'CompiledComputation({self._name!r}, {self._type_signature!r})'
 
 
 class Placement(ComputationBuildingBlock):
-  """A representation of a placement literal in TFF's internal language.
+  """A representation of a placement literal in the internal language.
 
   Currently this can only be `federated_language.SERVER` or
   `federated_language.CLIENTS`.
   """
-
-  @classmethod
-  def from_proto(
-      cls, computation_proto: computation_pb2.Computation
-  ) -> 'Placement':
-    _check_computation_oneof(computation_proto, 'placement')
-    return cls(
-        placements.uri_to_placement_literal(
-            str(computation_proto.placement.uri)
-        )
-    )
 
   def __init__(self, literal: placements.PlacementLiteral):
     """Constructs a new placement instance for the given placement literal.
@@ -1175,15 +1185,29 @@ class Placement(ComputationBuildingBlock):
     Raises:
       TypeError: if the arguments are of the wrong types.
     """
-    py_typecheck.check_type(literal, placements.PlacementLiteral)
     super().__init__(computation_types.PlacementType())
     self._literal = literal
 
-  def _proto(self) -> computation_pb2.Computation:
-    return computation_pb2.Computation(
-        type=self.type_signature.to_proto(),
-        placement=computation_pb2.Placement(uri=self._literal.uri),
-    )
+  @classmethod
+  def from_proto(
+      cls, computation_pb: computation_pb2.Computation
+  ) -> 'Placement':
+    """Returns a `Placement` for the `computation_pb`."""
+    _check_computation_has_field(computation_pb, 'placement')
+
+    literal = placements.uri_to_placement_literal(computation_pb.placement.uri)
+    return Placement(literal)
+
+  def to_proto(self) -> computation_pb2.Computation:
+    """Returns a `computation_pb2.Computation` for this building block."""
+    if self._proto is None:
+      type_pb = self._type_signature.to_proto()
+      placement_pb = computation_pb2.Placement(uri=self._literal.uri)
+      self._proto = computation_pb2.Computation(
+          type=type_pb,
+          placement=placement_pb,
+      )
+    return self._proto
 
   def children(self) -> Iterator[ComputationBuildingBlock]:
     del self
@@ -1201,16 +1225,16 @@ class Placement(ComputationBuildingBlock):
     return self._literal == other._literal
 
   def __hash__(self):
-    if self._cached_hash is None:
-      self._cached_hash = hash((self._literal))
-    return self._cached_hash
+    if self._hash is None:
+      self._hash = hash((self._literal))
+    return self._hash
 
   def __repr__(self) -> str:
-    return "Placement('{}')".format(self.uri)
+    return f'Placement({self._literal.uri!r})'
 
 
 class Literal(ComputationBuildingBlock):
-  """A representation of a literal in TFF's internal language."""
+  """A representation of a literal in the internal language."""
 
   def __init__(
       self, value: array.Array, type_signature: computation_types.TensorType
@@ -1246,33 +1270,39 @@ class Literal(ComputationBuildingBlock):
     super().__init__(type_signature)
     self._value = value
     self._type_signature = type_signature
-    self._cached_hash = None
-
-  @property
-  def type_signature(self) -> computation_types.TensorType:
-    return self._type_signature
+    self._hash = None
 
   @classmethod
-  def from_proto(
-      cls, computation_proto: computation_pb2.Computation
-  ) -> 'Literal':
-    _check_computation_oneof(computation_proto, 'literal')
-    value = array.from_proto(computation_proto.literal.value)
-    type_signature = computation_types.Type.from_proto(computation_proto.type)
+  def from_proto(cls, computation_pb: computation_pb2.Computation) -> 'Literal':
+    """Returns a `Literal` for the `computation_pb`."""
+    _check_computation_has_field(computation_pb, 'literal')
+
+    value = array.from_proto(computation_pb.literal.value)
+    type_signature = computation_types.Type.from_proto(computation_pb.type)
     if not isinstance(type_signature, computation_types.TensorType):
       raise ValueError(
           'Expected `type_signature` to be a `federated_language.TensorType`,'
           f' found {type(type_signature)}.'
       )
-    return cls(value, type_signature)
+    return Literal(value, type_signature)
 
-  def _proto(self) -> computation_pb2.Computation:
-    type_pb = self.type_signature.to_proto()
-    value_pb = array.to_proto(
-        self._value, dtype_hint=self.type_signature.dtype.type
-    )
-    literal_pb = computation_pb2.Literal(value=value_pb)
-    return computation_pb2.Computation(type=type_pb, literal=literal_pb)
+  def to_proto(self) -> computation_pb2.Computation:
+    """Returns a `computation_pb2.Computation` for this building block."""
+    if self._proto is None:
+      type_pb = self._type_signature.to_proto()
+      value_pb = array.to_proto(
+          self._value, dtype_hint=self.type_signature.dtype.type
+      )
+      literal_pb = computation_pb2.Literal(value=value_pb)
+      self._proto = computation_pb2.Computation(
+          type=type_pb,
+          literal=literal_pb,
+      )
+    return self._proto
+
+  @property
+  def type_signature(self) -> computation_types.TensorType:
+    return self._type_signature
 
   def children(self) -> Iterator[ComputationBuildingBlock]:
     return iter(())
@@ -1297,13 +1327,13 @@ class Literal(ComputationBuildingBlock):
       return self._value == other._value
 
   def __hash__(self):
-    if self._cached_hash is None:
+    if self._hash is None:
       if isinstance(self._value, (np.ndarray, np.generic)):
         hashable_value = tuple(self._value.flatten().tolist())
       else:
         hashable_value = self._value
-      self._cached_hash = hash((hashable_value, self._type_signature))
-    return self._cached_hash
+      self._hash = hash((hashable_value, self._type_signature))
+    return self._hash
 
   def __repr__(self) -> str:
     if isinstance(self._value, np.ndarray):
@@ -1333,7 +1363,6 @@ def _string_representation(
   Raises:
     TypeError: If `comp` has an unepxected type.
   """
-  py_typecheck.check_type(comp, ComputationBuildingBlock)
 
   def _join(components: Iterable[list[str]]) -> list[str]:
     """Returns a `list` of strings by combining each component in `components`.
@@ -1455,7 +1484,9 @@ def _string_representation(
         lines = [['<'], elements_lines, ['>']]
       return _join(lines)
     else:
-      raise NotImplementedError('Unexpected type found: {}.'.format(type(comp)))
+      raise NotImplementedError(
+          f'Unexpected building block found: {type(comp)}.'
+      )
 
   lines = _lines_for_comp(comp, formatted)
   lines = [line.rstrip() for line in lines]
@@ -1465,7 +1496,7 @@ def _string_representation(
     return ''.join(lines)
 
 
-def _structural_representation(comp):
+def _structural_representation(comp: ComputationBuildingBlock):
   """Returns the structural string representation of the given `comp`.
 
   This functions creates and returns a string representing the structure of the
@@ -1477,7 +1508,6 @@ def _structural_representation(comp):
   Raises:
     TypeError: If `comp` has an unepxected type.
   """
-  py_typecheck.check_type(comp, ComputationBuildingBlock)
   padding_char = ' '
 
   def _get_leading_padding(string):
@@ -1824,24 +1854,10 @@ def _structural_representation(comp):
           [node_line, edge_line], elements_lines, Alignment.LEFT
       )
     else:
-      raise NotImplementedError('Unexpected type found: {}.'.format(type(comp)))
+      raise NotImplementedError(
+          f'Unexpected building block found: {type(comp)}.'
+      )
 
   lines = _lines_for_comp(comp)
   lines = [line.rstrip() for line in lines]
   return '\n'.join(lines)
-
-
-_deserializer_dict = {
-    'reference': Reference.from_proto,
-    'selection': Selection.from_proto,
-    'struct': Struct.from_proto,
-    'call': Call.from_proto,
-    'lambda': Lambda.from_proto,
-    'block': Block.from_proto,
-    'intrinsic': Intrinsic.from_proto,
-    'data': Data.from_proto,
-    'placement': Placement.from_proto,
-    'literal': Literal.from_proto,
-    'tensorflow': CompiledComputation,
-    'xla': CompiledComputation,
-}

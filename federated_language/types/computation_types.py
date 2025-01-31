@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Defines functions and classes for building and manipulating TFF types."""
+"""Defines functions and classes for building and manipulating types."""
 
 import abc
 import atexit
@@ -64,7 +64,7 @@ def _check_type_has_field(type_pb: computation_pb2.Type, field: str):
 
 
 class Type(abc.ABC):
-  """An abstract interface for all classes that represent TFF types."""
+  """An abstract interface for all classes that represent types."""
 
   @classmethod
   def from_proto(cls, type_pb: computation_pb2.Type) -> 'Type':
@@ -83,7 +83,7 @@ class Type(abc.ABC):
     elif type_oneof == 'tensor':
       return TensorType.from_proto(type_pb)
     else:
-      raise NotImplementedError(f'Unknown type oneof {type_oneof}.')
+      raise NotImplementedError(f'Unexpected type found: {type_oneof}.')
 
   @abc.abstractmethod
   def to_proto(self) -> computation_pb2.Type:
@@ -131,9 +131,6 @@ class Type(abc.ABC):
     Returns:
       `True` if type definitions are syntactically identical (as defined above),
       otherwise `False`.
-
-    Raises:
-      NotImplementedError: If not implemented in the derived class.
     """
     raise NotImplementedError
 
@@ -288,7 +285,7 @@ def _to_dtype(dtype: _DtypeLike) -> np.dtype:
     dtype = np.str_
 
   if not dtype_utils.is_valid_dtype(dtype):
-    raise NotImplementedError(f'Unexpected `dtype` found: {dtype}.')
+    raise NotImplementedError(f'Unexpected dtype found: {dtype}.')
   return np.dtype(dtype)
 
 
@@ -545,9 +542,10 @@ class StructType(structure.Struct, Type, metaclass=_Intern):
     if self._proto is None:
       element_pbs = []
       for name, element in self.items():
+        value_pb = element.to_proto()
         element_pb = computation_pb2.StructType.Element(
             name=name,
-            value=element.to_proto(),
+            value=value_pb,
         )
         element_pbs.append(element_pb)
       struct_type_pb = computation_pb2.StructType(element=element_pbs)
@@ -751,7 +749,7 @@ class SequenceType(Type, metaclass=_Intern):
 
 
 class FunctionType(Type, metaclass=_Intern):
-  """An implementation of `federated_language.Type` representing functional types in TFF."""
+  """An implementation of `federated_language.Type` representing functional types."""
 
   @classmethod
   def _hashable_from_init_args(
@@ -849,7 +847,7 @@ class FunctionType(Type, metaclass=_Intern):
 
 
 class AbstractType(Type, metaclass=_Intern):
-  """An implementation of `federated_language.Type` representing abstract types in TFF."""
+  """An implementation of `federated_language.Type` representing abstract types."""
 
   @classmethod
   def _hashable_from_init_args(cls, label: str) -> Hashable:
@@ -903,11 +901,11 @@ class AbstractType(Type, metaclass=_Intern):
 
 
 class PlacementType(Type, metaclass=_Intern):
-  """An implementation of `federated_language.Type` representing the placement type in TFF.
+  """An implementation of `federated_language.Type` representing the placement type.
 
-  There is only one placement type, a TFF built-in, just as there is only one
-  `int` or `str` type in Python. All instances of this class represent the same
-  built-in TFF placement type.
+  There is only one placement type, a language built-in, just as there is only
+  one `int` or `str` type in Python. All instances of this class represent the
+  same built-in language placement type.
   """
 
   @classmethod
@@ -1016,7 +1014,7 @@ class FederatedType(Type, metaclass=_Intern):
       return FederatedType(member_type, placement, type_pb.federated.all_equal)
     else:
       raise NotImplementedError(
-          f'Placement oneof {placement_oneof} is not implemented yet.'
+          f'Unexpected placement found: {placement_oneof}.'
       )
 
   def to_proto(self) -> computation_pb2.Type:
@@ -1104,7 +1102,7 @@ def to_type(obj: object) -> Type:
   ((np.int32, [1]), (('x', (np.float32, [2])), (np.bool, [3])))
   ```
 
-  `attr.s` class instances can also be used to describe TFF types by populating
+  `attr.s` class instances can also be used to describe types by populating
   the fields with the corresponding types:
 
   ```python
@@ -1257,14 +1255,14 @@ def _get_contained_children_types(type_spec: Type) -> _ContainedChildrenTypes:
 
 
 def _string_representation(type_spec: Type, formatted: bool) -> str:
-  """Returns the string representation of a TFF `Type`.
+  """Returns the string representation of a `Type`.
 
   This function creates a `list` of strings representing the given `type_spec`;
   combines the strings in either a formatted or un-formatted representation; and
   returns the resulting string representation.
 
   Args:
-    type_spec: An instance of a TFF `Type`.
+    type_spec: An instance of a `Type`.
     formatted: A boolean indicating if the returned string should be formatted.
 
   Raises:
@@ -1276,7 +1274,7 @@ def _string_representation(type_spec: Type, formatted: bool) -> str:
 
     This function creates and returns a `list` of strings by combining a `list`
     of `components`. Each `component` is a `list` of strings representing a part
-    of the string of a TFF `Type`. The `components` are combined by iteratively
+    of the string of a `Type`. The `components` are combined by iteratively
     **appending** the last element of the result with the first element of the
     `component` and then **extending** the result with remaining elements of the
     `component`.
@@ -1294,7 +1292,7 @@ def _string_representation(type_spec: Type, formatted: bool) -> str:
 
     Args:
       components: A `list` where each element is a `list` of strings
-        representing a part of the string of a TFF `Type`.
+        representing a part of the string of a `Type`.
     """
     lines = ['']
     for component in components:
@@ -1386,9 +1384,7 @@ def _string_representation(type_spec: Type, formatted: bool) -> str:
       else:
         return [type_spec.dtype.name]
     else:
-      raise NotImplementedError(
-          'Unexpected type found: {}.'.format(type(type_spec))
-      )
+      raise NotImplementedError(f'Unexpected type found: {type(type_spec)}.')
 
   lines = _lines_for_type(type_spec, formatted)
   lines = [line.rstrip() for line in lines]
