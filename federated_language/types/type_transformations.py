@@ -13,12 +13,9 @@
 """A library of transformation functions for computation types."""
 
 from collections.abc import Callable
-from typing import TypeVar
 
 from federated_language.common_libs import py_typecheck
 from federated_language.types import computation_types
-
-T = TypeVar('T')
 
 
 def strip_placement(
@@ -124,27 +121,3 @@ def transform_type_postorder(
     return transform_fn(type_signature)
   else:
     raise NotImplementedError(f'Unexpected type found: {type(type_signature)}.')
-
-
-# TODO: b/134525440 - Unifying the recursive methods in type_analysis.
-def visit_preorder(
-    type_signature: computation_types.Type,
-    fn: Callable[[computation_types.Type, T], T],
-    context: T,
-):
-  """Recursively calls `fn` on the possibly nested structure `type_signature`.
-
-  Walks the tree in a preorder manner. Updates `context` on the way down with
-  the appropriate information, as defined in `fn`.
-
-  Args:
-    type_signature: A `computation_types.Type`.
-    fn: A function to apply to each of the constituent elements of
-      `type_signature` with the argument `context`. Must return an updated
-      version of `context` which incorporated the information we'd like to track
-      as we move down the type tree.
-    context: Initial state of information to be passed down the tree.
-  """
-  context = fn(type_signature, context)
-  for child_type in type_signature.children():
-    visit_preorder(child_type, fn, context)

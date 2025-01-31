@@ -572,10 +572,8 @@ def from_container(value: object, recursive=False) -> Struct:
         return Struct((None, v) for v in value)
     elif must_be_container:
       raise TypeError(
-          'Unable to convert a Python object of type {} into '
-          'an `Struct`. Object: {}'.format(
-              py_typecheck.type_string(type(value)), value
-          )
+          f'Unable to convert a Python object of type {type(value)} into an'
+          f' `Struct`. Object: {value}'
       )
     else:
       return value

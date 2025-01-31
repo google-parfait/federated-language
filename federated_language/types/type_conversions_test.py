@@ -575,21 +575,5 @@ class TypeToPyContainerTest(absltest.TestCase):
     )
 
 
-class TypeToNonAllEqualTest(absltest.TestCase):
-
-  def test_with_bool(self):
-    for x in [True, False]:
-      self.assertEqual(
-          str(
-              type_conversions.type_to_non_all_equal(
-                  computation_types.FederatedType(
-                      np.int32, placements.CLIENTS, all_equal=x
-                  )
-              )
-          ),
-          '{int32}@CLIENTS',
-      )
-
-
 if __name__ == '__main__':
   absltest.main()

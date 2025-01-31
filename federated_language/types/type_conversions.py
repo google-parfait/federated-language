@@ -375,18 +375,3 @@ def type_to_py_container(value, type_spec: computation_types.Type):
     # `collections.OrderedDict`, or `structure.Struct` when
     # elements has (name, value) tuples.
     return container_type(elements)  # pytype: disable=wrong-arg-count
-
-
-def type_to_non_all_equal(type_spec):
-  """Constructs a non-`all_equal` version of the federated type `type_spec`.
-
-  Args:
-    type_spec: An instance of `federated_language.FederatedType`.
-
-  Returns:
-    A federated type with the same member and placement, but `all_equal=False`.
-  """
-  py_typecheck.check_type(type_spec, computation_types.FederatedType)
-  return computation_types.FederatedType(
-      type_spec.member, type_spec.placement, all_equal=False
-  )

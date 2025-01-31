@@ -14,13 +14,37 @@
 
 from absl.testing import absltest
 from federated_language.compiler import building_block_factory
-from federated_language.compiler import building_block_test_utils
 from federated_language.compiler import building_blocks
 from federated_language.compiler import intrinsic_defs
 from federated_language.compiler import tree_analysis
 from federated_language.types import computation_types
 from federated_language.types import placements
 import numpy as np
+
+
+def _create_test_federated_aggregate():
+  value_type = computation_types.TensorType(np.int32)
+  value = building_blocks.Literal(1, value_type)
+  federated_value = building_block_factory.create_federated_value(
+      value, placements.SERVER
+  )
+  accumulate_type = computation_types.StructType((value_type, value_type))
+  accumulate = building_blocks.Lambda('a', accumulate_type, value)
+  merge_type = computation_types.StructType((value_type, value_type))
+  merge = building_blocks.Lambda('b', merge_type, value)
+  report = building_blocks.Lambda('c', value_type, value)
+  return building_block_factory.create_federated_aggregate(
+      federated_value, value, accumulate, merge, report
+  )
+
+
+def _create_test_federated_broadcast():
+  value_type = computation_types.TensorType(np.int32)
+  value = building_blocks.Literal(1, value_type)
+  federated_value = building_block_factory.create_federated_value(
+      value, placements.SERVER
+  )
+  return building_block_factory.create_federated_broadcast(federated_value)
 
 
 class TestCheckContainsOnlyReducibleIntrinsics(absltest.TestCase):
@@ -65,26 +89,32 @@ class NodesDependentOnPredicateTest(absltest.TestCase):
 
   def test_raises_on_none_comp(self):
     with self.assertRaises(TypeError):
-      tree_analysis.extract_nodes_consuming(None, lambda x: True)
+      tree_analysis._extract_nodes_consuming(None, lambda x: True)
 
   def test_raises_on_none_predicate(self):
     data = building_blocks.Literal(1, computation_types.TensorType(np.int32))
     with self.assertRaises(TypeError):
-      tree_analysis.extract_nodes_consuming(data, None)
+      tree_analysis._extract_nodes_consuming(data, None)
 
   def test_adds_all_nodes_to_set_with_constant_true_predicate(self):
-    nested_tree = building_block_test_utils.create_nested_syntax_tree()
-    all_nodes = tree_analysis.extract_nodes_consuming(
-        nested_tree, lambda x: True
-    )
-    node_count = tree_analysis.count(nested_tree)
+    type_spec = computation_types.TensorType(np.int32)
+    comp = building_blocks.Struct([
+        building_blocks.Literal(1, type_spec),
+        building_blocks.Literal(2, type_spec),
+        building_blocks.Literal(3, type_spec),
+    ])
+    all_nodes = tree_analysis._extract_nodes_consuming(comp, lambda x: True)
+    node_count = tree_analysis.count(comp)
     self.assertLen(all_nodes, node_count)
 
   def test_adds_no_nodes_to_set_with_constant_false_predicate(self):
-    nested_tree = building_block_test_utils.create_nested_syntax_tree()
-    all_nodes = tree_analysis.extract_nodes_consuming(
-        nested_tree, lambda x: False
-    )
+    type_spec = computation_types.TensorType(np.int32)
+    comp = building_blocks.Struct([
+        building_blocks.Literal(1, type_spec),
+        building_blocks.Literal(2, type_spec),
+        building_blocks.Literal(3, type_spec),
+    ])
+    all_nodes = tree_analysis._extract_nodes_consuming(comp, lambda x: False)
     self.assertEmpty(all_nodes)
 
   def test_propogates_dependence_up_through_lambda(self):
@@ -93,7 +123,7 @@ class NodesDependentOnPredicateTest(absltest.TestCase):
         'whimsy_intrinsic', type_signature
     )
     lam = building_blocks.Lambda('x', np.int32, whimsy_intrinsic)
-    dependent_nodes = tree_analysis.extract_nodes_consuming(
+    dependent_nodes = tree_analysis._extract_nodes_consuming(
         lam, whimsy_intrinsic_predicate
     )
     self.assertIn(lam, dependent_nodes)
@@ -105,7 +135,7 @@ class NodesDependentOnPredicateTest(absltest.TestCase):
     )
     integer_reference = building_blocks.Reference('int', np.int32)
     block = building_blocks.Block([('x', integer_reference)], whimsy_intrinsic)
-    dependent_nodes = tree_analysis.extract_nodes_consuming(
+    dependent_nodes = tree_analysis._extract_nodes_consuming(
         block, whimsy_intrinsic_predicate
     )
     self.assertIn(block, dependent_nodes)
@@ -117,7 +147,7 @@ class NodesDependentOnPredicateTest(absltest.TestCase):
     )
     integer_reference = building_blocks.Reference('int', np.int32)
     block = building_blocks.Block([('x', whimsy_intrinsic)], integer_reference)
-    dependent_nodes = tree_analysis.extract_nodes_consuming(
+    dependent_nodes = tree_analysis._extract_nodes_consuming(
         block, whimsy_intrinsic_predicate
     )
     self.assertIn(block, dependent_nodes)
@@ -129,7 +159,7 @@ class NodesDependentOnPredicateTest(absltest.TestCase):
     )
     integer_reference = building_blocks.Reference('int', np.int32)
     tup = building_blocks.Struct([integer_reference, whimsy_intrinsic])
-    dependent_nodes = tree_analysis.extract_nodes_consuming(
+    dependent_nodes = tree_analysis._extract_nodes_consuming(
         tup, whimsy_intrinsic_predicate
     )
     self.assertIn(tup, dependent_nodes)
@@ -140,7 +170,7 @@ class NodesDependentOnPredicateTest(absltest.TestCase):
         'whimsy_intrinsic', type_signature
     )
     selection = building_blocks.Selection(whimsy_intrinsic, index=0)
-    dependent_nodes = tree_analysis.extract_nodes_consuming(
+    dependent_nodes = tree_analysis._extract_nodes_consuming(
         selection, whimsy_intrinsic_predicate
     )
     self.assertIn(selection, dependent_nodes)
@@ -153,7 +183,7 @@ class NodesDependentOnPredicateTest(absltest.TestCase):
     ref_to_x = building_blocks.Reference('x', np.int32)
     identity_lambda = building_blocks.Lambda('x', np.int32, ref_to_x)
     called_lambda = building_blocks.Call(identity_lambda, whimsy_intrinsic)
-    dependent_nodes = tree_analysis.extract_nodes_consuming(
+    dependent_nodes = tree_analysis._extract_nodes_consuming(
         called_lambda, whimsy_intrinsic_predicate
     )
     self.assertIn(called_lambda, dependent_nodes)
@@ -172,7 +202,7 @@ class NodesDependentOnPredicateTest(absltest.TestCase):
       )
 
     block = building_blocks.Block([('x', federated_zero)], ref_to_x)
-    dependent_nodes = tree_analysis.extract_nodes_consuming(
+    dependent_nodes = tree_analysis._extract_nodes_consuming(
         block, federated_zero_predicate
     )
     self.assertIn(ref_to_x, dependent_nodes)
@@ -185,9 +215,7 @@ class BroadcastDependentOnAggregateTest(absltest.TestCase):
       tree_analysis.check_broadcast_not_dependent_on_aggregate(None)
 
   def test_does_not_find_aggregate_dependent_on_broadcast(self):
-    broadcast = (
-        building_block_test_utils.create_whimsy_called_federated_broadcast()
-    )
+    broadcast = _create_test_federated_broadcast()
     value_type = broadcast.type_signature
     zero = building_blocks.Literal(1, value_type.member)
     accumulate_result = building_blocks.Literal(2, value_type.member)
@@ -214,9 +242,7 @@ class BroadcastDependentOnAggregateTest(absltest.TestCase):
     )
 
   def test_finds_broadcast_dependent_on_aggregate(self):
-    aggregate = (
-        building_block_test_utils.create_whimsy_called_federated_aggregate()
-    )
+    aggregate = _create_test_federated_aggregate()
     broadcasted_aggregate = building_block_factory.create_federated_broadcast(
         aggregate
     )
@@ -226,9 +252,7 @@ class BroadcastDependentOnAggregateTest(absltest.TestCase):
       )
 
   def test_returns_correct_example_of_broadcast_dependent_on_aggregate(self):
-    aggregate = (
-        building_block_test_utils.create_whimsy_called_federated_aggregate()
-    )
+    aggregate = _create_test_federated_aggregate()
     broadcasted_aggregate = building_block_factory.create_federated_broadcast(
         aggregate
     )
@@ -245,9 +269,7 @@ class AggregateDependentOnAggregateTest(absltest.TestCase):
       tree_analysis.check_aggregate_not_dependent_on_aggregate(None)
 
   def test_does_not_find_aggregate_dependent_on_broadcast(self):
-    broadcast = (
-        building_block_test_utils.create_whimsy_called_federated_broadcast()
-    )
+    broadcast = _create_test_federated_broadcast()
     value_type = broadcast.type_signature
     zero = building_blocks.Literal(1, value_type.member)
     accumulate_result = building_blocks.Literal(2, value_type.member)
@@ -274,9 +296,7 @@ class AggregateDependentOnAggregateTest(absltest.TestCase):
     )
 
   def test_finds_aggregate_dependent_on_aggregate(self):
-    aggregate = (
-        building_block_test_utils.create_whimsy_called_federated_aggregate()
-    )
+    aggregate = _create_test_federated_aggregate()
     broadcasted_aggregate = building_block_factory.create_federated_broadcast(
         aggregate
     )
@@ -294,20 +314,21 @@ class ContainsCalledIntrinsic(absltest.TestCase):
       tree_analysis.contains_called_intrinsic(None)
 
   def test_returns_true_with_none_uri(self):
-    comp = building_block_test_utils.create_whimsy_called_federated_broadcast()
+    comp = _create_test_federated_broadcast()
     self.assertTrue(tree_analysis.contains_called_intrinsic(comp))
 
   def test_returns_true_with_matching_uri(self):
-    comp = building_block_test_utils.create_whimsy_called_federated_broadcast()
+    comp = _create_test_federated_broadcast()
     uri = intrinsic_defs.FEDERATED_BROADCAST.uri
     self.assertTrue(tree_analysis.contains_called_intrinsic(comp, uri))
 
   def test_returns_false_with_no_called_intrinsic(self):
-    comp = building_block_test_utils.create_identity_function('a')
-    self.assertFalse(tree_analysis.contains_called_intrinsic(comp))
+    ref = building_blocks.Reference('a', np.int32)
+    fn = building_blocks.Lambda(ref.name, ref.type_signature, ref)
+    self.assertFalse(tree_analysis.contains_called_intrinsic(fn))
 
   def test_returns_false_with_unmatched_called_intrinsic(self):
-    comp = building_block_test_utils.create_whimsy_called_federated_broadcast()
+    comp = _create_test_federated_broadcast()
     uri = intrinsic_defs.FEDERATED_MAP.uri
     self.assertFalse(tree_analysis.contains_called_intrinsic(comp, uri))
 

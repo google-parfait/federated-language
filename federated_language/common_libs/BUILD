@@ -66,10 +66,7 @@ py_test(
 py_library(
     name = "py_typecheck",
     srcs = ["py_typecheck.py"],
-    deps = [
-        "@pypi//attrs",
-        "@pypi//typing_extensions",
-    ],
+    deps = ["@pypi//typing_extensions"],
 )
 
 py_test(
