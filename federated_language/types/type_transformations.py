@@ -123,7 +123,7 @@ def transform_type_postorder(
   ):
     return transform_fn(type_signature)
   else:
-    raise NotImplementedError(f'Unexpected type found: {type_signature}.')
+    raise NotImplementedError(f'Unexpected type found: {type(type_signature)}.')
 
 
 # TODO: b/134525440 - Unifying the recursive methods in type_analysis.

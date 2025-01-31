@@ -150,4 +150,4 @@ def infer_dtype(
   elif isinstance(obj, (str, bytes)):
     return np.str_
   else:
-    raise NotImplementedError(f'Unexpected type found: {type(obj)}.')
+    raise NotImplementedError(f'Unexpected obj found: {type(obj)}.')

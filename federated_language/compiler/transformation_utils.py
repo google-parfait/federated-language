@@ -126,9 +126,7 @@ def transform_postorder(comp, transform):
     comp, comp_modified = transform(comp)
     return comp, comp_modified or variables_modified or result_modified
   else:
-    raise NotImplementedError(
-        'Unrecognized computation building block: {}'.format(str(comp))
-    )
+    raise NotImplementedError(f'Unexpected building block found: {type(comp)}.')
 
 
 TransformReturnType = tuple[building_blocks.ComputationBuildingBlock, bool]
@@ -254,7 +252,7 @@ def transform_preorder(
     )
   else:
     raise NotImplementedError(
-        'Unrecognized computation building block: {}'.format(str(inner_comp))
+        f'Unexpected building block found: {type(inner_comp)}.'
     )
 
 
@@ -348,7 +346,7 @@ def transform_postorder_with_symbol_bindings(comp, transform, symbol_tree):
       return _traverse_block(comp, transform, ctxt_tree, identifier_sequence)
     else:
       raise NotImplementedError(
-          'Unrecognized computation building block: {}'.format(str(comp))
+          f'Unexpected building block found: {type(comp)}.'
       )
 
   def _traverse_leaf(comp, transform, context_tree, identifier_seq):

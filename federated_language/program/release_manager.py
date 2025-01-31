@@ -230,7 +230,9 @@ class FilteringReleaseManager(ReleaseManager[ReleasableStructure, Key]):
             # this is safe because `tree` makes the same assumption.
             return type(subtree)(items)  # pytype: disable=wrong-arg-count
         else:
-          raise NotImplementedError(f'Unexpected type found: {type(subtree)}.')
+          raise NotImplementedError(
+              f'Unexpected subtree found: {type(subtree)}.'
+          )
       else:
         if self._filter_fn(path):
           return None
@@ -344,7 +346,7 @@ class PeriodicReleaseManager(ReleaseManager[ReleasableStructure, Key]):
       self._timestamp = datetime.datetime.now()
     else:
       raise NotImplementedError(
-          f'Unexpected `periodicity` found: {type(periodicity)}.'
+          f'Unexpected periodicity found: {type(periodicity)}.'
       )
 
   async def release(self, value: ReleasableStructure, key: Key) -> None:
@@ -365,7 +367,7 @@ class PeriodicReleaseManager(ReleaseManager[ReleasableStructure, Key]):
         await self._release_manager.release(value, key=key)
     else:
       raise NotImplementedError(
-          f'Unexpected `periodicity` found: {type(self._periodicity)}.'
+          f'Unexpected periodicity found: {type(self._periodicity)}.'
       )
 
 

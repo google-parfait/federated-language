@@ -50,7 +50,7 @@ class TestMaterializableValueReference(
     elif isinstance(value, list):
       self._type_signature = computation_types.SequenceType(np.int32)
     else:
-      raise NotImplementedError(f'Unexpected type found: {type(value)}.')
+      raise NotImplementedError(f'Unexpected value found: {type(value)}.')
 
   @property
   def type_signature(self) -> value_reference.MaterializableTypeSignature:

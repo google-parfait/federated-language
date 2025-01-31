@@ -1061,7 +1061,9 @@ def sequence_reduce(value, zero, op):
     comp = _bind_comp_as_reference(comp)
     return value_impl.Value(comp)
   else:
-    raise NotImplementedError(f'Unexpected type found: {value.type_signature}.')
+    raise NotImplementedError(
+        f'Unexpected type found: {type(value.type_signature)}.'
+    )
 
 
 def sequence_sum(value):

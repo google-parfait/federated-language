@@ -97,7 +97,7 @@ def from_proto(array_pb: array_pb2.Array) -> Array:
   elif dtype is np.str_:
     value = array_pb.string_list.value
   else:
-    raise NotImplementedError(f'Unexpected `dtype` found: {dtype}.')
+    raise NotImplementedError(f'Unexpected dtype found: {dtype}.')
 
   # Strings are stored as bytes in `array_pb2.Array` and trailing null values
   # are dropped when using `np.bytes_`, use `np.object_` instead.
@@ -286,7 +286,7 @@ def to_proto(
         string_list=array_pb2.Array.BytesList(value=value),
     )
   else:
-    raise NotImplementedError(f'Unexpected `dtype` found: {dtype}.')
+    raise NotImplementedError(f'Unexpected dtype found: {dtype}.')
 
 
 def from_proto_content(array_pb: array_pb2.Array) -> Array:
@@ -297,7 +297,7 @@ def from_proto_content(array_pb: array_pb2.Array) -> Array:
   if dtype is not np.str_:
     value = np.frombuffer(array_pb.content, dtype)
   else:
-    raise NotImplementedError(f'Unexpected `dtype` found: {dtype}.')
+    raise NotImplementedError(f'Unexpected dtype found: {dtype}.')
 
   # `Array` is a `Union` of native Python types and numpy types. However, the
   # protobuf representation of `Array` contains additional information like
@@ -343,7 +343,7 @@ def to_proto_content(
   if dtype is not np.str_:
     value = np.asarray(value, dtype)
   else:
-    raise NotImplementedError(f'Unexpected `dtype` found: {dtype}.')
+    raise NotImplementedError(f'Unexpected dtype found: {dtype}.')
 
   dtype_pb = dtype_utils.to_proto(dtype)
   shape_pb = array_shape.to_proto(value.shape)

@@ -104,7 +104,7 @@ def infer_type(arg: object) -> Optional[computation_types.Type]:
     dtype = dtype_utils.infer_dtype(arg)
     return computation_types.TensorType(dtype)
   else:
-    raise NotImplementedError(f'Unexpected type found: {type(arg)}.')
+    raise NotImplementedError(f'Unexpected arg found: {type(arg)}.')
 
 
 def to_structure_with_type(
