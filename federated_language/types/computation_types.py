@@ -1154,9 +1154,7 @@ def to_type(obj: object) -> Type:
     return StructType(structure.to_elements(obj))
   else:
     raise TypeError(
-        'Unable to interpret an argument of type {} as a type spec.'.format(
-            py_typecheck.type_string(type(obj))
-        )
+        f'Unable to interpret an argument of type {type(obj)} as a type spec.'
     )
 
 

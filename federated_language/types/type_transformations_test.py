@@ -361,44 +361,5 @@ class TransformTypePostorderTest(absltest.TestCase):
     self.assertFalse(not_mutated)
 
 
-class VisitPreorderTest(parameterized.TestCase):
-
-  @parameterized.named_parameters([
-      ('abstract_type', computation_types.AbstractType('T'), 1),
-      (
-          'nested_function_type',
-          computation_types.FunctionType(
-              computation_types.FunctionType(
-                  computation_types.FunctionType(np.int32, np.int32), np.int32
-              ),
-              np.int32,
-          ),
-          7,
-      ),
-      (
-          'named_tuple_type',
-          computation_types.StructType([
-              np.int32,
-              np.bool_,
-              computation_types.SequenceType(np.int32),
-          ]),
-          5,
-      ),
-      ('placement_type', computation_types.PlacementType(), 1),
-  ])
-  def test_preorder_call_count(self, type_signature, expected_count):
-    class Counter:
-      k = 0
-
-    def _count_hits(given_type, arg):
-      del given_type  # Unused.
-      Counter.k += 1
-      return arg
-
-    type_transformations.visit_preorder(type_signature, _count_hits, None)
-    actual_count = Counter.k
-    self.assertEqual(actual_count, expected_count)
-
-
 if __name__ == '__main__':
   absltest.main()

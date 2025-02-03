@@ -19,7 +19,6 @@ import sys
 import typing
 from typing import Optional, Protocol, TypeVar, Union
 
-import attrs
 from typing_extensions import TypeGuard
 
 
@@ -43,14 +42,14 @@ def check_type(target, type_spec, label=None):
     raise TypeError(
         'Expected {}{}, found {}.'.format(
             '{} to be of type '.format(label) if label is not None else '',
-            type_string(type_spec),
-            type_string(type(target)),
+            _type_string(type_spec),
+            _type_string(type(target)),
         )
     )
   return target
 
 
-def type_string(type_spec):
+def _type_string(type_spec):
   """Creates a string representation of `type_spec` for error reporting.
 
   Args:
@@ -70,23 +69,13 @@ def type_string(type_spec):
       return '{}.{}'.format(type_spec.__module__, type_spec.__name__)
   else:
     assert isinstance(type_spec, (tuple, list))
-    type_names = [type_string(x) for x in type_spec]
+    type_names = [_type_string(x) for x in type_spec]
     if len(type_names) == 1:
       return type_names[0]
     elif len(type_names) == 2:
       return '{} or {}'.format(*type_names)
     else:
       return ', '.join(type_names[0:-1] + ['or {}'.format(type_names[-1])])
-
-
-def check_attrs(value):
-  """Checks that `value` is an attrs decorated class or an instance thereof."""
-  if not attrs.has(type(value)):
-    raise TypeError(
-        'Expected an instance of an attrs decorated class, or an '
-        'attrs-decorated class type; found a value of type '
-        f'{type(value)}'
-    )
 
 
 @typing.runtime_checkable

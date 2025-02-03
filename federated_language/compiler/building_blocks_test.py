@@ -16,7 +16,7 @@ from absl.testing import absltest
 from absl.testing import parameterized
 from federated_language.common_libs import structure
 from federated_language.compiler import array
-from federated_language.compiler import building_block_test_utils
+from federated_language.compiler import building_block_factory
 from federated_language.compiler import building_blocks
 from federated_language.compiler import computation_factory
 from federated_language.compiler import intrinsic_defs
@@ -444,9 +444,7 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
     self._serialize_deserialize_roundtrip_test(x)
 
   def test_data_children_is_empty(self):
-    any_proto = building_block_test_utils.create_any_proto_from_array(
-        np.array(1, np.int32)
-    )
+    any_proto = any_pb2.Any()
     data = building_blocks.Data(any_proto, np.int32)
     self.assertEqual([], list(data.children()))
 
@@ -1451,9 +1449,7 @@ class IntrinsicTest(parameterized.TestCase):
 class DataTest(parameterized.TestCase):
 
   def test_eq_returns_true(self):
-    any_proto = building_block_test_utils.create_any_proto_from_array(
-        np.array([1, 2, 3], np.int32)
-    )
+    any_proto = any_pb2.Any()
     type_signature = computation_types.TensorType(np.int32)
     data = building_blocks.Data(any_proto, type_signature)
     other = building_blocks.Data(any_proto, type_signature)
@@ -1462,23 +1458,19 @@ class DataTest(parameterized.TestCase):
     self.assertEqual(data, other)
 
   def test_eq_returns_false_different_content(self):
-    any_proto1 = building_block_test_utils.create_any_proto_from_array(
-        np.array([1, 2, 3], np.int32)
-    )
+    any_proto1 = any_pb2.Any()
+    any_proto1.Pack(array.to_proto(1))
     type_signature = computation_types.TensorType(np.int32)
     data = building_blocks.Data(any_proto1, type_signature)
 
-    any_proto2 = building_block_test_utils.create_any_proto_from_array(
-        np.array([4], np.int32)
-    )
+    any_proto2 = any_pb2.Any()
+    any_proto2.Pack(array.to_proto(2))
     other = building_blocks.Data(any_proto2, type_signature)
     self.assertIsNot(data, other)
     self.assertNotEqual(data, other)
 
   def test_eq_returns_false_different_type_signatures(self):
-    any_proto = building_block_test_utils.create_any_proto_from_array(
-        np.array([1, 1, 1], np.int32)
-    )
+    any_proto = any_pb2.Any()
     type_signature1 = computation_types.TensorType(np.int32)
     type_signature2 = computation_types.TensorType(np.float32)
     data = building_blocks.Data(any_proto, type_signature1)
@@ -1488,9 +1480,7 @@ class DataTest(parameterized.TestCase):
     self.assertNotEqual(data, other)
 
   def test_hash_returns_same_value(self):
-    any_proto = building_block_test_utils.create_any_proto_from_array(
-        np.array([1, 2, 3], np.int32)
-    )
+    any_proto = any_pb2.Any()
     type_signature = computation_types.TensorType(np.int32)
     data = building_blocks.Data(any_proto, type_signature)
     other = building_blocks.Data(any_proto, type_signature)
@@ -1498,23 +1488,19 @@ class DataTest(parameterized.TestCase):
     self.assertEqual(hash(data), hash(other))
 
   def test_hash_returns_different_value_for_different_content(self):
-    any_proto1 = building_block_test_utils.create_any_proto_from_array(
-        np.array([1, 2, 3], np.int32)
-    )
+    any_proto1 = any_pb2.Any()
+    any_proto1.Pack(array.to_proto(1))
     type_signature = computation_types.TensorType(np.int32)
     data = building_blocks.Data(any_proto1, type_signature)
 
-    any_proto2 = building_block_test_utils.create_any_proto_from_array(
-        np.array([4], np.int32)
-    )
+    any_proto2 = any_pb2.Any()
+    any_proto2.Pack(array.to_proto(2))
     other = building_blocks.Data(any_proto2, type_signature)
     self.assertNotEqual(data, other)
     self.assertNotEqual(hash(data), hash(other))
 
   def test_hash_returns_different_value_for_different_type_signatures(self):
-    any_proto = building_block_test_utils.create_any_proto_from_array(
-        np.array([1, 1, 1], np.int32)
-    )
+    any_proto = any_pb2.Any()
     type_signature1 = computation_types.TensorType(np.int32)
     type_signature2 = computation_types.TensorType(np.float32)
     data = building_blocks.Data(any_proto, type_signature1)
@@ -2376,9 +2362,7 @@ class RepresentationTest(absltest.TestCase):
     self.assertEqual(comp.structural_representation(), 'Compiled(a)')
 
   def test_returns_string_for_data(self):
-    any_proto = building_block_test_utils.create_any_proto_from_array(
-        np.array([1, 2, 3], np.int32)
-    )
+    any_proto = any_pb2.Any()
     comp = building_blocks.Data(any_proto, np.int32)
 
     expected = str(id(any_proto))
@@ -2512,10 +2496,18 @@ class RepresentationTest(absltest.TestCase):
     # pyformat: enable
 
   def test_returns_string_for_federated_aggregate(self):
-    comp = building_block_test_utils.create_whimsy_called_federated_aggregate(
-        accumulate_parameter_name='a',
-        merge_parameter_name='b',
-        report_parameter_name='c',
+    value_type = computation_types.TensorType(np.int32)
+    value = building_blocks.Literal(1, value_type)
+    federated_value = building_block_factory.create_federated_value(
+        value, placements.CLIENTS
+    )
+    accumulate_type = computation_types.StructType((value_type, value_type))
+    accumulate = building_blocks.Lambda('a', accumulate_type, value)
+    merge_type = computation_types.StructType((value_type, value_type))
+    merge = building_blocks.Lambda('b', merge_type, value)
+    report = building_blocks.Lambda('c', value_type, value)
+    comp = building_block_factory.create_federated_aggregate(
+        federated_value, value, accumulate, merge, report
     )
 
     self.assertEqual(
@@ -2548,9 +2540,14 @@ class RepresentationTest(absltest.TestCase):
     # pyformat: enable
 
   def test_returns_string_for_federated_map(self):
-    comp = building_block_test_utils.create_whimsy_called_federated_map(
-        parameter_name='a'
+    value_type = computation_types.TensorType(np.int32)
+    value = building_blocks.Literal(1, value_type)
+    ref = building_blocks.Reference('a', value_type)
+    fn = building_blocks.Lambda(ref.name, ref.type_signature, ref)
+    arg = building_block_factory.create_federated_value(
+        value, placements.CLIENTS
     )
+    comp = building_block_factory.create_federated_map(fn, arg)
 
     self.assertEqual(
         comp.compact_representation(),

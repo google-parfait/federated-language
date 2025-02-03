@@ -79,7 +79,6 @@ py_library(
         "//federated_language/common_libs:py_typecheck",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
-        "//federated_language/types:type_conversions",
         "//federated_language/types:type_transformations",
     ],
 )
@@ -144,21 +143,6 @@ py_test(
 )
 
 py_library(
-    name = "building_block_test_utils",
-    testonly = True,
-    srcs = ["building_block_test_utils.py"],
-    deps = [
-        ":array",
-        ":building_block_factory",
-        ":building_blocks",
-        "//federated_language/types:computation_types",
-        "//federated_language/types:placements",
-        "@protobuf//:protobuf_python",
-        "@pypi//numpy",
-    ],
-)
-
-py_library(
     name = "building_blocks",
     srcs = ["building_blocks.py"],
     deps = [
@@ -183,7 +167,7 @@ py_test(
     srcs = ["building_blocks_test.py"],
     deps = [
         ":array",
-        ":building_block_test_utils",
+        ":building_block_factory",
         ":building_blocks",
         ":computation_factory",
         ":intrinsic_defs",
@@ -261,13 +245,13 @@ py_test(
     size = "small",
     srcs = ["transformation_utils_test.py"],
     deps = [
-        ":building_block_test_utils",
         ":building_blocks",
         ":computation_factory",
         ":transformation_utils",
         "//federated_language/common_libs:py_typecheck",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
+        "@protobuf//:protobuf_python",
         "@pypi//absl_py",
         "@pypi//numpy",
     ],
@@ -293,7 +277,6 @@ py_test(
     srcs = ["tree_analysis_test.py"],
     deps = [
         ":building_block_factory",
-        ":building_block_test_utils",
         ":building_blocks",
         ":intrinsic_defs",
         ":tree_analysis",

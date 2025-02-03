@@ -25,7 +25,6 @@ from federated_language.compiler import intrinsic_defs
 from federated_language.compiler import transformation_utils
 from federated_language.types import computation_types
 from federated_language.types import placements
-from federated_language.types import type_conversions
 from federated_language.types import type_transformations
 
 Index = Union[str, int]
@@ -381,7 +380,11 @@ def create_federated_aggregate(
 
   intrinsic_type = computation_types.FunctionType(
       (
-          type_conversions.type_to_non_all_equal(value.type_signature),
+          computation_types.FederatedType(
+              value.type_signature.member,  # pytype: disable=attribute-error
+              value.type_signature.placement,  # pytype: disable=attribute-error
+              all_equal=False,
+          ),
           zero_arg_type,
           accumulate.type_signature,
           merge.type_signature,
@@ -668,8 +671,16 @@ def create_federated_mean(
   if weight is not None:
     intrinsic_type = computation_types.FunctionType(
         (
-            type_conversions.type_to_non_all_equal(value.type_signature),
-            type_conversions.type_to_non_all_equal(weight.type_signature),
+            computation_types.FederatedType(
+                value.type_signature.member,  # pytype: disable=attribute-error
+                value.type_signature.placement,  # pytype: disable=attribute-error
+                all_equal=False,
+            ),
+            computation_types.FederatedType(
+                weight.type_signature.member,  # pytype: disable=attribute-error
+                weight.type_signature.placement,  # pytype: disable=attribute-error
+                all_equal=False,
+            ),
         ),
         result_type,
     )
@@ -680,7 +691,11 @@ def create_federated_mean(
     return building_blocks.Call(intrinsic, values)
   else:
     intrinsic_type = computation_types.FunctionType(
-        type_conversions.type_to_non_all_equal(value.type_signature),
+        computation_types.FederatedType(
+            value.type_signature.member,  # pytype: disable=attribute-error
+            value.type_signature.placement,  # pytype: disable=attribute-error
+            all_equal=False,
+        ),
         result_type,
     )
     intrinsic = building_blocks.Intrinsic(
@@ -714,7 +729,12 @@ def create_federated_min(
       placements.SERVER,
   )
   intrinsic_type = computation_types.FunctionType(
-      type_conversions.type_to_non_all_equal(value.type_signature), result_type
+      computation_types.FederatedType(
+          value.type_signature.member,  # pytype: disable=attribute-error
+          value.type_signature.placement,  # pytype: disable=attribute-error
+          all_equal=False,
+      ),
+      result_type,
   )
   intrinsic = building_blocks.Intrinsic(
       intrinsic_defs.FEDERATED_MIN.uri, intrinsic_type
@@ -747,7 +767,12 @@ def create_federated_max(
       placements.SERVER,
   )
   intrinsic_type = computation_types.FunctionType(
-      type_conversions.type_to_non_all_equal(value.type_signature), result_type
+      computation_types.FederatedType(
+          value.type_signature.member,  # pytype: disable=attribute-error
+          value.type_signature.placement,  # pytype: disable=attribute-error
+          all_equal=False,
+      ),
+      result_type,
   )
   intrinsic = building_blocks.Intrinsic(
       intrinsic_defs.FEDERATED_MAX.uri, intrinsic_type
@@ -784,7 +809,11 @@ def create_federated_secure_sum(
   )
   intrinsic_type = computation_types.FunctionType(
       [
-          type_conversions.type_to_non_all_equal(value.type_signature),
+          computation_types.FederatedType(
+              value.type_signature.member,  # pytype: disable=attribute-error
+              value.type_signature.placement,  # pytype: disable=attribute-error
+              all_equal=False,
+          ),
           max_input.type_signature,
       ],
       result_type,
@@ -825,7 +854,11 @@ def create_federated_secure_sum_bitwidth(
   )
   intrinsic_type = computation_types.FunctionType(
       [
-          type_conversions.type_to_non_all_equal(value.type_signature),
+          computation_types.FederatedType(
+              value.type_signature.member,  # pytype: disable=attribute-error
+              value.type_signature.placement,  # pytype: disable=attribute-error
+              all_equal=False,
+          ),
           bitwidth.type_signature,
       ],
       result_type,
@@ -862,7 +895,11 @@ def create_federated_select(
   )
   intrinsic_type = computation_types.FunctionType(
       [
-          type_conversions.type_to_non_all_equal(client_keys.type_signature),
+          computation_types.FederatedType(
+              client_keys.type_signature.member,  # pytype: disable=attribute-error
+              client_keys.type_signature.placement,  # pytype: disable=attribute-error
+              all_equal=False,
+          ),
           max_key.type_signature,
           server_val.type_signature,
           select_fn.type_signature,
@@ -902,7 +939,12 @@ def create_federated_sum(
       placements.SERVER,
   )
   intrinsic_type = computation_types.FunctionType(
-      type_conversions.type_to_non_all_equal(value.type_signature), result_type
+      computation_types.FederatedType(
+          value.type_signature.member,  # pytype: disable=attribute-error
+          value.type_signature.placement,  # pytype: disable=attribute-error
+          all_equal=False,
+      ),
+      result_type,
   )
   intrinsic = building_blocks.Intrinsic(
       intrinsic_defs.FEDERATED_SUM.uri, intrinsic_type
