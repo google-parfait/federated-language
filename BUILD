@@ -33,6 +33,8 @@ exports_files([
     "requirements_lock_3_10.txt",
     "requirements_lock_3_11.txt",
     "requirements_lock_3_9.txt",
+    "requirements_lock_3_12.txt",
+    "requirements_lock_3_13.txt",
     "requirements.in",
     "pyproject.toml",
 ])
