@@ -65,8 +65,8 @@ jobs:
         bazelisk test //federated_language/... \
             --@rules_python//python/config_settings:python_version="${{ matrix.python-version }}"
 
-  test-requirements:
-    name: Test Requirements
+  test-dependencies:
+    name: Test Dependencies
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -81,6 +81,10 @@ jobs:
         disk-cache: ${{ github.workflow }}
         repository-cache: true
 
-    - name: Test requirements
+    - name: Test Bazel Dependencies
+      run: |
+        bazelisk mod deps --lockfile_mode=error
+
+    - name: Test Python Dependencies
       run: |
         bazelisk test //tools/...

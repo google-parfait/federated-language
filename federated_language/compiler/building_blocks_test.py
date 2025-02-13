@@ -1699,11 +1699,7 @@ class PlacementTest(parameterized.TestCase):
 class LiteralTest(parameterized.TestCase):
 
   @parameterized.named_parameters(
-      (
-          'bool',
-          True,
-          computation_types.TensorType(np.bool_)
-      ),
+      ('bool', True, computation_types.TensorType(np.bool)),
       ('int8', 1, computation_types.TensorType(np.int8)),
       ('int16', 1, computation_types.TensorType(np.int16)),
       ('int32', 1, computation_types.TensorType(np.int32)),
@@ -1737,14 +1733,15 @@ class LiteralTest(parameterized.TestCase):
       ),
       (
           'generic_bool',
-          np.bool_(True), computation_types.TensorType(np.bool_)
+          np.bool(True),
+          computation_types.TensorType(np.bool),
       ),
       ('generic_str', np.str_('a'), computation_types.TensorType(np.str_)),
       ('generic_bytes', np.bytes_(b'a'), computation_types.TensorType(np.str_)),
       (
           'array_bool',
-          np.array([True, False], np.bool_),
-          computation_types.TensorType(np.bool_, shape=[2]),
+          np.array([True, False], np.bool),
+          computation_types.TensorType(np.bool, shape=[2]),
       ),
       (
           'array_int',
@@ -1952,7 +1949,7 @@ class LiteralTest(parameterized.TestCase):
           'bool',
           building_blocks.Literal(
               True,
-              computation_types.TensorType(np.bool_),
+              computation_types.TensorType(np.bool),
           ),
       ),
       (
@@ -2002,11 +1999,11 @@ class LiteralTest(parameterized.TestCase):
           'bool',
           building_blocks.Literal(
               True,
-              computation_types.TensorType(np.bool_)
+              computation_types.TensorType(np.bool),
           ),
           building_blocks.Literal(
               True,
-              computation_types.TensorType(np.bool_)
+              computation_types.TensorType(np.bool),
           ),
       ),
       (
@@ -2148,12 +2145,8 @@ class LiteralTest(parameterized.TestCase):
   @parameterized.named_parameters(
       (
           'bool',
-          building_blocks.Literal(
-              True, computation_types.TensorType(np.bool_)
-          ),
-          building_blocks.Literal(
-              True, computation_types.TensorType(np.bool_)
-          ),
+          building_blocks.Literal(True, computation_types.TensorType(np.bool)),
+          building_blocks.Literal(True, computation_types.TensorType(np.bool)),
       ),
       (
           'int',
@@ -2236,10 +2229,8 @@ class LiteralTest(parameterized.TestCase):
   @parameterized.named_parameters(
       (
           'bool',
-          building_blocks.Literal(
-              True, computation_types.TensorType(np.bool_)
-          ),
-          'Literal(True, TensorType(np.bool_))',
+          building_blocks.Literal(True, computation_types.TensorType(np.bool)),
+          'Literal(True, TensorType(np.bool))',
       ),
       (
           'int',
@@ -2275,7 +2266,7 @@ class LiteralTest(parameterized.TestCase):
           building_blocks.Literal(
               np.int32(1), computation_types.TensorType(np.int32)
           ),
-          'Literal(1, TensorType(np.int32))',
+          'Literal(np.int32(1), TensorType(np.int32))',
       ),
       (
           'array',
