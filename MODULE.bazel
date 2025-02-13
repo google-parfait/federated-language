@@ -33,6 +33,12 @@ python.toolchain(
     is_default = True,
     python_version = "3.11",
 )
+python.toolchain(
+    python_version = "3.12",
+)
+python.toolchain(
+    python_version = "3.13",
+)
 use_repo(python, python = "python_versions")
 
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
@@ -50,5 +56,15 @@ pip.parse(
     hub_name = "pypi",
     python_version = "3.11",
     requirements_lock = "//:requirements_lock_3_11.txt",
+)
+pip.parse(
+    hub_name = "pypi",
+    python_version = "3.12",
+    requirements_lock = "//:requirements_lock_3_12.txt",
+)
+pip.parse(
+    hub_name = "pypi",
+    python_version = "3.13",
+    requirements_lock = "//:requirements_lock_3_13.txt",
 )
 use_repo(pip, "pypi")
