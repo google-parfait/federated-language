@@ -65,6 +65,26 @@ jobs:
         bazelisk test //federated_language/... \
             --@rules_python//python/config_settings:python_version="${{ matrix.python-version }}"
 
+  test-bazel-lockfile:
+    name: Test Bazel lockfile
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+
+    - name: Checkout repository
+      uses: actions/checkout@v4.2.2
+
+    - name: Setup Bazel
+      uses: bazel-contrib/setup-bazel@0.9.1
+      with:
+        bazelisk-cache: true
+        disk-cache: ${{ github.workflow }}
+        repository-cache: true
+
+    - name: Test requirements
+      run: |
+        bazelisk mod deps --lockfile_mode=error
+
   test-requirements:
     name: Test Requirements
     runs-on: ubuntu-latest
