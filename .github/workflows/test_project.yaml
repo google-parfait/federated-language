@@ -34,6 +34,30 @@ concurrency:
 
 jobs:
 
+  test-dependencies:
+    name: Test Dependencies
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+
+    - name: Checkout repository
+      uses: actions/checkout@v4.2.2
+
+    - name: Setup Bazel
+      uses: bazel-contrib/setup-bazel@0.9.1
+      with:
+        bazelisk-cache: true
+        disk-cache: ${{ github.workflow }}
+        repository-cache: true
+
+    - name: Test Bazel Dependencies
+      run: |
+        bazelisk mod deps --lockfile_mode=error
+
+    - name: Test Python Dependencies
+      run: |
+        bazelisk test //tools/...
+
   test-python:
     name: Test PY ${{ matrix.python-version }}
     runs-on: ubuntu-latest
@@ -64,23 +88,3 @@ jobs:
       run: |
         bazelisk test //federated_language/... \
             --@rules_python//python/config_settings:python_version="${{ matrix.python-version }}"
-
-  test-requirements:
-    name: Test Requirements
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-
-    - name: Checkout repository
-      uses: actions/checkout@v4.2.2
-
-    - name: Setup Bazel
-      uses: bazel-contrib/setup-bazel@0.9.1
-      with:
-        bazelisk-cache: true
-        disk-cache: ${{ github.workflow }}
-        repository-cache: true
-
-    - name: Test requirements
-      run: |
-        bazelisk test //tools/...
