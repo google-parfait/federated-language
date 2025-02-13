@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "federated_language"
 description = "A framework for implementing federated algorithms and computations on privacy-sensitive data."
 readme = "README.md"
-requires-python = ">=3.9,<3.12"
+requires-python = ">=3.9,<3.14"
 license = {file = "LICENSE"}
 authors = [
   { name="Federated Language Team", email="no-reply@google.com" },
@@ -23,6 +23,8 @@ classifiers = [
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3 :: Only",
   "Topic :: Scientific/Engineering",
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
@@ -34,7 +36,7 @@ classifiers = [
 dependencies = [
     'absl-py~=1.0',
     'attrs~=23.1',
-    'dm-tree==0.1.8',
+    'dm-tree~=0.1.8',
     'ml_dtypes~=0.4.0',
     'numpy~=2.0',
     'protobuf~=5.26',

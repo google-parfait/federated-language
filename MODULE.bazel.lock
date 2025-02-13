@@ -364,7 +364,7 @@
     },
     "@@rules_python+//python/private/pypi:pip.bzl%pip_internal": {
       "general": {
-        "bzlTransitiveDigest": "dRYS0L8J5w6EOkSrPTMCPAqIrV/wakb+l4Ur/qpcsl0=",
+        "bzlTransitiveDigest": "eEm08CF6Uo6yah1H5PFgIPQtz5CNt+cCYIfPA28SzmQ=",
         "usagesDigest": "OLoIStnzNObNalKEMRq99FqenhPGLFZ5utVLV4sz7OI=",
         "recordedFileInputs": {
           "@@rules_python+//tools/publish/requirements_darwin.txt": "2994136eab7e57b083c3de76faf46f70fad130bc8e7360a7fed2b288b69e79dc",
@@ -2842,6 +2842,11 @@
             "rules_python++python+pythons_hub",
             "python_3_12_host",
             "rules_python++python+python_3_12_host"
+          ],
+          [
+            "rules_python++python+pythons_hub",
+            "python_3_13_host",
+            "rules_python++python+python_3_13_host"
           ],
           [
             "rules_python++python+pythons_hub",
