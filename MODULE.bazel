@@ -18,9 +18,9 @@ module(
     compatibility_level = 0,
 )
 
-bazel_dep(name = "protobuf", version = "26.0")
+bazel_dep(name = "protobuf", version = "29.0")
 bazel_dep(name = "rules_license", version = "1.0.0")
-bazel_dep(name = "rules_python", version = "0.38.0")
+bazel_dep(name = "rules_python", version = "1.0.0")
 
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(
