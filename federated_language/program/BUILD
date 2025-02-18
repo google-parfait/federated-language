@@ -33,6 +33,7 @@ py_library(
         ":federated_context",
         ":logging_release_manager",
         ":memory_release_manager",
+        ":native_platform",
         ":program_state_manager",
         ":release_manager",
         ":value_reference",
@@ -114,6 +115,42 @@ py_test(
     deps = [
         ":memory_release_manager",
         ":program_test_utils",
+        "@pypi//absl_py",
+        "@pypi//dm_tree",
+        "@pypi//numpy",
+    ],
+)
+
+py_library(
+    name = "native_platform",
+    srcs = ["native_platform.py"],
+    deps = [
+        ":federated_context",
+        ":structure_utils",
+        ":value_reference",
+        "//federated_language/common_libs:structure",
+        "//federated_language/computation:computation_base",
+        "//federated_language/execution_contexts:async_execution_context",
+        "//federated_language/types:computation_types",
+        "//federated_language/types:placements",
+        "//federated_language/types:type_conversions",
+        "@pypi//dm_tree",
+    ],
+)
+
+py_test(
+    name = "native_platform_test",
+    srcs = ["native_platform_test.py"],
+    deps = [
+        ":native_platform",
+        ":program_test_utils",
+        ":structure_utils",
+        ":value_reference",
+        "//federated_language/computation:computation_impl",
+        "//federated_language/execution_contexts:async_execution_context",
+        "//federated_language/federated_context:federated_computation",
+        "//federated_language/types:computation_types",
+        "//federated_language/types:placements",
         "@pypi//absl_py",
         "@pypi//dm_tree",
         "@pypi//numpy",

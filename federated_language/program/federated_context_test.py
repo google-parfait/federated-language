@@ -137,7 +137,7 @@ class CheckInFederatedContextTest(parameterized.TestCase):
     with context_stack_impl.context_stack.install(context):
       try:
         federated_context.check_in_federated_context()
-      except TypeError:
+      except ValueError:
         self.fail('Raised `ValueError` unexpectedly.')
 
     with self.assertRaises(ValueError):
@@ -165,7 +165,7 @@ class CheckInFederatedContextTest(parameterized.TestCase):
     with context_stack_impl.context_stack.install(context):
       try:
         federated_context.check_in_federated_context()
-      except TypeError:
+      except ValueError:
         self.fail('Raised `ValueError` unexpectedly.')
 
       context = TestContext()
