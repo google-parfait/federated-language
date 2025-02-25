@@ -52,46 +52,6 @@ class ConcreteComputationTest(absltest.TestCase):
           context_stack=context_stack_impl.context_stack,
       )
 
-  def test_with_type_preserves_python_container(self):
-    struct_return_type = computation_types.FunctionType(
-        np.int32, computation_types.StructType([(None, np.int32)])
-    )
-    original_comp = computation_impl.ConcreteComputation(
-        computation_proto=computation_pb2.Computation(**{
-            'type': struct_return_type.to_proto(),
-            'intrinsic': computation_pb2.Intrinsic(uri='whatever'),
-        }),
-        context_stack=context_stack_impl.context_stack,
-    )
-
-    list_return_type = computation_types.FunctionType(
-        np.int32,
-        computation_types.StructWithPythonType([(None, np.int32)], list),
-    )
-    fn_with_annotated_type = computation_impl.ConcreteComputation.with_type(
-        original_comp, list_return_type
-    )
-    self.assertEqual(list_return_type, fn_with_annotated_type.type_signature)
-
-  def test_with_type_raises_non_assignable_type(self):
-    int_return_type = computation_types.FunctionType(np.int32, np.int32)
-    original_comp = computation_impl.ConcreteComputation(
-        computation_proto=computation_pb2.Computation(**{
-            'type': int_return_type.to_proto(),
-            'intrinsic': computation_pb2.Intrinsic(uri='whatever'),
-        }),
-        context_stack=context_stack_impl.context_stack,
-    )
-
-    list_return_type = computation_types.FunctionType(
-        np.int32,
-        computation_types.StructWithPythonType([(None, np.int32)], list),
-    )
-    with self.assertRaises(computation_types.TypeNotAssignableError):
-      computation_impl.ConcreteComputation.with_type(
-          original_comp, list_return_type
-      )
-
 
 class FromBuildingBlockTest(absltest.TestCase):
 

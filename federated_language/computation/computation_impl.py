@@ -34,31 +34,6 @@ class ConcreteComputation(computation_base.Computation):
   """
 
   @classmethod
-  def get_proto(
-      cls, value: 'ConcreteComputation'
-  ) -> computation_pb2.Computation:
-    py_typecheck.check_type(value, cls)
-    return value._proto  # pylint: disable=protected-access
-
-  @classmethod
-  def with_type(
-      cls,
-      value: 'ConcreteComputation',
-      type_spec: computation_types.FunctionType,
-  ) -> 'ConcreteComputation':
-    py_typecheck.check_type(value, cls)
-    py_typecheck.check_type(type_spec, computation_types.Type)
-    # Ensure we are assigning a type-safe signature.
-    value.type_signature.check_assignable_from(type_spec)
-    # pylint: disable=protected-access
-    return cls(
-        computation_proto=value._proto,
-        context_stack=value._context_stack,
-        annotated_type=type_spec,
-    )
-    # pylint: enable=protected-access
-
-  @classmethod
   def from_building_block(
       cls, building_block: building_blocks.ComputationBuildingBlock
   ) -> 'ConcreteComputation':
@@ -142,21 +117,25 @@ class ConcreteComputation(computation_base.Computation):
     """Returns a `computation_pb2.Computation` for this computation."""
     return self._proto
 
+  @property
+  def type_signature(self) -> computation_types.FunctionType:
+    return self._type_signature
+
+  @property
+  def context_stack(self) -> context_stack_base.ContextStack:
+    return self._context_stack
+
+  def __call__(self, *args, **kwargs):
+    arg = function_utils.pack_args(self._type_signature.parameter, args, kwargs)
+    result = self._context_stack.current.invoke(self, arg)
+    return result
+
   def __eq__(self, other: object) -> bool:
     if self is other:
       return True
     elif not isinstance(other, ConcreteComputation):
       return NotImplemented
     return self._proto == other._proto
-
-  @property
-  def type_signature(self) -> computation_types.FunctionType:
-    return self._type_signature
-
-  def __call__(self, *args, **kwargs):
-    arg = function_utils.pack_args(self._type_signature.parameter, args, kwargs)
-    result = self._context_stack.current.invoke(self, arg)
-    return result
 
   def __hash__(self) -> int:
     return hash(self._proto.SerializeToString(deterministic=True))
