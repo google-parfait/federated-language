@@ -20,6 +20,7 @@ package(
         "//federated_language:__pkg__",
         "//federated_language/compiler:__subpackages__",
         "//federated_language/computation:__subpackages__",
+        "//federated_language/examples:__subpackages__",
         "//federated_language/execution_contexts:__subpackages__",
         "//federated_language/executor_stacks:__subpackages__",
         "//federated_language/executors:__subpackages__",
