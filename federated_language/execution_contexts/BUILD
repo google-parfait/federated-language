@@ -35,7 +35,6 @@ py_library(
     name = "async_execution_context",
     srcs = ["async_execution_context.py"],
     deps = [
-        ":compiler_pipeline",
         "//federated_language/common_libs:py_typecheck",
         "//federated_language/common_libs:retrying",
         "//federated_language/common_libs:structure",
@@ -65,18 +64,8 @@ py_test(
     ],
 )
 
-py_library(
-    name = "compiler_pipeline",
-    srcs = ["compiler_pipeline.py"],
-    deps = [
-        "//federated_language/common_libs:py_typecheck",
-        "//federated_language/computation:computation_base",
-    ],
-)
-
 py_test(
     name = "compiler_pipeline_test",
-    size = "small",
     srcs = ["compiler_pipeline_test.py"],
     deps = [
         ":compiler_pipeline",
@@ -96,5 +85,14 @@ py_library(
         "//federated_language/context_stack:context_base",
         "//federated_language/executors:cardinalities_utils",
         "//federated_language/executors:executor_factory",
+    ],
+)
+
+py_library(
+    name = "compiler_pipeline",
+    srcs = ["compiler_pipeline.py"],
+    deps = [
+        "//federated_language/common_libs:py_typecheck",
+        "//federated_language/computation:computation_base",
     ],
 )
