@@ -20,12 +20,12 @@ import typing
 from typing import Union
 
 from federated_language.common_libs import py_typecheck
-from federated_language.context_stack import context_base
+from federated_language.context_stack import context
 from federated_language.context_stack import context_stack_base
 from federated_language.context_stack import runtime_error_context
 
 
-_Context = Union[context_base.SyncContext, context_base.AsyncContext]
+_Context = Union[context.AsyncContext, context.SyncContext]
 
 
 class ContextStackImpl(context_stack_base.ContextStack, threading.local):

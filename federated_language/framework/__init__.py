@@ -118,9 +118,9 @@ from federated_language.computation.function_utils import unpack_arg
 from federated_language.computation.function_utils import unpack_args_from_struct
 from federated_language.computation.function_utils import wrap_as_zero_or_one_arg_callable
 from federated_language.computation.polymorphic_computation import PolymorphicComputation
-from federated_language.context_stack.context_base import AsyncContext
-from federated_language.context_stack.context_base import ContextError
-from federated_language.context_stack.context_base import SyncContext
+from federated_language.context_stack.context import AsyncContext
+from federated_language.context_stack.context import ContextError
+from federated_language.context_stack.context import SyncContext
 from federated_language.context_stack.context_stack_base import ContextStack
 from federated_language.context_stack.context_stack_test_utils import with_context
 from federated_language.context_stack.get_context_stack import get_context_stack

@@ -28,7 +28,7 @@ from federated_language.compiler import building_blocks
 from federated_language.computation import computation_impl
 from federated_language.computation import function_utils
 from federated_language.computation import polymorphic_computation
-from federated_language.context_stack import context_base
+from federated_language.context_stack import context
 from federated_language.context_stack import context_stack_impl
 from federated_language.context_stack import symbol_binding_context
 from federated_language.types import computation_types
@@ -63,15 +63,17 @@ def _check_struct_or_federated_struct(
 
 
 def _bind_computation_to_reference(comp, op: str):
-  context = context_stack_impl.context_stack.current
-  if not isinstance(context, symbol_binding_context.SymbolBindingContext):
-    raise context_base.ContextError(
+  current_context = context_stack_impl.context_stack.current
+  if not isinstance(
+      current_context, symbol_binding_context.SymbolBindingContext
+  ):
+    raise context.ContextError(
         '`federated_language.Value`s should only be used in contexts which can'
         ' bind references, generally a `FederatedComputationContext`.'
-        f' Attempted to bind the result of {op} in a context {context} of type'
-        f' {type(context)}.'
+        f' Attempted to bind the result of {op} in a context'
+        f' {current_context} of type {type(current_context)}.'
     )
-  return context.bind_computation_to_reference(comp)
+  return current_context.bind_computation_to_reference(comp)
 
 
 class Value(typed_object.TypedObject, abc.ABC):

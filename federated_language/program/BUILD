@@ -56,7 +56,7 @@ py_library(
         ":structure_utils",
         ":value_reference",
         "//federated_language/computation:computation_base",
-        "//federated_language/context_stack:context_base",
+        "//federated_language/context_stack:context",
         "//federated_language/context_stack:get_context_stack",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
@@ -69,7 +69,7 @@ py_test(
     srcs = ["federated_context_test.py"],
     deps = [
         ":federated_context",
-        "//federated_language/context_stack:context_base",
+        "//federated_language/context_stack:context",
         "//federated_language/context_stack:context_stack_impl",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",

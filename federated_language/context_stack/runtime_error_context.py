@@ -13,10 +13,10 @@
 # limitations under the License.
 """Defines classes/functions to manipulate the API context stack."""
 
-from federated_language.context_stack import context_base
+from federated_language.context_stack import context
 
 
-class RuntimeErrorContext(context_base.SyncContext):
+class RuntimeErrorContext(context.SyncContext):
   """A context that will fail if you execute against it."""
 
   def _raise_runtime_error(self):

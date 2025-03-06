@@ -17,7 +17,7 @@ from unittest import mock
 
 from absl.testing import absltest
 from absl.testing import parameterized
-from federated_language.context_stack import context_base
+from federated_language.context_stack import context
 from federated_language.context_stack import context_stack_impl
 from federated_language.program import federated_context
 from federated_language.types import computation_types
@@ -25,10 +25,10 @@ from federated_language.types import placements
 import numpy as np
 
 
-class TestContext(context_base.SyncContext):
+class _TestContext(context.SyncContext):
 
   def invoke(self, comp, arg):
-    return None
+    raise AssertionError
 
 
 class ContainsOnlyServerPlacedDataTest(parameterized.TestCase):
@@ -127,14 +127,14 @@ class ContainsOnlyServerPlacedDataTest(parameterized.TestCase):
 class CheckInFederatedContextTest(parameterized.TestCase):
 
   def test_does_not_raise_value_error_with_context(self):
-    context = mock.create_autospec(
+    mock_context = mock.create_autospec(
         federated_context.FederatedContext, spec_set=True, instance=True
     )
 
     with self.assertRaises(ValueError):
       federated_context.check_in_federated_context()
 
-    with context_stack_impl.context_stack.install(context):
+    with context_stack_impl.context_stack.install(mock_context):
       try:
         federated_context.check_in_federated_context()
       except ValueError:
@@ -144,11 +144,11 @@ class CheckInFederatedContextTest(parameterized.TestCase):
       federated_context.check_in_federated_context()
 
   def test_raises_value_error_with_context(self):
-    context = TestContext()
+    mock_context = _TestContext()
     with self.assertRaises(ValueError):
       federated_context.check_in_federated_context()
 
-    with context_stack_impl.context_stack.install(context):
+    with context_stack_impl.context_stack.install(mock_context):
       with self.assertRaises(ValueError):
         federated_context.check_in_federated_context()
 
@@ -159,17 +159,17 @@ class CheckInFederatedContextTest(parameterized.TestCase):
     with self.assertRaises(ValueError):
       federated_context.check_in_federated_context()
 
-    context = mock.create_autospec(
+    mock_context = mock.create_autospec(
         federated_context.FederatedContext, spec_set=True, instance=True
     )
-    with context_stack_impl.context_stack.install(context):
+    with context_stack_impl.context_stack.install(mock_context):
       try:
         federated_context.check_in_federated_context()
       except ValueError:
         self.fail('Raised `ValueError` unexpectedly.')
 
-      context = TestContext()
-      with context_stack_impl.context_stack.install(context):
+      mock_context = _TestContext()
+      with context_stack_impl.context_stack.install(mock_context):
         with self.assertRaises(ValueError):
           federated_context.check_in_federated_context()
 

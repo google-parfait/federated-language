@@ -19,10 +19,10 @@ import contextlib
 import functools
 from typing import Union
 
-from federated_language.context_stack import context_base
+from federated_language.context_stack import context
 from federated_language.context_stack import context_stack_impl
 
-_Context = Union[context_base.AsyncContext, context_base.SyncContext]
+_Context = Union[context.AsyncContext, context.SyncContext]
 _ContextFactory = Callable[[], _Context]
 
 
@@ -40,8 +40,8 @@ def with_context(context_fn: _ContextFactory):
 
     @contextlib.contextmanager
     def _install_context(context_fn: _ContextFactory):
-      context = context_fn()
-      with context_stack_impl.context_stack.install(context):
+      ctx = context_fn()
+      with context_stack_impl.context_stack.install(ctx):
         yield
 
     if asyncio.iscoroutinefunction(fn):

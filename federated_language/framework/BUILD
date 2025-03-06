@@ -42,7 +42,7 @@ py_library(
         "//federated_language/computation:computation_wrapper",
         "//federated_language/computation:function_utils",
         "//federated_language/computation:polymorphic_computation",
-        "//federated_language/context_stack:context_base",
+        "//federated_language/context_stack:context",
         "//federated_language/context_stack:context_stack_base",
         "//federated_language/context_stack:context_stack_test_utils",
         "//federated_language/context_stack:get_context_stack",

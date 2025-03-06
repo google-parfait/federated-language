@@ -17,7 +17,7 @@ import abc
 from typing import Optional, Union
 
 from federated_language.computation import computation_base
-from federated_language.context_stack import context_base
+from federated_language.context_stack import context
 from federated_language.context_stack import get_context_stack
 from federated_language.program import structure_utils
 from federated_language.program import value_reference
@@ -68,7 +68,7 @@ def contains_only_server_placed_data(
   return type_analysis.contains_only(type_signature, _predicate)
 
 
-class FederatedContext(context_base.SyncContext):
+class FederatedContext(context.SyncContext):
   """An abstract interface representing a federated context.
 
   A federated context supports invoking a limited set of

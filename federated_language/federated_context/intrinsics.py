@@ -21,7 +21,7 @@ from federated_language.common_libs import structure
 from federated_language.compiler import building_block_factory
 from federated_language.compiler import building_blocks
 from federated_language.compiler import intrinsic_defs
-from federated_language.context_stack import context_base
+from federated_language.context_stack import context
 from federated_language.context_stack import context_stack_impl
 from federated_language.context_stack import symbol_binding_context
 from federated_language.federated_context import value_impl
@@ -37,7 +37,7 @@ import numpy as np
 def _bind_comp_as_reference(comp):
   fc_context = context_stack_impl.context_stack.current
   if not isinstance(fc_context, symbol_binding_context.SymbolBindingContext):
-    raise context_base.ContextError(
+    raise context.ContextError(
         f'Attempted to construct an intrinsic in context {fc_context} which '
         ' does not support binding references.'
     )

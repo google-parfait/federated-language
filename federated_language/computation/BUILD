@@ -108,7 +108,7 @@ py_test(
         ":computation_impl",
         ":computation_wrapper",
         ":function_utils",
-        "//federated_language/context_stack:context_base",
+        "//federated_language/context_stack:context",
         "//federated_language/context_stack:context_stack_impl",
         "//federated_language/proto:computation_py_pb2",
         "//federated_language/types:computation_types",
@@ -158,7 +158,7 @@ py_test(
     deps = [
         ":computation_impl",
         ":polymorphic_computation",
-        "//federated_language/context_stack:context_base",
+        "//federated_language/context_stack:context",
         "//federated_language/context_stack:context_stack_base",
         "//federated_language/proto:computation_py_pb2",
         "//federated_language/types:computation_types",

@@ -16,7 +16,7 @@
 import abc
 from typing import Generic, TypeVar
 
-from federated_language.context_stack import context_base
+from federated_language.context_stack import context
 
 
 _Symbol = TypeVar('_Symbol')
@@ -24,7 +24,7 @@ _Reference = TypeVar('_Reference')
 
 
 class SymbolBindingContext(
-    context_base.SyncContext, abc.ABC, Generic[_Symbol, _Reference]
+    context.SyncContext, abc.ABC, Generic[_Symbol, _Reference]
 ):
   """Interface for contexts which handle binding and tracking of references."""
 

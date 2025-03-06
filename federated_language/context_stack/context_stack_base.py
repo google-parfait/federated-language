@@ -38,7 +38,7 @@ class ContextStack(abc.ABC):
 
     Args:
       ctx: The context to temporarily install at the top of the context stack,
-        an instance of `Context` defined in `context_base.py`.
+        an instance of `Context` defined in `context.py`.
 
     Yields:
       The installed context.

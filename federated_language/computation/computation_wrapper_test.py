@@ -18,7 +18,7 @@ from absl.testing import absltest
 from federated_language.computation import computation_impl
 from federated_language.computation import computation_wrapper
 from federated_language.computation import function_utils
-from federated_language.context_stack import context_base
+from federated_language.context_stack import context
 from federated_language.context_stack import context_stack_impl
 from federated_language.proto import computation_pb2
 from federated_language.types import computation_types
@@ -52,7 +52,7 @@ class WrappedForTest(computation_impl.ConcreteComputation):
     return self._fn
 
 
-class ContextForTest(context_base.SyncContext):
+class ContextForTest(context.SyncContext):
 
   def invoke(self, comp, arg):
     result = comp.fn(arg) if comp.type_signature.parameter else comp.fn()

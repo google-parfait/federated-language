@@ -36,8 +36,8 @@ py_library(
 )
 
 py_library(
-    name = "context_base",
-    srcs = ["context_base.py"],
+    name = "context",
+    srcs = ["context.py"],
 )
 
 py_library(
@@ -49,7 +49,7 @@ py_library(
     name = "context_stack_impl",
     srcs = ["context_stack_impl.py"],
     deps = [
-        ":context_base",
+        ":context",
         ":context_stack_base",
         ":runtime_error_context",
         "//federated_language/common_libs:py_typecheck",
@@ -61,7 +61,7 @@ py_test(
     size = "small",
     srcs = ["context_stack_impl_test.py"],
     deps = [
-        ":context_base",
+        ":context",
         ":context_stack_impl",
         "@pypi//absl_py",
     ],
@@ -71,7 +71,7 @@ py_library(
     name = "context_stack_test_utils",
     srcs = ["context_stack_test_utils.py"],
     deps = [
-        ":context_base",
+        ":context",
         ":context_stack_impl",
     ],
 )
@@ -80,7 +80,7 @@ py_test(
     name = "context_stack_test_utils_test",
     srcs = ["context_stack_test_utils_test.py"],
     deps = [
-        ":context_base",
+        ":context",
         ":context_stack_impl",
         ":context_stack_test_utils",
         "@pypi//absl_py",
@@ -107,7 +107,7 @@ py_test(
 py_library(
     name = "runtime_error_context",
     srcs = ["runtime_error_context.py"],
-    deps = [":context_base"],
+    deps = [":context"],
 )
 
 py_library(
@@ -124,7 +124,7 @@ py_test(
     size = "small",
     srcs = ["set_default_context_test.py"],
     deps = [
-        ":context_base",
+        ":context",
         ":context_stack_impl",
         ":set_default_context",
         "@pypi//absl_py",
@@ -134,5 +134,5 @@ py_test(
 py_library(
     name = "symbol_binding_context",
     srcs = ["symbol_binding_context.py"],
-    deps = [":context_base"],
+    deps = [":context"],
 )

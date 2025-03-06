@@ -17,7 +17,7 @@ from typing import Optional
 from absl.testing import absltest
 from absl.testing import parameterized
 from federated_language.compiler import building_blocks
-from federated_language.context_stack import context_base
+from federated_language.context_stack import context
 from federated_language.context_stack import context_stack_impl
 from federated_language.context_stack import context_stack_test_utils
 from federated_language.federated_context import federated_computation_context
@@ -125,7 +125,7 @@ class FederatedBroadcastTest(parameterized.TestCase):
   def test_raises_context_error_with_no_federated_context(self):
     value = _create_fake_value(_INT_SERVER)
 
-    with self.assertRaises(context_base.ContextError):
+    with self.assertRaises(context.ContextError):
       intrinsics.federated_broadcast(value)
 
 
@@ -166,7 +166,7 @@ class FederatedEvalTest(parameterized.TestCase):
     fn = _create_fake_fn(None, _INT)
     placement = placements.CLIENTS
 
-    with self.assertRaises(context_base.ContextError):
+    with self.assertRaises(context.ContextError):
       intrinsics.federated_eval(fn, placement)
 
 
@@ -238,7 +238,7 @@ class FederatedMapTest(parameterized.TestCase):
     fn = _create_fake_fn(_INT, _FLOAT)
     arg = _create_fake_value(_INT_CLIENTS)
 
-    with self.assertRaises(context_base.ContextError):
+    with self.assertRaises(context.ContextError):
       intrinsics.federated_map(fn, arg)
 
 
@@ -315,7 +315,7 @@ class FederatedSecureSumTest(parameterized.TestCase):
     value = _create_fake_value(_INT_CLIENTS)
     max_input = _create_fake_value(_INT)
 
-    with self.assertRaises(context_base.ContextError):
+    with self.assertRaises(context.ContextError):
       intrinsics.federated_secure_sum(value, max_input)
 
 
@@ -392,7 +392,7 @@ class FederatedSecureSumBitwidthTest(parameterized.TestCase):
     value = _create_fake_value(_INT_CLIENTS)
     bitwidth = _create_fake_value(_INT)
 
-    with self.assertRaises(context_base.ContextError):
+    with self.assertRaises(context.ContextError):
       intrinsics.federated_secure_sum_bitwidth(value, bitwidth)
 
 
@@ -506,7 +506,7 @@ class FederatedSelectTest(parameterized.TestCase):
     server_value = _create_fake_value(_STRUCT_INT_SERVER)
     select_fn = _create_fake_fn([_STRUCT_INT, _INT], _FLOAT)
 
-    with self.assertRaises(context_base.ContextError):
+    with self.assertRaises(context.ContextError):
       intrinsics.federated_select(client_keys, max_key, server_value, select_fn)
 
 
@@ -538,7 +538,7 @@ class FederatedSumTest(parameterized.TestCase):
   def test_raises_context_error_with_no_federated_context(self):
     value = _create_fake_value(_INT_CLIENTS)
 
-    with self.assertRaises(context_base.ContextError):
+    with self.assertRaises(context.ContextError):
       intrinsics.federated_sum(value)
 
 
@@ -636,7 +636,7 @@ class FederatedZipTest(parameterized.TestCase):
         _create_fake_value(_INT_CLIENTS),
     ]
 
-    with self.assertRaises(context_base.ContextError):
+    with self.assertRaises(context.ContextError):
       intrinsics.federated_zip(value)
 
 
@@ -704,7 +704,7 @@ class FederatedMeanTest(parameterized.TestCase):
     value = _create_fake_value(_FLOAT_CLIENTS)
     weight = None
 
-    with self.assertRaises(context_base.ContextError):
+    with self.assertRaises(context.ContextError):
       intrinsics.federated_mean(value, weight)
 
 
@@ -743,7 +743,7 @@ class FederatedMinTest(parameterized.TestCase):
   def test_raises_context_error_with_no_federated_context(self):
     value = _create_fake_value(_INT_CLIENTS)
 
-    with self.assertRaises(context_base.ContextError):
+    with self.assertRaises(context.ContextError):
       intrinsics.federated_min(value)
 
 
@@ -782,7 +782,7 @@ class FederatedMaxTest(parameterized.TestCase):
   def test_raises_context_error_with_no_federated_context(self):
     value = _create_fake_value(_INT_CLIENTS)
 
-    with self.assertRaises(context_base.ContextError):
+    with self.assertRaises(context.ContextError):
       intrinsics.federated_min(value)
 
 
@@ -831,7 +831,7 @@ class FederatedAggregateTest(parameterized.TestCase):
     merge = _create_fake_fn([_FLOAT, _FLOAT], _FLOAT)
     report = _create_fake_fn(_FLOAT, _STR)
 
-    with self.assertRaises(context_base.ContextError):
+    with self.assertRaises(context.ContextError):
       intrinsics.federated_aggregate(value, zero, accumulate, merge, report)
 
 
@@ -872,7 +872,7 @@ class FederatedValueTest(parameterized.TestCase):
     value = _create_fake_value(_INT)
     placement = placements.CLIENTS
 
-    with self.assertRaises(context_base.ContextError):
+    with self.assertRaises(context.ContextError):
       intrinsics.federated_value(value, placement)
 
 
@@ -908,7 +908,7 @@ class SequenceMapTest(parameterized.TestCase):
     fn = _create_fake_fn(_INT, _FLOAT)
     arg = _create_fake_value(_SEQUENCE_INT)
 
-    with self.assertRaises(context_base.ContextError):
+    with self.assertRaises(context.ContextError):
       intrinsics.sequence_map(fn, arg)
 
 
@@ -946,7 +946,7 @@ class SequenceReduceTest(parameterized.TestCase):
     zero = _create_fake_value(_FLOAT)
     op = _create_fake_fn([_FLOAT, _INT], _FLOAT)
 
-    with self.assertRaises(context_base.ContextError):
+    with self.assertRaises(context.ContextError):
       intrinsics.sequence_reduce(value, zero, op)
 
 
@@ -978,7 +978,7 @@ class SequenceSumTest(parameterized.TestCase):
   def test_raises_context_error_with_no_federated_context(self):
     value = _create_fake_value(_SEQUENCE_INT)
 
-    with self.assertRaises(context_base.ContextError):
+    with self.assertRaises(context.ContextError):
       intrinsics.sequence_sum(value)
 
 

@@ -24,7 +24,7 @@ from federated_language.common_libs import structure
 from federated_language.common_libs import tracing
 from federated_language.computation import computation_base
 from federated_language.computation import function_utils
-from federated_language.context_stack import context_base
+from federated_language.context_stack import context
 from federated_language.execution_contexts import compiler_pipeline
 from federated_language.executors import cardinalities_utils
 from federated_language.executors import executor_base
@@ -132,7 +132,7 @@ async def _invoke(executor, comp, arg, result_type: computation_types.Type):
   return type_conversions.type_to_py_container(result_value, result_type)
 
 
-class AsyncExecutionContext(context_base.AsyncContext, Generic[_Computation]):
+class AsyncExecutionContext(context.AsyncContext, Generic[_Computation]):
   """An asynchronous execution context backed by an `executor_base.Executor`.
 
   This context's `ingest` and `invoke` methods return Python coroutine objects

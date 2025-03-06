@@ -13,12 +13,11 @@
 # limitations under the License.
 
 from absl.testing import absltest
-from federated_language.context_stack import context_base
+from federated_language.context_stack import context
 from federated_language.context_stack import context_stack_impl
 
 
-class _TestContext(context_base.SyncContext):
-  """A test context."""
+class _TestContext(context.SyncContext):
 
   def invoke(self, comp, arg):
     raise AssertionError
@@ -29,12 +28,12 @@ class ContextStackTest(absltest.TestCase):
   def test_set_default_context_with_context(self):
     default_context = _TestContext()
     context_stack = context_stack_impl.ContextStackImpl(default_context)
-    context = _TestContext()
-    self.assertIsNot(context_stack.current, context)
+    test_context = _TestContext()
+    self.assertIsNot(context_stack.current, test_context)
 
-    context_stack.set_default_context(context)
+    context_stack.set_default_context(test_context)
 
-    self.assertIs(context_stack.current, context)
+    self.assertIs(context_stack.current, test_context)
 
   def test_set_default_context_raises_type_error_with_none(self):
     default_context = _TestContext()

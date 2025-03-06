@@ -32,7 +32,7 @@ import abc
 from typing import Any
 
 
-class ContextError(RuntimeError):
+class ContextError(RuntimeError):  # pylint: disable=g-bad-exception-name
   pass
 
 

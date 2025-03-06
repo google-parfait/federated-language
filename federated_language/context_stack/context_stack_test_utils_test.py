@@ -19,13 +19,12 @@ from unittest import mock
 
 from absl.testing import absltest
 from absl.testing import parameterized
-from federated_language.context_stack import context_base
+from federated_language.context_stack import context
 from federated_language.context_stack import context_stack_impl
 from federated_language.context_stack import context_stack_test_utils
 
 
-class _TestContext(context_base.SyncContext):
-  """A test context."""
+class _TestContext(context.SyncContext):
 
   def invoke(self, comp, arg):
     raise AssertionError
@@ -34,74 +33,86 @@ class _TestContext(context_base.SyncContext):
 class WithContextTest(parameterized.TestCase, unittest.IsolatedAsyncioTestCase):
 
   def test_installs_context_fn_sync_no_arg(self):
-    context = _TestContext()
-    context_fn = lambda: context
+    test_context = _TestContext()
+    context_fn = lambda: test_context
 
     @context_stack_test_utils.with_context(context_fn)
     def _foo():
-      self.assertEqual(context_stack_impl.context_stack.current, context)
+      self.assertEqual(context_stack_impl.context_stack.current, test_context)
 
     # Assert that a sync function is returned.
     self.assertFalse(asyncio.iscoroutinefunction(_foo))
 
     with mock.patch.object(contextlib.ExitStack, 'enter_context'):
       # Assert that the context is not installed.
-      self.assertNotEqual(context_stack_impl.context_stack.current, context)
+      self.assertNotEqual(
+          context_stack_impl.context_stack.current, test_context
+      )
 
       _foo()
 
       # Assert that the context is not installed.
-      self.assertNotEqual(context_stack_impl.context_stack.current, context)
+      self.assertNotEqual(
+          context_stack_impl.context_stack.current, test_context
+      )
 
   def test_installs_context_fn_sync_args(self):
-    context = _TestContext()
-    context_fn = lambda: context
+    test_context = _TestContext()
+    context_fn = lambda: test_context
 
     @context_stack_test_utils.with_context(context_fn)
     def _foo(x):
       del x  # Unused.
-      self.assertEqual(context_stack_impl.context_stack.current, context)
+      self.assertEqual(context_stack_impl.context_stack.current, test_context)
 
     # Assert that a sync function is returned.
     self.assertFalse(asyncio.iscoroutinefunction(_foo))
 
     with mock.patch.object(contextlib.ExitStack, 'enter_context'):
       # Assert that the context is not installed.
-      self.assertNotEqual(context_stack_impl.context_stack.current, context)
+      self.assertNotEqual(
+          context_stack_impl.context_stack.current, test_context
+      )
 
       _foo(1)
 
       # Assert that the context is not installed.
-      self.assertNotEqual(context_stack_impl.context_stack.current, context)
+      self.assertNotEqual(
+          context_stack_impl.context_stack.current, test_context
+      )
 
   def test_installs_context_fn_sync_kwargs(self):
-    context = _TestContext()
-    context_fn = lambda: context
+    test_context = _TestContext()
+    context_fn = lambda: test_context
 
     @context_stack_test_utils.with_context(context_fn)
     def _foo(*, x):
       del x  # Unused.
-      self.assertEqual(context_stack_impl.context_stack.current, context)
+      self.assertEqual(context_stack_impl.context_stack.current, test_context)
 
     # Assert that a sync function is returned.
     self.assertFalse(asyncio.iscoroutinefunction(_foo))
 
     with mock.patch.object(contextlib.ExitStack, 'enter_context'):
       # Assert that the context is not installed.
-      self.assertNotEqual(context_stack_impl.context_stack.current, context)
+      self.assertNotEqual(
+          context_stack_impl.context_stack.current, test_context
+      )
 
       _foo(x=1)
 
       # Assert that the context is not installed.
-      self.assertNotEqual(context_stack_impl.context_stack.current, context)
+      self.assertNotEqual(
+          context_stack_impl.context_stack.current, test_context
+      )
 
   def test_installs_context_fn_sync_return(self):
-    context = _TestContext()
-    context_fn = lambda: context
+    test_context = _TestContext()
+    context_fn = lambda: test_context
 
     @context_stack_test_utils.with_context(context_fn)
     def _foo():
-      self.assertEqual(context_stack_impl.context_stack.current, context)
+      self.assertEqual(context_stack_impl.context_stack.current, test_context)
       return 1
 
     # Assert that a sync function is returned.
@@ -109,52 +120,62 @@ class WithContextTest(parameterized.TestCase, unittest.IsolatedAsyncioTestCase):
 
     with mock.patch.object(contextlib.ExitStack, 'enter_context'):
       # Assert that the context is not installed.
-      self.assertNotEqual(context_stack_impl.context_stack.current, context)
+      self.assertNotEqual(
+          context_stack_impl.context_stack.current, test_context
+      )
 
       x = _foo()
 
       # Assert that the context is not installed.
-      self.assertNotEqual(context_stack_impl.context_stack.current, context)
+      self.assertNotEqual(
+          context_stack_impl.context_stack.current, test_context
+      )
 
       # Assert that the return value is returned by the decorator.
       self.assertEqual(x, 1)
 
   async def test_installs_context_fn_async(self):
-    context = _TestContext()
-    context_fn = lambda: context
+    test_context = _TestContext()
+    context_fn = lambda: test_context
 
     @context_stack_test_utils.with_context(context_fn)
     async def _foo():
-      self.assertEqual(context_stack_impl.context_stack.current, context)
+      self.assertEqual(context_stack_impl.context_stack.current, test_context)
 
     # Assert that an async function is returned.
     self.assertTrue(asyncio.iscoroutinefunction(_foo))
 
     with mock.patch.object(contextlib.ExitStack, 'enter_context'):
       # Assert that the context is not installed.
-      self.assertNotEqual(context_stack_impl.context_stack.current, context)
+      self.assertNotEqual(
+          context_stack_impl.context_stack.current, test_context
+      )
 
       await _foo()
 
       # Assert that the context is not installed.
-      self.assertNotEqual(context_stack_impl.context_stack.current, context)
+      self.assertNotEqual(
+          context_stack_impl.context_stack.current, test_context
+      )
 
   def test_installs_context_test_case(self):
-    context = _TestContext()
-    context_fn = lambda: context
+    test_context = _TestContext()
+    context_fn = lambda: test_context
 
     class _FooTest(absltest.TestCase, unittest.IsolatedAsyncioTestCase):
 
       @context_stack_test_utils.with_context(context_fn)
       async def test_async(self):
-        self.assertEqual(context_stack_impl.context_stack.current, context)
+        self.assertEqual(context_stack_impl.context_stack.current, test_context)
 
       @context_stack_test_utils.with_context(context_fn)
       def test_sync(self):
-        self.assertEqual(context_stack_impl.context_stack.current, context)
+        self.assertEqual(context_stack_impl.context_stack.current, test_context)
 
       def test_undecorated(self):
-        self.assertNotEqual(context_stack_impl.context_stack.current, context)
+        self.assertNotEqual(
+            context_stack_impl.context_stack.current, test_context
+        )
 
     # Assert that a sync function is returned.
     self.assertFalse(asyncio.iscoroutinefunction(_FooTest.test_sync))
@@ -164,7 +185,9 @@ class WithContextTest(parameterized.TestCase, unittest.IsolatedAsyncioTestCase):
 
     with mock.patch.object(contextlib.ExitStack, 'enter_context'):
       # Assert that the context is not installed.
-      self.assertNotEqual(context_stack_impl.context_stack.current, context)
+      self.assertNotEqual(
+          context_stack_impl.context_stack.current, test_context
+      )
 
       # Assert that the test passes with the expected number of test cases.
       suite = unittest.defaultTestLoader.loadTestsFromTestCase(_FooTest)
@@ -175,7 +198,9 @@ class WithContextTest(parameterized.TestCase, unittest.IsolatedAsyncioTestCase):
       self.assertTrue(result.wasSuccessful())
 
       # Assert that the context is not installed.
-      self.assertNotEqual(context_stack_impl.context_stack.current, context)
+      self.assertNotEqual(
+          context_stack_impl.context_stack.current, test_context
+      )
 
 
 if __name__ == '__main__':

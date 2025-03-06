@@ -19,7 +19,7 @@ from typing import Generic, Optional, TypeVar
 from federated_language.common_libs import async_utils
 from federated_language.common_libs import py_typecheck
 from federated_language.computation import computation_base
-from federated_language.context_stack import context_base
+from federated_language.context_stack import context
 from federated_language.execution_contexts import async_execution_context
 from federated_language.executors import cardinalities_utils
 from federated_language.executors import executor_factory
@@ -28,7 +28,7 @@ from federated_language.executors import executor_factory
 _Computation = TypeVar('_Computation', bound=computation_base.Computation)
 
 
-class SyncExecutionContext(context_base.SyncContext, Generic[_Computation]):
+class SyncExecutionContext(context.SyncContext, Generic[_Computation]):
   """A synchronous execution context backed by an `executor_base.Executor`."""
 
   def __init__(
