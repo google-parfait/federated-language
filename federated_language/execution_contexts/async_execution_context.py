@@ -16,6 +16,7 @@
 import asyncio
 from collections.abc import Callable, Mapping, Sequence
 import contextlib
+import functools
 from typing import Generic, Optional, TypeVar
 
 from federated_language.common_libs import py_typecheck
@@ -25,7 +26,6 @@ from federated_language.common_libs import tracing
 from federated_language.computation import computation_base
 from federated_language.computation import function_utils
 from federated_language.context_stack import context_base
-from federated_language.execution_contexts import compiler_pipeline
 from federated_language.executors import cardinalities_utils
 from federated_language.executors import executor_base
 from federated_language.executors import executor_factory
@@ -170,10 +170,7 @@ class AsyncExecutionContext(context_base.AsyncContext, Generic[_Computation]):
     super().__init__()
     py_typecheck.check_type(executor_fn, executor_factory.ExecutorFactory)
     self._executor_factory = executor_fn
-    if compiler_fn is not None:
-      self._compiler_pipeline = compiler_pipeline.CompilerPipeline(compiler_fn)
-    else:
-      self._compiler_pipeline = None
+    self._compiler = compiler_fn
     self._transform_args = transform_args
     self._transform_result = transform_result
     self._cardinality_inference_fn = cardinality_inference_fn
@@ -243,9 +240,7 @@ class AsyncExecutionContext(context_base.AsyncContext, Generic[_Computation]):
     # container types, so we must remember them here so that they can be
     # restored in the output.
     result_type = comp.type_signature.result
-    if self._compiler_pipeline is not None:
-      with tracing.span('ExecutionContext', 'Compile', span=True):
-        comp = self._compiler_pipeline.compile(comp)
+    comp = self._compile(comp)
 
     with tracing.span('ExecutionContext', 'Invoke', span=True):
       if arg is not None:
@@ -272,3 +267,12 @@ class AsyncExecutionContext(context_base.AsyncContext, Generic[_Computation]):
         if self._transform_result is not None:
           result = self._transform_result(result)
         return result
+
+  @functools.lru_cache()
+  def _compile(self, comp):
+    print('---')
+    # raise RuntimeError
+    if self._compiler is not None:
+      with tracing.span('ExecutionContext', 'Compile', span=True):
+        comp = self._compiler(comp)
+    return comp
