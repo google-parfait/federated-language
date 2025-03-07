@@ -60,5 +60,21 @@ class ContextStackTest(absltest.TestCase):
     self.assertIs(context_stack.current, default_context)
 
 
+class SetDefaultContextTest(absltest.TestCase):
+
+  def test_with_context(self):
+    test_context = _TestContext()
+    context_stack = context_stack_impl.context_stack
+    self.assertIsNot(context_stack.current, test_context)
+
+    context_stack_impl.set_default_context(test_context)
+
+    self.assertIs(context_stack.current, test_context)
+
+  def test_raises_type_error_with_none(self):
+    with self.assertRaises(TypeError):
+      context_stack_impl.set_default_context(None)
+
+
 if __name__ == '__main__':
   absltest.main()
