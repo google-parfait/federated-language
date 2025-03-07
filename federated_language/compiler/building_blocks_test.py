@@ -514,7 +514,7 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
     )
     reserialized = deserialized.to_proto()
     self.assertEqual(str(serialized), str(reserialized))
-    # Note: This is not an equality comparison because ser/de is not an identity
+    # NOTE: This is not an equality comparison because ser/de is not an identity
     # transform: it will drop the container from `StructWithPythonType`.
     target.type_signature.check_assignable_from(deserialized.type_signature)
 

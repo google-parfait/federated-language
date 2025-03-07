@@ -566,7 +566,7 @@ def create_federated_map_all_equal(
                  |
                  [Comp, Comp]
 
-  Note: The `fn` is required to be deterministic and therefore should contain no
+  NOTE: The `fn` is required to be deterministic and therefore should contain no
   `building_blocks.CompiledComputations`.
 
   Args:

@@ -366,7 +366,7 @@ def to_odict_or_tuple(
 def flatten(struct: object) -> list[object]:
   """Returns a list of values in a possibly recursively nested `Struct`.
 
-  Note: _This implementation is not compatible with the approach of
+  NOTE: This implementation is not compatible with the approach of
   `tf.nest.flatten`, which enforces lexical order for
   `collections.OrderedDict`s.
 
@@ -429,7 +429,7 @@ def pack_sequence_as(
       return Struct(elements), position
 
   result, _ = _pack(structure, flat_sequence, 0)
-  # Note: trailing elements are currently ignored.
+  # NOTE: trailing elements are currently ignored.
   return result
 
 
@@ -479,7 +479,7 @@ def map_structure(fn: Callable[..., object], *structures: Struct) -> object:
   Args:
     fn: a callable that accepts as many arguments as there are structures.
     *structures: a scalar, tuple, or list of constructed scalars and/or
-      tuples/lists, or scalars. Note: numpy arrays are considered scalars.
+      tuples/lists, or scalars. NOTE: numpy arrays are considered scalars.
 
   Returns:
     A new structure with the same arity as `structure` and same type as
@@ -601,7 +601,7 @@ def _to_container_recursive(
   This function is always recursive, since the non-recursive version would be
   just `container_fn(value)`.
 
-  Note: _This function will only recurse through `Struct`s, so if called
+  NOTE: _This function will only recurse through `Struct`s, so if called
   on the input `Struct([('a', 1), ('b', {'c': Struct(...)})])`
   the inner `Struct` will not be converted, because we do not recurse
   through Python `dict`s.

@@ -11,10 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""An example execution context used to execute a `Computation`.
+"""An example execution context used to execute a `ConcreteComputation`.
 
 This example demonstrates how to implement an execution context that can execute
-a `Computation`:
+a `ConcreteComputation`:
 
 * Federated intrinsics and compositional constructs.
 * Logic from other libraries (e.g., TensorFlow, JAX, PyTorch).
@@ -103,13 +103,14 @@ class _ExecutionScope:
 
 
 class ExecutionContext(federated_language.framework.AsyncContext):
-  """An execution context used to execute a `Computation`.
+  """An execution context used to execute a `ConcreteComputation`.
 
   This execution context prioritizes simplicity and readability over
   performance, and:
 
-  * Executes a `Computation` locally in a single Python process.
-  * Supports a `Computation` created using the `python_computation` decorator.
+  * Executes a `ConcreteComputation` locally in a single Python process.
+  * Supports a `ConcreteComputation` created using the `python_computation`
+    decorator.
   * Supports all federated compositional constructs.
   * Supports most federated intrinsics.
   * Does not support TensorFlow or XLA constructs.

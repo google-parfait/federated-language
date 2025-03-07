@@ -36,19 +36,19 @@ def _check_parameters(parameters):
     if parameter.default is not inspect.Parameter.empty:
       # We don't have a way to build defaults into the function's type.
       raise TypeError(
-          'TFF does not support default parameters. Found parameter '
+          'Default parameters are not supported. Found parameter '
           f'`{parameter.name}` with default value {parameter.default}'
       )
     if parameter.kind is inspect.Parameter.POSITIONAL_ONLY:
       # We don't have a way to encode positional-only into the function's type.
       raise TypeError(
-          'TFF does not support positional-only parameters. Found parameter '
+          'Positional-only parameters are not supported. Found parameter '
           f'`{parameter.name}` which appears before a `/` entry.'
       )
     if parameter.kind is inspect.Parameter.KEYWORD_ONLY:
       # We don't have a way to encode keyword-only into the function's type.
       raise TypeError(
-          'TFF does not support keyword-only arguments. Found parameter '
+          'Keyword-only arguments are not supported. Found parameter '
           f'`{parameter.name}` which appears after a `*` or `*args` entry.'
       )
     if parameter.kind in (
@@ -59,7 +59,7 @@ def _check_parameters(parameters):
       # arguments should be bundled into args vs. kwargs, since arguments can
       # be passed by position *or* by keyword at later call sites.
       raise TypeError(
-          'TFF does not support varargs. Found varargs parameter '
+          'Parameter varargs are not supported. Found varargs parameter '
           f'`{parameter.name}`.'
       )
     if parameter.kind is not inspect.Parameter.POSITIONAL_OR_KEYWORD:
@@ -228,7 +228,7 @@ def _wrap(
   _check_parameters(parameters)
 
   if parameters and not parameter_types:
-    # There is no TFF type specification, and the function/tf.function declares
+    # There is no type specification, and the function/tf.function declares
     # parameters. Create a polymorphic template.
     wrapped_fn = _wrap_polymorphic(fn, wrapper_fn, infer_type_fn)
   else:
@@ -243,11 +243,10 @@ def _wrap(
 
 
 def _is_function(obj):
-  # TFF supports passing type specifications (i.e. objects that can be turned
-  # into a `federated_language.Type`) as arguments to a computation decorator.
-  # In some cases those type specifications (e.g. np.int32) are a `type`, making
-  # them `Callable`, but they should not be treated as the function being
-  # decorated.
+  # Type specifications are supported (i.e. objects that can be turned into a
+  # `federated_language.Type`) as arguments to a computation decorator. In some
+  # cases those type specifications (e.g. np.int32) are a `type`, making them
+  # `Callable`, but they should not be treated as the function being decorated.
   if isinstance(obj, type):
     return False
   return isinstance(obj, Callable)
@@ -262,7 +261,7 @@ class ComputationReturnedNoneError(ValueError):
     filename = code.co_filename
     message = (
         f'The function defined on line {line_number} of file {filename} '
-        "returned `None` (or didn't explicitly `return` at all), but TFF "
+        "returned `None` (or didn't explicitly `return` at all), but "
         'computations must return some non-`None` value.'
     )
     super().__init__(message)
@@ -274,7 +273,7 @@ class ComputationWrapper:
   This class builds upon the _wrap() function defined above, adding on
   functionality shared between the computation and `federated_computation`
   decorators. The shared functionality includes relating formal Python function
-  parameters and call arguments to TFF types, packing and unpacking arguments,
+  parameters and call arguments to types, packing and unpacking arguments,
   verifying types, and support for polymorphism.
 
   Here's how one can use `ComputationWrapper` to construct a decorator/wrapper

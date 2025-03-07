@@ -221,7 +221,7 @@ class Reference(ComputationBuildingBlock):
       return True
     elif not isinstance(other, Reference):
       return NotImplemented
-    # Important: References are only equal to each other if they are the same
+    # IMPORTANT: References are only equal to each other if they are the same
     # object because two references with the same `name` are different if they
     # are in different locations within the same scope, in different scopes, or
     # in different contexts.
@@ -947,7 +947,7 @@ class Intrinsic(ComputationBuildingBlock):
     """
     intrinsic_def = intrinsic_defs.uri_to_intrinsic_def(uri)
     if intrinsic_def is not None:
-      # Note: this is really expensive.
+      # NOTE: this is really expensive.
       type_analysis.check_concrete_instance_of(
           type_signature, intrinsic_def.type_signature
       )
@@ -1598,7 +1598,7 @@ def _structural_representation(comp: ComputationBuildingBlock):
   ):
     """Calculates the inset for the given padding.
 
-    Note: This function is intended to only be called from `_fit_with_padding`.
+    NOTE: This function is intended to only be called from `_fit_with_padding`.
 
     Args:
       left: A `list` of strings.
@@ -1629,7 +1629,7 @@ def _structural_representation(comp: ComputationBuildingBlock):
   def _fit_with_inset(left, right, inset):
     r"""Concatenates the lines of two `list`s of strings.
 
-    Note: This function is intended to only be called from `_fit_with_padding`.
+    NOTE: This function is intended to only be called from `_fit_with_padding`.
 
     Args:
       left: A `list` of strings.

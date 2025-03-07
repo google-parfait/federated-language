@@ -20,7 +20,7 @@ order. See
 https://docs.python.org/3/library/struct.html#byte-order-size-and-alignment for
 more information.
 
-Important: This library only uses `pickle` to serialize Python containers (e.g.
+IMPORTANT: This library only uses `pickle` to serialize Python containers (e.g.
 `Sequence`, `Mapping`, `NamedTuple`, etc) and does not use `pickle` to serialize
 the values held in those containers.
 """
