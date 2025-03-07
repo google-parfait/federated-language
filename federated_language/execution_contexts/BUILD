@@ -35,7 +35,6 @@ py_library(
     name = "async_execution_context",
     srcs = ["async_execution_context.py"],
     deps = [
-        ":compiler_pipeline",
         "//federated_language/common_libs:py_typecheck",
         "//federated_language/common_libs:retrying",
         "//federated_language/common_libs:structure",
