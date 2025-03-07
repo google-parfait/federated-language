@@ -1148,6 +1148,9 @@ def to_type(obj: object) -> Type:
       return StructWithPythonType(obj, type(obj))
   elif attrs.has(type(obj)):
     return StructWithPythonType(attrs.asdict(obj, recurse=False), type(obj))
+  elif isinstance(obj, py_typecheck.SupportsNamedTuple):
+    elements = [(k, np.dtype(v)) for k, v in obj.__annotations__.items()]
+    return StructWithPythonType(elements, obj)
   elif isinstance(obj, Mapping):
     return StructWithPythonType(obj, type(obj))
   elif isinstance(obj, structure.Struct):
