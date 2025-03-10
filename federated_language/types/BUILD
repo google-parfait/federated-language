@@ -35,7 +35,7 @@ licenses(["notice"])
 py_library(
     name = "types",
     srcs = ["__init__.py"],
-    visibility = ["//tools:__subpackages__"],
+    visibility = ["//visibility:private"],
 )
 
 py_library(
