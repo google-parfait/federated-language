@@ -25,7 +25,7 @@ from federated_language.types import type_conversions
 from federated_language.types import typed_object
 
 
-def is_signature_compatible_with_types(
+def _is_signature_compatible_with_types(
     signature: inspect.Signature, *args, **kwargs
 ) -> bool:
   """Determines if functions matching signature accept `args` and `kwargs`.
@@ -75,7 +75,7 @@ def is_signature_compatible_with_types(
   return True
 
 
-def is_argument_struct(arg) -> bool:
+def _is_argument_struct(arg) -> bool:
   """Determines if 'arg' is interpretable as an argument struct.
 
   Args:
@@ -93,7 +93,7 @@ def is_argument_struct(arg) -> bool:
   if isinstance(arg, structure.Struct):
     elements = structure.to_elements(arg)
   elif isinstance(arg, typed_object.TypedObject):
-    return is_argument_struct(arg.type_signature)
+    return _is_argument_struct(arg.type_signature)
   else:
     if arg is not None:
       arg = computation_types.to_type(arg)
@@ -119,7 +119,7 @@ def unpack_args_from_struct(
   Args:
     struct_with_args: An instance of either an `struct.Struct` or
       computation_types.StructType` (or something convertible to it by
-      computation_types.to_type()), on which is_argument_struct() is True.
+      computation_types.to_type()), on which _is_argument_struct() is True.
 
   Returns:
     A pair (args, kwargs) containing tuple elements from 'struct_with_args'.
@@ -127,7 +127,7 @@ def unpack_args_from_struct(
   Raises:
     TypeError: if 'struct_with_args' is of a wrong type.
   """
-  if not is_argument_struct(struct_with_args):
+  if not _is_argument_struct(struct_with_args):
     raise TypeError('Not an argument struct: {}.'.format(struct_with_args))
   if isinstance(struct_with_args, structure.Struct):
     elements = structure.to_elements(struct_with_args)
@@ -192,7 +192,7 @@ def pack_args_into_struct(
     )
   else:
     py_typecheck.check_type(type_spec, computation_types.StructType)
-    if not is_argument_struct(type_spec):
+    if not _is_argument_struct(type_spec):
       raise TypeError(
           'Parameter type {} does not have a structure of an argument struct, '
           'and cannot be populated from multiple positional and keyword '
@@ -280,7 +280,7 @@ def pack_args(
             parameter_type, len(args), len(kwargs)
         )
     )
-  if not is_argument_struct(parameter_type):
+  if not _is_argument_struct(parameter_type):
     raise TypeError(
         'Parameter type {} does not have a structure of an argument '
         'struct, and cannot be populated from multiple positional and '
@@ -319,7 +319,7 @@ def _infer_unpack_needed(
   signature = inspect.signature(fn)
 
   if parameter_type is None:
-    if is_signature_compatible_with_types(signature):
+    if _is_signature_compatible_with_types(signature):
       if should_unpack:
         raise ValueError('Requested unpacking of a no-arg function.')
       return False
@@ -329,7 +329,7 @@ def _infer_unpack_needed(
           'a body of a no-parameter computation.'.format(signature)
       )
 
-  unpack_required = not is_signature_compatible_with_types(
+  unpack_required = not _is_signature_compatible_with_types(
       signature, parameter_type
   )
   if unpack_required and should_unpack is not None and not should_unpack:
@@ -339,9 +339,9 @@ def _infer_unpack_needed(
             fn.__name__, signature, parameter_type
         )
     )
-  if is_argument_struct(parameter_type):
+  if _is_argument_struct(parameter_type):
     arg_types, kwarg_types = unpack_args_from_struct(parameter_type)
-    unpack_possible = is_signature_compatible_with_types(
+    unpack_possible = _is_signature_compatible_with_types(
         signature, *arg_types, **kwarg_types
     )
   else:
@@ -432,7 +432,7 @@ def wrap_as_zero_or_one_arg_callable(
   """
   signature = inspect.signature(fn)
   if parameter_type is None:
-    if is_signature_compatible_with_types(signature):
+    if _is_signature_compatible_with_types(signature):
       # Deliberate wrapping to isolate the caller from `fn`, e.g., to prevent
       # the caller from mistakenly specifying args that match fn's defaults.
       return lambda: fn()  # pylint: disable=unnecessary-lambda

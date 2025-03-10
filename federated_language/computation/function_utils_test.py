@@ -55,7 +55,7 @@ class FunctionUtilsTest(parameterized.TestCase):
       self, signature, *args, **kwargs
   ):
     self.assertFalse(
-        function_utils.is_signature_compatible_with_types(
+        function_utils._is_signature_compatible_with_types(
             signature, *args, **kwargs
         )
     )
@@ -78,7 +78,7 @@ class FunctionUtilsTest(parameterized.TestCase):
       self, signature, *args, **kwargs
   ):
     self.assertFalse(
-        function_utils.is_signature_compatible_with_types(
+        function_utils._is_signature_compatible_with_types(
             signature, *args, **kwargs
         )
     )
@@ -97,7 +97,7 @@ class FunctionUtilsTest(parameterized.TestCase):
       ('struct_kwargs_first', structure.Struct([('a', 1), (None, 2)]), False),
   )
   def test_is_argument_struct(self, arg, expected_result):
-    self.assertEqual(function_utils.is_argument_struct(arg), expected_result)
+    self.assertEqual(function_utils._is_argument_struct(arg), expected_result)
 
   @parameterized.named_parameters(
       ('tuple_unnamed', structure.Struct([(None, 1)]), [1], {}),
