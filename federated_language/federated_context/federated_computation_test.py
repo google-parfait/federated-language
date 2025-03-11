@@ -15,7 +15,7 @@
 from absl.testing import absltest
 from federated_language.computation import computation_impl
 from federated_language.computation import computation_wrapper
-from federated_language.context_stack import context_stack_impl
+from federated_language.context_stack import get_context_stack
 from federated_language.context_stack import runtime_error_context
 from federated_language.federated_context import federated_computation
 from federated_language.types import computation_types
@@ -68,7 +68,7 @@ class FederatedComputationWrapperTest(absltest.TestCase):
     self.assertEqual(str(foo.to_building_block()), '(foo_arg -> foo_arg)')
 
   def test_stack_resets_on_none_returned(self):
-    stack = context_stack_impl.get_context_stack()
+    stack = get_context_stack.get_context_stack()
     self.assertIsInstance(
         stack.current, runtime_error_context.RuntimeErrorContext
     )

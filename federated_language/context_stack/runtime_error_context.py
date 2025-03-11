@@ -17,9 +17,21 @@ from federated_language.context_stack import context
 
 
 class RuntimeErrorContext(context.SyncContext):
-  """A context that will fail when used to invoke a computation."""
+  """A context that will fail if you execute against it."""
+
+  def _raise_runtime_error(self):
+    raise RuntimeError(
+        'No default context installed.\n'
+        '\n'
+        'You should not expect to get this error using the TFF API.\n'
+        '\n'
+        'If you are getting this error when testing a module inside of '
+        '`federated_language/python/core/...`, you may need to explicitly '
+        'invoke `execution_contexts.set_sync_local_cpp_execution_context()` in '
+        'the `main` function of your test.'
+    )
 
   def invoke(self, comp, arg):
-    del comp, arg  # Unused
-
-    raise RuntimeError('No default context installed.')
+    del comp  # Unused
+    del arg  # Unused
+    self._raise_runtime_error()
