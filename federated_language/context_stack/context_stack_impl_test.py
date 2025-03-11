@@ -35,13 +35,6 @@ class ContextStackTest(absltest.TestCase):
 
     self.assertIs(context_stack.current, test_context)
 
-  def test_set_default_context_raises_type_error_with_none(self):
-    default_context = _TestContext()
-    context_stack = context_stack_impl.ContextStackImpl(default_context)
-
-    with self.assertRaises(TypeError):
-      context_stack.set_default_context(None)
-
   def test_install_pushes_context_on_stack(self):
     default_context = _TestContext()
     context_stack = context_stack_impl.ContextStackImpl(default_context)
@@ -58,6 +51,18 @@ class ContextStackTest(absltest.TestCase):
       self.assertIs(context_stack.current, context_two)
 
     self.assertIs(context_stack.current, default_context)
+
+
+class SetDefaultContextTest(absltest.TestCase):
+
+  def test_with_context(self):
+    test_context = _TestContext()
+    context_stack = context_stack_impl.context_stack
+    self.assertIsNot(context_stack.current, test_context)
+
+    context_stack_impl.set_default_context(test_context)
+
+    self.assertIs(context_stack.current, test_context)
 
 
 if __name__ == '__main__':

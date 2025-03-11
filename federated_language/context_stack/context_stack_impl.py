@@ -13,13 +13,11 @@
 # limitations under the License.
 """Defines classes/functions to manipulate the API context stack."""
 
-from collections.abc import Generator
+from collections.abc import Iterator
 import contextlib
 import threading
-import typing
 from typing import Union
 
-from federated_language.common_libs import py_typecheck
 from federated_language.context_stack import context
 from federated_language.context_stack import context_stack_base
 from federated_language.context_stack import runtime_error_context
@@ -31,31 +29,20 @@ _Context = Union[context.AsyncContext, context.SyncContext]
 class ContextStackImpl(context_stack_base.ContextStack, threading.local):
   """An implementation of a common thread-local context stack to run against."""
 
-  def __init__(self, default_context):
+  def __init__(self, default_context: _Context):
     super().__init__()
     self._stack = [default_context]
 
   def set_default_context(self, ctx: _Context) -> None:
-    """Places `ctx` at the bottom of the stack.
-
-    Args:
-      ctx: An instance of `federated_language.framework.AsyncContext` or
-        `federated_language.framework.AsyncContext`.
-    """
-    py_typecheck.check_type(ctx, typing.get_args(_Context))
-    assert self._stack
+    """Installs `ctx` as the default context at the bottom of the stack."""
     self._stack[0] = ctx
 
   @property
   def current(self) -> _Context:
-    assert self._stack
-    ctx = self._stack[-1]
-    assert isinstance(ctx, typing.get_args(_Context))
-    return ctx
+    return self._stack[-1]
 
   @contextlib.contextmanager
-  def install(self, ctx: _Context) -> Generator[_Context, None, None]:
-    py_typecheck.check_type(ctx, typing.get_args(_Context))
+  def install(self, ctx: _Context) -> Iterator[_Context]:
     self._stack.append(ctx)
     try:
       yield ctx
@@ -64,3 +51,17 @@ class ContextStackImpl(context_stack_base.ContextStack, threading.local):
 
 
 context_stack = ContextStackImpl(runtime_error_context.RuntimeErrorContext())
+
+
+def get_context_stack() -> context_stack_base.ContextStack:
+  """Returns the global context stack."""
+  return context_stack
+
+
+def set_default_context(ctx: _Context) -> None:
+  """Installs `ctx` as the default context in the global context stack."""
+  context_stack.set_default_context(ctx)
+
+
+def set_no_default_context() -> None:
+  context_stack.set_default_context(runtime_error_context.RuntimeErrorContext())

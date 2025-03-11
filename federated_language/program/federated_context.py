@@ -18,7 +18,7 @@ from typing import Optional, Union
 
 from federated_language.computation import computation_base
 from federated_language.context_stack import context
-from federated_language.context_stack import get_context_stack
+from federated_language.context_stack import context_stack_impl
 from federated_language.program import structure_utils
 from federated_language.program import value_reference
 from federated_language.types import computation_types
@@ -181,7 +181,7 @@ class FederatedContext(context.SyncContext):
 
 def check_in_federated_context() -> None:
   """Checks if the current context is a `federated_language.program.FederatedContext`."""
-  context_stack = get_context_stack.get_context_stack()
+  context_stack = context_stack_impl.get_context_stack()
   if not isinstance(context_stack.current, FederatedContext):
     raise ValueError(
         'Expected the current context to be a'

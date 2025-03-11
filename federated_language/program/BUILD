@@ -57,7 +57,7 @@ py_library(
         ":value_reference",
         "//federated_language/computation:computation_base",
         "//federated_language/context_stack:context",
-        "//federated_language/context_stack:get_context_stack",
+        "//federated_language/context_stack:context_stack_impl",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
         "//federated_language/types:type_analysis",

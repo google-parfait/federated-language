@@ -54,7 +54,7 @@ py_test(
         ":federated_computation",
         "//federated_language/computation:computation_impl",
         "//federated_language/computation:computation_wrapper",
-        "//federated_language/context_stack:get_context_stack",
+        "//federated_language/context_stack:context_stack_impl",
         "//federated_language/context_stack:runtime_error_context",
         "//federated_language/types:computation_types",
         "@pypi//absl_py",
