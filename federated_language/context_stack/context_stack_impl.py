@@ -53,7 +53,7 @@ class ContextStackImpl(context_stack_base.ContextStack, threading.local):
 context_stack = ContextStackImpl(runtime_error_context.RuntimeErrorContext())
 
 
-def get_context_stack() -> context_stack_base.ContextStack:
+def get_context_stack() -> ContextStackImpl:
   """Returns the global context stack."""
   return context_stack
 
