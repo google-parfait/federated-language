@@ -291,6 +291,7 @@ def to_proto(
 
 def from_proto_content(array_pb: array_pb2.Array) -> Array:
   """Returns an `Array` for the `array_pb`."""
+  # return from_proto(array_pb)
   dtype = dtype_utils.from_proto(array_pb.dtype)
   shape = array_shape.from_proto(array_pb.shape)
 
@@ -320,6 +321,7 @@ def to_proto_content(
     value: Array, *, dtype_hint: Optional[type[np.generic]] = None
 ) -> array_pb2.Array:
   """Returns an `Array` for the `value`."""
+  # return to_proto(value, dtype_hint=dtype_hint)
 
   if dtype_hint is not None:
     if not dtype_utils.is_valid_dtype(dtype_hint):
