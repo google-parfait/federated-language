@@ -146,45 +146,72 @@ def to_structure_with_type(
     ValueError: If `obj` and `type_spec` do not match or a container does not
       have either all named or unnamed elements.
   """
-  if not tree.is_nested(obj):
-    return obj
 
   def _get_item(
       type_spec: computation_types.Type, key: Union[str, int]
   ) -> Union[computation_types.FederatedType, computation_types.StructType]:
     if isinstance(type_spec, computation_types.FederatedType):
-      type_spec = type_spec.member
-    if not isinstance(type_spec, computation_types.StructType):
+      if not type_spec.all_equal:
+        return type_spec.member
+      else:
+        type_spec = type_spec.member
+    elif isinstance(type_spec, computation_types.SequenceType):
+      return type_spec.element
+
+    if isinstance(type_spec, computation_types.StructType):
+      return type_spec[key]
+    else:
       raise ValueError(
           'Expected `type_spec` to be a `federated_language.StructType`, found'
           f' {type(type_spec)}.'
       )
 
-    return type_spec[key]
+  def _get_container_cls(
+      type_spec: computation_types.StructType,
+  ) -> type[object]:
+    container_cls = type_spec.python_container
+    if container_cls is None:
+      has_names = [name is not None for name, _ in type_spec.items()]
+      if any(has_names):
+        if not all(has_names):
+          raise ValueError(
+              'Expected `type_spec` to have either all named or unnamed'
+              f' elements, found {type_spec}.'
+          )
+        container_cls = dict
+      else:
+        container_cls = list
+    return container_cls
+
+  def _get_container_spec(
+      type_spec: computation_types.Type,
+  ) -> tuple[type[object], Optional[list[Optional[str]]]]:
+    if isinstance(type_spec, computation_types.FederatedType):
+      if not type_spec.all_equal:
+        return list, None
+      else:
+        type_spec = type_spec.member
+    elif isinstance(type_spec, computation_types.SequenceType):
+      return list, None
+
+    if isinstance(type_spec, computation_types.StructType):
+      names = [name for name, _ in type_spec.items()]
+      container_cls = _get_container_cls(type_spec)
+      return container_cls, names
+    else:
+      raise ValueError(
+          'Expected `type_spec` to be a `federated_language.StructType`,'
+          ' found {type(type_spec)}.'
+      )
 
   def _to_structure(path: tuple[Union[str, int], ...], obj: object) -> object:
+
+    if isinstance(obj, structure.Struct):
+      raise RuntimeError()
+
     if tree.is_nested(obj):
       container_type = functools.reduce(_get_item, path, type_spec)
-      if isinstance(container_type, computation_types.FederatedType):
-        container_type = container_type.member
-      if not isinstance(container_type, computation_types.StructType):
-        raise ValueError(
-            'Expected `container_type` to be a'
-            f' `federated_language.StructType`, found {type(container_type)}.'
-        )
-
-      container_cls = container_type.python_container
-      if container_cls is None:
-        names = [name is not None for name, _ in container_type.items()]
-        if any(names):
-          if not all(names):
-            raise ValueError(
-                'Expected `container_type` to have either all named or unnamed'
-                f' elements, found {container_type}.'
-            )
-          container_cls = dict
-        else:
-          container_cls = list
+      container_cls, names = _get_container_spec(container_type)
 
       if isinstance(obj, py_typecheck.SupportsNamedTuple):
         elements = obj._asdict().values()
@@ -199,10 +226,8 @@ def to_structure_with_type(
         )
 
       if isinstance(container_cls, py_typecheck.SupportsNamedTuple):
-        names = [name for name, _ in container_type.items()]
         return container_cls(**dict(zip(names, elements)))
       elif issubclass(container_cls, Mapping):
-        names = [name for name, _ in container_type.items()]
         return container_cls(zip(names, elements))  # pylint: disable=too-many-function-args
       elif issubclass(container_cls, Sequence):
         return container_cls(elements)  # pylint: disable=too-many-function-args
@@ -214,7 +239,10 @@ def to_structure_with_type(
     else:
       return None
 
-  return tree.traverse_with_path(_to_structure, obj, top_down=False)
+  if tree.is_nested(obj):
+    return tree.traverse_with_path(_to_structure, obj, top_down=False)
+  else:
+    return obj
 
 
 def _is_container_type_without_names(container_type: type[object]) -> bool:

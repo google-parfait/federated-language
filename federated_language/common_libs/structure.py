@@ -170,6 +170,17 @@ class Struct(Generic[_T]):
       )
     return self._element_array[self._name_to_index[name]]
 
+  def __setstate__(self, state):
+    # IMPORTANT: At unpickling time, `__getattr__()` is called by the
+    # implementation of `object.__reduce__()`. However, `__init__()` is not
+    # called when unpickling an instance. This class implements `__getattr__()`
+    # and accesses attributes that have not been set. Implementing
+    # `__setstate__` instead of relying on `object.__reduce__()` prevents this.
+    dict_attributes, slot_attributes = state
+    self.__dict__.update(dict_attributes)
+    for name, value in slot_attributes.items():
+      setattr(self, name, value)
+
   def __eq__(self, other: object) -> bool:
     if self is other:
       return True

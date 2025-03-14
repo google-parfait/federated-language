@@ -41,6 +41,12 @@ type signature of a `federated_language.Computation`.
 A `federated_language.Computation` is an abstraction defining the API for a
 computation.
 
+### ConcreteComputation
+
+A `federated_language.framework.ConcreteComputation` is the Federated Language
+implementation of `federated_language.Computation` API backed by a
+`computation_pb2.Computation` Protobuf.
+
 ### ComputationBuildingBlock
 
 A `federated_language.framework.ComputationBuildingBlock` is the Python
@@ -48,8 +54,8 @@ representation of the [AST](#ast).
 
 ### computation_pb2.Computation
 
-A `computation_pb2.Computation` is the Proto or serialized representation of the
-[AST](#ast).
+A `computation_pb2.Computation` is the Protobuf or serialized representation of
+the [AST](#ast).
 
 ## Tracing
 
@@ -94,7 +100,7 @@ A **compiler** is a sequence of **transformations**.
 A **transformations** creates a new [AST](#ast) an existing one. Transformations
 can operate on `federated_language.framework.ComputationBuildingBlock`s in order
 to transform the Python representation of an [AST](#ast) or on
-`computation_pb2.Computation`s in order to transform the Proto or serialized
+`computation_pb2.Computation`s in order to transform the Protobuf or serialized
 representation of an [AST](#ast).
 
 An **atomic transformation** is one that applies a single mutation (possibly

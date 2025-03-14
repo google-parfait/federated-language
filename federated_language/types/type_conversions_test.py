@@ -215,7 +215,7 @@ class ToStructureWithTypeTest(parameterized.TestCase):
       (
           'list_to_list',
           [1, 2, 3],
-          computation_types.StructType([np.int32] * 3),
+          computation_types.StructType([np.int32, np.int32, np.int32]),
           [1, 2, 3],
       ),
       (
@@ -244,7 +244,7 @@ class ToStructureWithTypeTest(parameterized.TestCase):
       (
           'dict_to_list',
           {'a': 1, 'b': 2, 'c': 3},
-          computation_types.StructType([np.int32] * 3),
+          computation_types.StructType([np.int32, np.int32, np.int32]),
           [1, 2, 3],
       ),
       (
@@ -273,7 +273,7 @@ class ToStructureWithTypeTest(parameterized.TestCase):
       (
           'named_tuple_to_list',
           _TestNamedTuple(1, 2, 3),
-          computation_types.StructType([np.int32] * 3),
+          computation_types.StructType([np.int32, np.int32, np.int32]),
           [1, 2, 3],
       ),
       (
@@ -316,18 +316,38 @@ class ToStructureWithTypeTest(parameterized.TestCase):
           [1, 2, 3],
       ),
       (
-          'federated_structure',
+          'federated_structure_not_all_equal',
           [1, 2, 3],
-          computation_types.FederatedType([np.int32] * 3, placements.CLIENTS),
+          computation_types.FederatedType(
+              np.int32,
+              placements.CLIENTS,
+              all_equal=False,
+          ),
+          [1, 2, 3],
+      ),
+      (
+          'federated_structure_all_equal',
+          [1, 2, 3],
+          computation_types.FederatedType(
+              [np.int32, np.int32, np.int32],
+              placements.CLIENTS,
+              all_equal=True,
+          ),
           [1, 2, 3],
       ),
       (
           'federated_structure_nested',
           [[1, 2], [3]],
           computation_types.FederatedType(
-              [[np.int32] * 2, [np.int32]], placements.CLIENTS
+              [[np.int32, np.int32], [np.int32]], placements.CLIENTS
           ),
           [[1, 2], [3]],
+      ),
+      (
+          'sequence',
+          [1, 2, 3],
+          computation_types.SequenceType(np.int32),
+          [1, 2, 3],
       ),
   )
   def test_returns_result(self, obj, type_spec, expected):
@@ -343,7 +363,7 @@ class ToStructureWithTypeTest(parameterized.TestCase):
       (
           'wrong_type_spec_nested',
           [[1, 2], [3]],
-          computation_types.StructType([np.int32] * 3),
+          computation_types.StructType([np.int32, np.int32, np.int32]),
       ),
       (
           'partially_named',
