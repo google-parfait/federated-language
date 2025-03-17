@@ -32,7 +32,7 @@ licenses(["notice"])
 py_library(
     name = "context_stack",
     srcs = ["__init__.py"],
-    visibility = ["//tools:__subpackages__"],
+    visibility = ["//visibility:private"],
 )
 
 py_library(
