@@ -98,7 +98,7 @@ def infer_type(arg: object) -> Optional[computation_types.Type]:
       return computation_types.StructType(elements)
     else:
       return computation_types.StructWithPythonType(elements, type(arg))
-  elif isinstance(arg, (np.ndarray, np.generic)):
+  elif isinstance(arg, (np.generic, np.ndarray)):
     return computation_types.TensorType(arg.dtype, arg.shape)
   elif isinstance(arg, (bool, int, float, complex, str, bytes)):
     dtype = dtype_utils.infer_dtype(arg)

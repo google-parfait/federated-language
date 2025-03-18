@@ -1244,7 +1244,7 @@ class Literal(ComputationBuildingBlock):
       ValueError: If `value` is not compatible with `type_signature`.
     """
     if (
-        isinstance(value, (np.ndarray, np.generic))
+        isinstance(value, (np.generic, np.ndarray))
         and value.dtype.type is np.str_
     ):
       value = value.astype(np.bytes_)
@@ -1323,7 +1323,7 @@ class Literal(ComputationBuildingBlock):
 
   def __hash__(self):
     if self._hash is None:
-      if isinstance(self._value, (np.ndarray, np.generic)):
+      if isinstance(self._value, (np.generic, np.ndarray)):
         hashable_value = tuple(self._value.flatten().tolist())
       else:
         hashable_value = self._value

@@ -135,7 +135,7 @@ def to_proto(
       raise ValueError(f'Expected {value} to be compatible with {dtype_hint}.')
     dtype = dtype_hint
   else:
-    if isinstance(value, (np.ndarray, np.generic)):
+    if isinstance(value, (np.generic, np.ndarray)):
       dtype = value.dtype.type
       # If the value has a dtype of `np.bytes_` or `np.object_`, the serialized
       # dtype should still be a `np.str_`.
@@ -150,7 +150,7 @@ def to_proto(
   if dtype is np.str_:
 
     def _contains_type(value, classinfo):
-      if isinstance(value, (np.ndarray, np.generic)):
+      if isinstance(value, (np.generic, np.ndarray)):
         if value.size == 0:
           return False
         item = value.item(0)
@@ -330,7 +330,7 @@ def to_proto_content(
       raise ValueError(f'Expected {value} to be compatible with {dtype_hint}.')
     dtype = dtype_hint
   else:
-    if isinstance(value, (np.ndarray, np.generic)):
+    if isinstance(value, (np.generic, np.ndarray)):
       dtype = value.dtype.type
       # If the value has a dtype of `np.bytes_` or `np.object_`, the serialized
       # dtype should still be a `np.str_`.
@@ -365,7 +365,7 @@ def is_compatible_dtype(value: Array, dtype: type[np.generic]) -> bool:
     value: The value to check.
     dtype: The dtype to check against.
   """
-  if isinstance(value, (np.ndarray, np.generic)):
+  if isinstance(value, (np.generic, np.ndarray)):
     value_dtype = value.dtype.type
   else:
     value_dtype = type(value)
@@ -395,7 +395,7 @@ def is_compatible_dtype(value: Array, dtype: type[np.generic]) -> bool:
     return False
 
   # Check dtype size.
-  if isinstance(value, (np.ndarray, np.generic)):
+  if isinstance(value, (np.generic, np.ndarray)):
     # `np.can_cast` does not support Python scalars and does not does not apply
     # value-based logic to `np.ndarray` or numpy scalars. See
     # https://numpy.org/doc/stable/reference/generated/numpy.can_cast.html for

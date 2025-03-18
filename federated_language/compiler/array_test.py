@@ -245,7 +245,7 @@ class FromProtoTest(parameterized.TestCase):
   def test_returns_value(self, proto, expected_value):
     actual_value = array.from_proto(proto)
 
-    if isinstance(actual_value, (np.ndarray, np.generic)):
+    if isinstance(actual_value, (np.generic, np.ndarray)):
       np.testing.assert_array_equal(actual_value, expected_value, strict=True)
     else:
       self.assertIsInstance(actual_value, type(expected_value))
@@ -1084,7 +1084,7 @@ class FromProtoContentTest(parameterized.TestCase):
   def test_returns_value(self, proto, expected_value):
     actual_value = array.from_proto_content(proto)
 
-    if isinstance(actual_value, (np.ndarray, np.generic)):
+    if isinstance(actual_value, (np.generic, np.ndarray)):
       np.testing.assert_array_equal(actual_value, expected_value, strict=True)
     else:
       self.assertIsInstance(actual_value, type(expected_value))
