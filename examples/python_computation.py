@@ -46,7 +46,7 @@ def _create_computation_from_fn(
     parameter_type: federated_language.Type,
     result_type: federated_language.Type,
 ) -> computation_pb2.Computation:
-  """Returns a `Computation` for a Python function.
+  """Returns a `computation_pb2.Computation` for the Python function.
 
   Args:
     fn: A Python function to use.
@@ -74,7 +74,7 @@ def _create_concrete_computation_from_fn(
     parameter_type: Optional[federated_language.Type],
     result_type: federated_language.Type,
 ) -> federated_language.framework.ConcreteComputation:
-  """Returns a `ConcreteComputation` for a Python function.
+  """Returns a `ConcreteComputation` for the Python function.
 
   Args:
     fn: A Python function to use.
@@ -121,10 +121,7 @@ def _check_parameter_types(
 def python_computation(
     parameter_types: Optional[Structure[type[object]]],
     result_type: type[object],
-) -> Callable[
-    [Callable[..., object]],
-    federated_language.framework.ConcreteComputation,
-]:
+) -> Callable[[Callable[..., object]], federated_language.Computation]:
   """A decorator factory that creates a `Computation` from a Python function.
 
   It is infeasible to infer the `return_type` of a Python function because of
@@ -164,9 +161,7 @@ def python_computation(
       function.
   """
 
-  def _decorator(
-      fn: Callable[..., object],
-  ) -> federated_language.framework.ConcreteComputation:
+  def _decorator(fn: Callable[..., object]) -> federated_language.Computation:
     nonlocal parameter_types
     nonlocal result_type
 
