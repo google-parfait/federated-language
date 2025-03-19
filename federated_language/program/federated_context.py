@@ -118,39 +118,28 @@ class FederatedContext(context.SyncContext):
   *returned as a value from* a `federated_language.Computation`:
 
   | Federated Language Type  | Python Representation                      |
-  | -------------------------- | ------------------------------------------ |
-  | `federated_language.TensorType`           |
-  `federated_language.program.MaterializableValueReference` |
-  | `federated_language.SequenceType`         |
-  `federated_language.program.MaterializableValueReference` |
-  | `federated_language.FederatedType`        | Python representation of the
-  `member` of   |
-  : (server-placed)            : the `federated_language.FederatedType`
-  :
-  | `federated_language.StructWithPythonType` | Python container of the
-  |
-  :                            : `federated_language.StructWithPythonType`
-  :
-  | `federated_language.StructType` (with no  | `collections.OrderedDict`
-  |
-  : Python type, all fields    :                                            :
-  : named)                     :                                            :
-  | `federated_language.StructType` (with no  | `tuple`
-  |
-  : Python type, no fields     :                                            :
-  : named)                     :                                            :
+  | ------------------------ | ------------------------------------------ |
+  | `TensorType`             | `MaterializableValueReference`             |
+  | `SequenceType`           | `MaterializableValueReference`             |
+  | `FederatedType`          | Python representation of the `member` of   |
+  : (server-placed)          : the `federated_language.FederatedType`     :
+  | `StructWithPythonType`   | Python container of the                    |
+  :                          : `federated_language.StructWithPythonType`  :
+  | `StructType` (with no    | `collections.OrderedDict`                  |
+  : Python type, all fields  :                                            :
+  : named)                   :                                            :
+  | `StructType` (with no    | `tuple`                                    |
+  : Python type, no fields   :                                            :
+  : named)                   :                                            :
 
   Python representations of values that can be only be *accepted as an arguments
   to* a `federated_language.Computation`:
 
-  | TFF Type            | Python Representation                   |
-  | ------------------- | --------------------------------------- |
-  | `federated_language.FederatedType` | Opaque object returned by
-  |
-  : (client-placed)     : `federated_language.program.DataSourceIterator.select`
-  :
-  | `federated_language.FunctionType`  | `federated_language.Computation`
-  |
+  | Federated Language Type  | Python Representation                   |
+  | ------------------------ | --------------------------------------- |
+  | `FederatedType`          | Opaque object returned by               |
+  : (client-placed)          : `DataSourceIterator.select`             :
+  | `FunctionType`           | `federated_language.Computation`        |
   """
 
   @abc.abstractmethod

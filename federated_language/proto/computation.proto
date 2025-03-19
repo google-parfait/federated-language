@@ -193,7 +193,7 @@ message Computation {
     //
     // The following constructs are currently considered experimental, and are
     // not formally supported yet. They may be recognized, partially or fully
-    // handled by parts of the TFF codebase, but at this stage, one should not
+    // handled by parts of the codebase, but at this stage, one should not
     // depend on this being the case. Their exact representation may continue
     // to evolve, or they may be removed altogether. When these constructs are
     // ready for public consumption and come with an explicit support, we will
@@ -519,8 +519,9 @@ message PlacementType {
 //
 // While we will offer support for writing polymorphic TensorFlow logic, types
 // will be captured automatically and made concrete based on usage at the Python
-// level of the API. Users of TFF will not need to declare them explicitly, but
-// template specialization will happen before computation logic gets serialized.
+// level of the API. Users of the API will not need to declare them explicitly,
+// but template specialization will happen before computation logic gets
+// serialized.
 //
 // Next id: 8
 message TensorFlow {

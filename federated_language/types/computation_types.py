@@ -290,7 +290,7 @@ def _to_dtype(dtype: _DtypeLike) -> np.dtype:
 
 
 class TensorType(Type, metaclass=_Intern):
-  """An implementation of `federated_language.Type` representing types of tensors in TFF."""
+  """An implementation of `federated_language.Type` representing tensors."""
 
   @classmethod
   def _hashable_from_init_args(
@@ -474,7 +474,7 @@ def _reserved_names_in_elements(
 
 
 class StructType(structure.Struct, Type, metaclass=_Intern):
-  """An implementation of `federated_language.Type` representing structural types in TFF.
+  """An implementation of `federated_language.Type` representing structures.
 
   Elements initialized by name can be accessed as `foo.name`, and otherwise by
   index, `foo[index]`.
@@ -649,7 +649,7 @@ class StructWithPythonType(StructType, metaclass=_Intern):
 
 
 class SequenceType(Type, metaclass=_Intern):
-  """An implementation of `federated_language.Type` representing types of sequences in TFF.
+  """An implementation of `federated_language.Type` representing sequences.
 
   IMPORTANT: since `SequenceType` is frequently backed by `tf.data.Dataset`
   which converts `list` to `tuple`, any `SequenceType` constructed with
@@ -949,7 +949,7 @@ class PlacementType(Type, metaclass=_Intern):
 
 
 class FederatedType(Type, metaclass=_Intern):
-  """An implementation of `federated_language.Type` representing federated types in TFF."""
+  """An implementation of `federated_language.Type` representing placed types."""
 
   @classmethod
   def _hashable_from_init_args(
@@ -1335,7 +1335,7 @@ def _string_representation(type_spec: Type, formatted: bool) -> str:
     """Returns a `list` of strings representing the given `type_spec`.
 
     Args:
-      type_spec: An instance of a TFF `Type`.
+      type_spec: An instance of a `Type`.
       formatted: A boolean indicating if the returned string should be
         formatted.
     """

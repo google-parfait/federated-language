@@ -29,7 +29,7 @@ def _federated_computation_wrapper_fn(
     name: Optional[str] = None,
     **kwargs
 ):
-  """Wrapper function to plug orchestration logic into the TFF framework."""
+  """Wrapper function to plug orchestration logic into the framework."""
   del kwargs  # Unused.
   if parameter_type is None:
     parameter_name = None
@@ -58,10 +58,10 @@ def _federated_computation_wrapper_fn(
 federated_computation = computation_wrapper.ComputationWrapper(
     _federated_computation_wrapper_fn
 )
-federated_computation.__doc__ = """Decorates/wraps Python functions as TFF federated/composite computations.
+federated_computation.__doc__ = """Decorates/wraps Python functions as federated/composite computations.
 
   The term *federated computation* as used here refers to any computation that
-  uses TFF programming abstractions. Examples of such computations may include
+  uses API programming abstractions. Examples of such computations may include
   federated training or federated evaluation that involve both client-side and
   server-side logic and involve network communication. However, this
   decorator/wrapper can also be used to construct composite computations that
@@ -70,7 +70,7 @@ federated_computation.__doc__ = """Decorates/wraps Python functions as TFF feder
   The main feature that distinguishes *federated computation* function bodies
   in Python from the bodies of TensorFlow defuns is that whereas in the latter,
   one slices and dices `tf.Tensor` instances using a variety of TensorFlow ops,
-  in the former one slices and dices `federated_language.Value` instances using TFF operators.
+  in the former one slices and dices `federated_language.Value` instances using operators.
 
   The supported modes of usage are identical to those for
   `federated_language.tensorflow.computation`.
@@ -88,16 +88,16 @@ federated_computation.__doc__ = """Decorates/wraps Python functions as TFF feder
     element, and returns the result of applying the unary operator to the
     integer twice. The body of `foo` does not contain federated communication
     operators, but we define it with `federated_language.federated_computation` as it can be
-    used as building block in any section of TFF code (except inside sections
+    used as building block in any section of code (except inside sections
     of pure TensorFlow logic).
 
   Args:
-    *args: Either a Python function, or TFF type spec, or both (function first),
-      or neither. See also `federated_language.tensorflow.computation` for an extended
-      documentation.
+    *args: Either a Python function, or Federated Language type spec, or both
+      (function first), or neither. See also
+      `federated_language.tensorflow.computation` for an extended documentation.
 
   Returns:
-    If invoked with a function as an argument, returns an instance of a TFF
+    If invoked with a function as an argument, returns an instance of a
     computation constructed based on this function. If called without one, as
     in the typical decorator style of usage, returns a callable that expects
     to be called with the function definition supplied as a parameter. See
