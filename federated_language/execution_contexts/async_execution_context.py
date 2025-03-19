@@ -170,6 +170,7 @@ class AsyncExecutionContext(context.AsyncContext, Generic[_Computation]):
     super().__init__()
     py_typecheck.check_type(executor_fn, executor_factory.ExecutorFactory)
     self._executor_factory = executor_fn
+    # self._compiler_fn = compiler_fn
     if compiler_fn is not None:
       self._compiler_pipeline = compiler_pipeline.CompilerPipeline(compiler_fn)
     else:
@@ -247,6 +248,8 @@ class AsyncExecutionContext(context.AsyncContext, Generic[_Computation]):
       with tracing.span('ExecutionContext', 'Compile', span=True):
         comp = self._compiler_pipeline.compile(comp)
 
+    # with tracing.span('ExecutionContext', 'Compile', span=True):
+    #   comp = self._compile(comp)
     with tracing.span('ExecutionContext', 'Invoke', span=True):
       if arg is not None:
         cardinalities = self._cardinality_inference_fn(
@@ -272,3 +275,9 @@ class AsyncExecutionContext(context.AsyncContext, Generic[_Computation]):
         if self._transform_result is not None:
           result = self._transform_result(result)
         return result
+
+  # @functools.lru_cache()
+  # def _compile(self, comp):
+  #   if self._compiler_fn is not None:
+  #     comp = self._compiler_fn(comp)
+  #   return comp

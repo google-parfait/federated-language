@@ -185,7 +185,7 @@ async def program_loic(...) -> None:
     metrics_manager.release(metrics, metrics_type, round_number)
 ```
 
-Note: It is ok to release all the values if that is what is required.
+NOTE: It is ok to release all the values if that is what is required.
 
 ### Asynchronous Functions
 
@@ -249,7 +249,7 @@ different values of `foo`.
 **Do** use proto to define related but complex or verbose parameters instead of
 defining many FLAGS (go/absl.flags).
 
-> Note: Proto can be read from disk and used to construct Python objects, for
+> NOTE: Proto can be read from disk and used to construct Python objects, for
 > example:
 >
 > ```python
@@ -276,5 +276,5 @@ tested or into the program logic the program invokes.
 **Don't** write unit tests for the program, if testing the program is useful
 write those tests in terms of integration tests.
 
-Note: It should be unlikely that testing the program is useful if Python logic
+NOTE: It should be unlikely that testing the program is useful if Python logic
 and asynchronous functions are moved into libraries and tested.

@@ -1649,7 +1649,7 @@ class ToTypeTest(parameterized.TestCase):
   def test_list_of_named_tf_types(self):
     s = [('a', np.int32), ('b', np.float64)]
     t = computation_types.to_type(s)
-    # Note: list of pairs should be interpreted as a plain StructType, and
+    # NOTE: list of pairs should be interpreted as a plain StructType, and
     # not try to convert into a python list afterwards.
     self.assertNotIsInstance(t, computation_types.StructWithPythonType)
     self.assertEqual(str(t), '<a=int32,b=float64>')
@@ -1657,7 +1657,7 @@ class ToTypeTest(parameterized.TestCase):
   def test_list_of_partially_named_tf_types(self):
     s = [np.float64, ('a', np.int32)]
     t = computation_types.to_type(s)
-    # Note: list of pairs should be interpreted as a plain StructType, and
+    # NOTE: list of pairs should be interpreted as a plain StructType, and
     # not try to convert into a python list afterwards.
     self.assertNotIsInstance(t, computation_types.StructWithPythonType)
     self.assertEqual(str(t), '<float64,a=int32>')
@@ -1703,7 +1703,7 @@ class ToTypeTest(parameterized.TestCase):
   def test_namedtuples_addressable_by_name(self):
     elems = [('item' + str(k), np.int32) for k in range(5)]
     t = computation_types.to_type(elems)
-    # Note: list of pairs should be interpreted as a plain StructType, and
+    # NOTE: list of pairs should be interpreted as a plain StructType, and
     # not try to convert into a python list afterwards.
     self.assertNotIsInstance(t, computation_types.StructWithPythonType)
     self.assertIsInstance(t.item0, computation_types.TensorType)

@@ -38,7 +38,7 @@ def transform_postorder(comp, transform):
   parent is visited and transformed with the already-visited, and possibly
   transformed arguments in place.
 
-  Note: In particular, in `Call(f,x)`, both `f` and `x` are arguments to `Call`.
+  NOTE: In particular, in `Call(f,x)`, both `f` and `x` are arguments to `Call`.
   Therefore, `f` is transformed into `f'`, next `x` into `x'` and finally,
   `Call(f',x')` is transformed at the end.
 

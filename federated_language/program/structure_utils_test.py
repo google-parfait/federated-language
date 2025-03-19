@@ -264,7 +264,7 @@ class FlattenWithNameTest(parameterized.TestCase):
               'd': program_test_utils.TestMaterializableValueReference(2),
               'e': program_test_utils.TestSerializable(3, 4),
           },
-          # Note: Flattening a Mapping container will sort the keys, therefore
+          # NOTE: Flattening a Mapping container will sort the keys, therefore
           # this sequence is sorted. Unflattening the sequence will sort they
           # keys according to the provided structure.
           [
@@ -453,7 +453,7 @@ class FlattenTest(parameterized.TestCase):
               'd': program_test_utils.TestMaterializableValueReference(2),
               'e': program_test_utils.TestSerializable(3, 4),
           },
-          # Note: Flattening a Mapping container will sort the keys, therefore
+          # NOTE: Flattening a Mapping container will sort the keys, therefore
           # this sequence is sorted. Unflattening the sequence will sort they
           # keys according to the provided structure.
           [
@@ -641,7 +641,7 @@ class FlattenAsTest(parameterized.TestCase):
       (
           'dict_unordered',
           {'c': None, 'b': None, 'a': None, 'd': None, 'e': None},
-          # Note: Flattening a Mapping container will sort the keys, therefore
+          # NOTE: Flattening a Mapping container will sort the keys, therefore
           # this sequence is sorted. Unflattening the sequence will sort they
           # keys according to the provided structure.
           [

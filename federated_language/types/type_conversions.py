@@ -29,9 +29,9 @@ import tree
 
 
 def infer_type(arg: object) -> Optional[computation_types.Type]:
-  """Infers the TFF type of the argument (a `computation_types.Type` instance).
+  """Infers the type of the argument (a `computation_types.Type` instance).
 
-  Warning: This function is only partially implemented.
+  WARNING: This function is only partially implemented.
 
   The kinds of arguments that are currently correctly recognized:
   * tensors, variables, and data sets
@@ -41,7 +41,7 @@ def infer_type(arg: object) -> Optional[computation_types.Type]:
     `OrderedDict`s, `attrs` classes, and `federated_language.TypedObject`s
 
   Args:
-    arg: The argument, the TFF type of which to infer.
+    arg: The argument, the type of which to infer.
 
   Returns:
     Either an instance of `computation_types.Type`, or `None` if the argument is
@@ -112,7 +112,7 @@ def to_structure_with_type(
 ) -> object:
   """Converts the containers in `obj` to those defined by `type_spec`.
 
-  Note: This function does not convert any leaf in the structure.
+  NOTE: This function does not convert any leaf in the structure.
 
   For example:
 
@@ -294,7 +294,7 @@ def type_to_py_container(value, type_spec: computation_types.Type):
     else:
       if not isinstance(value, list):
         raise TypeError(
-            'Unexpected Python type for non-all-equal TFF type '
+            'Unexpected Python type for non-all-equal type '
             f'{type_spec}: expected `list`, found `{type(value)}`.'
         )
       return [
@@ -340,7 +340,7 @@ def type_to_py_container(value, type_spec: computation_types.Type):
   if num_named_elements > 0 and num_unnamed_elements > 0:
     raise ValueError(
         f'Cannot represent value {value} with a Python container because it'
-        ' contains a mix of named and unnamed elements.\n\nNote: this was'
+        ' contains a mix of named and unnamed elements.\n\nNOTE: this was'
         ' previously allowed when using the'
         ' `federated_language.structure.Struct` container. This support has'
         ' been removed: please change to use structures with either all-named'
@@ -352,14 +352,14 @@ def type_to_py_container(value, type_spec: computation_types.Type):
     else:
       container_type = tuple
 
-  # Avoid projecting the `structure.StructType`d TFF value into a Python
+  # Avoid projecting the `structure.StructType`d value into a Python
   # container that is not supported.
   if num_named_elements > 0 and _is_container_type_without_names(
       container_type
   ):
     raise ValueError(
         'Cannot represent value {} with named elements '
-        "using container type {} which does not support names. In TFF's "
+        'using container type {} which does not support names. In the '
         'typesystem, this corresponds to an implicit downcast'.format(
             value, container_type
         )
@@ -371,7 +371,7 @@ def type_to_py_container(value, type_spec: computation_types.Type):
     # Otherwise we must raise here.
     raise ValueError(
         'When packaging as a Python value which requires names, '
-        'the TFF type spec must have all names specified. Found '
+        'the type spec must have all names specified. Found '
         '{} names in type spec {} of length {}, with requested'
         'python type {}.'.format(
             len(dir(structure_type_spec)),

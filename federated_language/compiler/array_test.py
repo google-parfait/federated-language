@@ -709,7 +709,7 @@ class ToProtoTest(parameterized.TestCase):
       ),
       (
           'generic_bfloat16',
-          # Note: we must not use Python `float` here because ml_dtypes.bfloat16
+          # NOTE: we must not use Python `float` here because ml_dtypes.bfloat16
           # is declared as kind `V` (void) not `f` (float) to prevent numpy from
           # trying to equate float16 and bfloat16 (which are not compatible).
           ml_dtypes.bfloat16(1.0),
