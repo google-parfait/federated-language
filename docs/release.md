@@ -12,7 +12,7 @@
     *   Increment the **PATCH** version when making backward compatible bug
         fixes.
 
-    Tip: It may be helpful to
+    TIP: It may be helpful to
     [compare](https://github.com/google-parfait/federated-language/compare/) the
     latest release and the `main` branch to see the commits since the latest
     release.
@@ -26,7 +26,7 @@
     [federated-language](https://github.com/google-parfait/federated-language/)
     repository.
 
-    Important: Requires creating a
+    IMPORTANT: Requires creating a
     [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
 
     ```shell

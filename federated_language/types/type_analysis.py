@@ -561,7 +561,7 @@ def check_concrete_instance_of(
     if bound_type is None:
       if len(usages) == 1:
         # Single-use abstract types can't be wrong.
-        # Note: we could also add an exception here for cases where every usage
+        # NOTE: we could also add an exception here for cases where every usage
         # is equivalent to the first usage. However, that's not currently
         # needed since the only intrinsic that doesn't have a defining use is
         # GENERIC_ZERO, which has only a single-use type parameter.

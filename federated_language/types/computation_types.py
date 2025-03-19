@@ -178,7 +178,7 @@ class _Intern(abc.ABCMeta):
   `_Intern.__call__` is an iterator it will be converted to a list before
   `_hashable_from_init_args` and `__init__` are called.
 
-  Note: also that this metaclass must only be used with *immutable* values, as
+  NOTE: also that this metaclass must only be used with *immutable* values, as
   mutation would cause all similarly-constructed instances to be mutated
   together.
 
@@ -434,7 +434,7 @@ def _to_named_types(
   normalized element will have a name of `None` and a value equal to the element
   convereted to a type using `to_type`.
 
-  Note: This function treats a single element being passed in as `elements` as
+  NOTE: This function treats a single element being passed in as `elements` as
   if it were an iterable of that element.
 
   Args:

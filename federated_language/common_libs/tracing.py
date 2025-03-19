@@ -186,7 +186,7 @@ def trace(fn=None, **trace_kwargs):
 
   scope, sub_scope = _func_to_class_and_method(fn)
 
-  # Note: in a classic "what color is your function" situation,
+  # NOTE: in a classic "what color is your function" situation,
   # we unfortunately have to duplicate the wrapping of the
   # underlying function in order to cover both the sync and async cases.
   if inspect.iscoroutinefunction(fn):
@@ -295,7 +295,7 @@ _non_async_span_yields = ThreadLocalSpanYields()
 
 def _current_task() -> Optional[asyncio.Task]:
   """Get the current running task, or `None` if no task is running."""
-  # Note: `current_task` returns `None` if there is no current task, but it
+  # NOTE: `current_task` returns `None` if there is no current task, but it
   # throws if no currently running async loop.
   try:
     return asyncio.current_task()

@@ -795,7 +795,7 @@ def federated_secure_sum(value, max_input):
   result = federated_language.federated_secure_sum(value, (1, 2))
   ```
 
-  Note: To sum non-integer values or to sum integers with fewer constraints and
+  NOTE: To sum non-integer values or to sum integers with fewer constraints and
   weaker privacy properties, consider using `federated_sum`.
 
   Args:
@@ -878,7 +878,7 @@ def federated_secure_sum_bitwidth(value, bitwidth):
   result = federated_language.federated_secure_sum_bitwidth(value, [2, [4, 8]])
   ```
 
-  Note: To sum non-integer values or to sum integers with fewer constraints and
+  NOTE: To sum non-integer values or to sum integers with fewer constraints and
   weaker privacy properties, consider using `federated_sum`.
 
   Args:
@@ -1012,7 +1012,7 @@ def sequence_reduce(value, zero, op):
   `federated_map(x -> sequence_reduce(x, zero, op), value)`. See also the
   discussion on `sequence_map`.
 
-  Note: When applied to a federated value this function does the reduce
+  NOTE: When applied to a federated value this function does the reduce
   point-wise.
 
   Args:

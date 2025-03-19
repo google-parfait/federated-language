@@ -125,12 +125,12 @@ class FilteringReleaseManager(ReleaseManager[ReleasableStructure, Key]):
   * `lambda _: False` then nothing is released.
   * `lambda path: path == ('loss',)` then `{'loss': 1.0}` is released.
 
-  Note: The path `()` corresponds to the root of the structure; because the
+  NOTE: The path `()` corresponds to the root of the structure; because the
   `filter_fn` is applied to the items in the structure but not the structure
   itself, this path can be used to filter individual values from structures of
   values.
 
-  Important: Most `federated_language.program.ReleasableStructure` can be
+  IMPORTANT: Most `federated_language.program.ReleasableStructure` can be
   filtered, including
   individual values, structures, and structures nested in `NamedTuple`s.
   However, the fields of a `NamedTuple` cannot be filtered.
@@ -306,7 +306,7 @@ class PeriodicReleaseManager(ReleaseManager[ReleasableStructure, Key]):
   `datetime.timedelta(hours=3)` means that three hours after the previously
   released value the next value is released to the `release_manager`.
 
-   Note: that a `periodicity` of one or a very small `datetime.timedelta` will
+   NOTE: that a `periodicity` of one or a very small `datetime.timedelta` will
    release every value, making the
    `federated_language.program.PeriodicReleaseManager` a noop
    wrapper around the `release_manager`.
@@ -390,7 +390,7 @@ class DelayedReleaseManager(ReleaseManager[ReleasableStructure, Key]):
   argument (an integer). A `delay` of `3` means that all values will start to be
   released once `release` has been invoked at least three times.
 
-   Note: that a `delay` of one will release every value, making the
+   NOTE: that a `delay` of one will release every value, making the
    `federated_language.program.DelayedReleaseManager` a noop wrapper around the
    `release_manager`.
   """
