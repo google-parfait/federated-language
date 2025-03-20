@@ -76,8 +76,8 @@ def federated_aggregate(
     this final step might include computing their ratios).
 
   Args:
-    value: A value of a TFF federated type placed at
-      `federated_language.CLIENTS` to aggregate.
+    value: A value of a federated type placed at `federated_language.CLIENTS` to
+      aggregate.
     zero: The zero of type `U` in the algebra of reduction operators, as
       described above.
     accumulate: The reduction operator to use in the first stage of the process.
@@ -173,18 +173,18 @@ def federated_broadcast(value):
   """Broadcasts a federated value from the `federated_language.SERVER` to the `federated_language.CLIENTS`.
 
   Args:
-    value: A value of a TFF federated type placed at the
+    value: A value of a federated type placed at the
       `federated_language.SERVER`, all members of which are equal (the
       `federated_language.FederatedType.all_equal` property of `value` is
       `True`).
 
   Returns:
-    A representation of the result of broadcasting: a value of a TFF federated
-    type placed at the `federated_language.CLIENTS`, all members of which are
+    A representation of the result of broadcasting: a value of a federated type
+    placed at the `federated_language.CLIENTS`, all members of which are
     equal.
 
   Raises:
-    TypeError: If the argument is not a federated TFF value placed at the
+    TypeError: If the argument is not a federated value placed at the
       `federated_language.SERVER`.
   """
   value = value_impl.to_value(value, type_spec=None)
@@ -204,7 +204,7 @@ def federated_eval(fn, placement):
   """Evaluates a federated computation at `placement`, returning the result.
 
   Args:
-    fn: A no-arg TFF computation.
+    fn: A no-arg computation.
     placement: The desired result placement (either `federated_language.SERVER`
       or `federated_language.CLIENTS`).
 
@@ -246,8 +246,8 @@ def federated_map(fn, arg):
     fn: A mapping function to apply pointwise to member constituents of `arg`.
       The parameter of this function must be of the same type as the member
       constituents of `arg`.
-    arg: A value of a TFF federated type (or a value that can be implicitly
-      converted into a TFF federated type, e.g., by zipping) placed at
+    arg: A value of a federated type (or a value that can be implicitly
+      converted into a federated type, e.g., by zipping) placed at
       `federated_language.CLIENTS` or `federated_language.SERVER`.
 
   Returns:
@@ -349,11 +349,11 @@ def federated_mean(value, weight=None):
   `sum_{i=1}^k (w_i * v_i) / sum_{i=1}^k w_i`.
 
   Args:
-    value: The value of which the mean is to be computed. Must be of a TFF
-      federated type placed at `federated_language.CLIENTS`. The value may be
-      structured, e.g., its member constituents can be named tuples. The tensor
-      types that the value is composed of must be floating-point or complex.
-    weight: An optional weight, a TFF federated integer or floating-point tensor
+    value: The value of which the mean is to be computed. Must be of a federated
+      type placed at `federated_language.CLIENTS`. The value may be structured,
+      e.g., its member constituents can be named tuples. The tensor types that
+      the value is composed of must be floating-point or complex.
+    weight: An optional weight, a federated integer or floating-point tensor
       value, also placed at `federated_language.CLIENTS`.
 
   Returns:
@@ -363,7 +363,7 @@ def federated_mean(value, weight=None):
     member constituents contributed by all clients are equally weighted).
 
   Raises:
-    TypeError: If `value` is not a federated TFF value placed at
+    TypeError: If `value` is not a federated value placed at
     `federated_language.CLIENTS`,
       or if `weight` is not a federated integer or a floating-point tensor with
       the matching placement.
@@ -424,7 +424,7 @@ def federated_min(value: object) -> value_impl.Value:
   """Computes a min at `federated_language.SERVER` of a `value` placed on the `federated_language.CLIENTS`.
 
   Args:
-    value: A value of a TFF federated type placed at the
+    value: A value of a federated type placed at the
       `federated_language.CLIENTS`.
 
   Returns:
@@ -432,7 +432,7 @@ def federated_min(value: object) -> value_impl.Value:
     the `federated_language.SERVER`.
 
   Raises:
-    ValueError: If the argument is not a federated TFF value placed at
+    ValueError: If the argument is not a federated value placed at
       `federated_language.CLIENTS` compatible with min.
   """
   value = value_impl.to_value(value, type_spec=None)
@@ -454,7 +454,7 @@ def federated_max(value: object) -> value_impl.Value:
   """Computes a max at `federated_language.SERVER` of a `value` placed on the `federated_language.CLIENTS`.
 
   Args:
-    value: A value of a TFF federated type placed at the
+    value: A value of a federated type placed at the
       `federated_language.CLIENTS`.
 
   Returns:
@@ -462,7 +462,7 @@ def federated_max(value: object) -> value_impl.Value:
     the `federated_language.SERVER`.
 
   Raises:
-    ValueError: If the argument is not a federated TFF value placed at
+    ValueError: If the argument is not a federated value placed at
       `federated_language.CLIENTS` compatible with max.
   """
   value = value_impl.to_value(value, type_spec=None)
@@ -487,7 +487,7 @@ def federated_sum(value):
   `federated_language.federated_secure_sum_bitwidth`.
 
   Args:
-    value: A value of a TFF federated type placed at the
+    value: A value of a federated type placed at the
       `federated_language.CLIENTS`.
 
   Returns:
@@ -495,7 +495,7 @@ def federated_sum(value):
     on the `federated_language.SERVER`.
 
   Raises:
-    TypeError: If the argument is not a federated TFF value placed at
+    TypeError: If the argument is not a federated value placed at
       `federated_language.CLIENTS`.
   """
   value = value_impl.to_value(value, type_spec=None)
@@ -518,7 +518,7 @@ def federated_value(value, placement):
   `federated_language.federated_eval`.
 
   Args:
-    value: A value of a non-federated TFF type to be placed.
+    value: A value of a non-federated type to be placed.
     placement: The desired result placement (either `federated_language.SERVER`
       or `federated_language.CLIENTS`).
 
@@ -561,8 +561,8 @@ def federated_zip(value):
   """Converts an N-tuple of federated values into a federated N-tuple value.
 
   Args:
-    value: A value of a TFF named tuple type, the elements of which are
-      federated values with the same placement.
+    value: A value of a named tuple type, the elements of which are federated
+      values with the same placement.
 
   Returns:
     A federated value placed at the same location as the members of `value`, in
@@ -810,7 +810,7 @@ def federated_secure_sum(value, max_input):
     on the `federated_language.SERVER`.
 
   Raises:
-    TypeError: If the argument is not a federated TFF value placed at
+    TypeError: If the argument is not a federated value placed at
       `federated_language.CLIENTS`.
   """
   value = value_impl.to_value(value, type_spec=None)
@@ -882,7 +882,7 @@ def federated_secure_sum_bitwidth(value, bitwidth):
   weaker privacy properties, consider using `federated_sum`.
 
   Args:
-    value: An integer value of a TFF federated type placed at the
+    value: An integer value of a federated type placed at the
       `federated_language.CLIENTS`, in the range [0, 2^bitwidth - 1].
     bitwidth: An integer or nested structure of integers matching the structure
       of `value`. If integer `bitwidth` is used with a nested `value`, the same
@@ -893,7 +893,7 @@ def federated_secure_sum_bitwidth(value, bitwidth):
     on the `federated_language.SERVER`.
 
   Raises:
-    TypeError: If the argument is not a federated TFF value placed at
+    TypeError: If the argument is not a federated value placed at
       `federated_language.CLIENTS`.
   """
   value = value_impl.to_value(value, type_spec=None)
@@ -929,7 +929,7 @@ def federated_secure_sum_bitwidth(value, bitwidth):
 
 
 def sequence_map(fn, arg):
-  """Maps a TFF sequence `value` pointwise using a given function `fn`.
+  """Maps a sequence `value` pointwise using a given function `fn`.
 
   This function supports two modes of usage:
 
@@ -953,8 +953,7 @@ def sequence_map(fn, arg):
 
   Args:
     fn: A mapping function to apply pointwise to elements of `arg`.
-    arg: A value of a TFF type that is either a sequence, or a federated
-      sequence.
+    arg: A value of a type that is either a sequence, or a federated sequence.
 
   Returns:
     A sequence with the result of applying `fn` pointwise to each
@@ -993,9 +992,9 @@ def sequence_map(fn, arg):
 
 
 def sequence_reduce(value, zero, op):
-  """Reduces a TFF sequence `value` given a `zero` and reduction operator `op`.
+  """Reduces a sequence `value` given a `zero` and reduction operator `op`.
 
-  This method reduces a set of elements of a TFF sequence `value`, using a given
+  This method reduces a set of elements of a sequence `value`, using a given
   `zero` in the algebra (i.e., the result of reducing an empty sequence) of some
   type `U`, and a reduction operator `op` with type signature `(<U,T> -> U)`
   that incorporates a single `T`-typed element of `value` into the `U`-typed
@@ -1016,7 +1015,7 @@ def sequence_reduce(value, zero, op):
   point-wise.
 
   Args:
-    value: A value that is either a TFF sequence, or a federated sequence.
+    value: A value that is either a sequence, or a federated sequence.
     zero: The result of reducing a sequence with no elements.
     op: An operator with type signature `(<U,T> -> U)`, where `T` is the type of
       the elements of the sequence, and `U` is the type of `zero` to be used in
@@ -1070,8 +1069,7 @@ def sequence_sum(value):
   """Computes a sum of elements in a sequence.
 
   Args:
-    value: A value of a TFF type that is either a sequence, or a federated
-      sequence.
+    value: A value of a type that is either a sequence, or a federated sequence.
 
   Returns:
     The sum of elements in the sequence. If the argument `value` is of a
