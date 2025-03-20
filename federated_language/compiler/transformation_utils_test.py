@@ -14,7 +14,6 @@
 
 from absl.testing import absltest
 from absl.testing import parameterized
-from federated_language.common_libs import py_typecheck
 from federated_language.compiler import building_blocks
 from federated_language.compiler import computation_factory
 from federated_language.compiler import transformation_utils
@@ -220,7 +219,6 @@ def _construct_trivial_instance_of_all_computation_building_blocks():
 
 def _get_number_of_nodes_via_transform_postorder(comp, predicate=None):
   """Returns the number of nodes in `comp` matching `predicate`."""
-  py_typecheck.check_type(comp, building_blocks.ComputationBuildingBlock)
   count = 0
 
   def fn(comp):
@@ -237,7 +235,6 @@ def _get_number_of_nodes_via_transform_postorder_with_symbol_bindings(
     comp, predicate=None
 ):
   """Returns the number of nodes in `comp` matching `predicate`."""
-  py_typecheck.check_type(comp, building_blocks.ComputationBuildingBlock)
   empty_context_tree = transformation_utils.SymbolTree(FakeTracker)
   count = 0
 
@@ -257,7 +254,6 @@ def _get_number_of_nodes_via_transform_postorder_with_symbol_bindings(
 
 def _get_number_of_nodes_via_transform_preorder(comp, predicate=None):
   """Returns the number of nodes in `comp` matching `predicate`."""
-  py_typecheck.check_type(comp, building_blocks.ComputationBuildingBlock)
   count = 0
 
   def fn(comp):

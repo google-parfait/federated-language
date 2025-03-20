@@ -121,7 +121,10 @@ class SumIncompatibleError(TypeError):
     super().__init__(message)
 
 
-def check_is_sum_compatible(type_spec, type_spec_context=None):
+def check_is_sum_compatible(
+    type_spec: computation_types.Type,
+    type_spec_context: Optional[computation_types.Type] = None,
+):
   """Determines if `type_spec` is a type that can be added to itself.
 
   Types that are sum-compatible are composed of scalars of numeric types,
@@ -136,10 +139,8 @@ def check_is_sum_compatible(type_spec, type_spec_context=None):
   Raises:
      SumIncompatibleError: if `type_spec` is not sum-compatible.
   """
-  py_typecheck.check_type(type_spec, computation_types.Type)
   if type_spec_context is None:
     type_spec_context = type_spec
-  py_typecheck.check_type(type_spec_context, computation_types.Type)
   if isinstance(type_spec, computation_types.TensorType):
     if not (
         np.issubdtype(type_spec.dtype, np.number)

@@ -20,7 +20,7 @@ from federated_language.federated_context import value_impl
 from federated_language.types import computation_types
 
 
-def get_curried(fn):
+def get_curried(fn: value_impl.Value):
   """Returns a curried version of function `fn` that takes a parameter tuple.
 
   For functions `fn` of types <T1,T2,....,Tn> -> U, the result is a function
@@ -36,7 +36,6 @@ def get_curried(fn):
   Returns:
     A value that represents the curried form of `fn`.
   """
-  py_typecheck.check_type(fn, value_impl.Value)
   if not isinstance(fn.type_signature, computation_types.FunctionType):
     raise ValueError(
         'Expected a `federated_language.FunctionType`, found'

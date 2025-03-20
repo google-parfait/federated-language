@@ -247,7 +247,6 @@ py_test(
         ":building_blocks",
         ":computation_factory",
         ":transformation_utils",
-        "//federated_language/common_libs:py_typecheck",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
         "@protobuf//:protobuf_python",
