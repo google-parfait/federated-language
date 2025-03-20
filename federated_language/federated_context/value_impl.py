@@ -77,7 +77,7 @@ def _bind_computation_to_reference(comp, op: str):
 
 
 class Value(typed_object.TypedObject, abc.ABC):
-  """A generic base class for values that appear in TFF computations.
+  """A generic base class for values that appear in computations.
 
   If the value in this class is of `StructType` or `FederatedType` containing a
   `StructType`, the inner fields can be accessed by name
@@ -246,45 +246,43 @@ def to_value(
 ) -> Value:
   """Converts the argument into an instance of the abstract class `federated_language.Value`.
 
-  Instances of `federated_language.Value` represent TFF values that appear
-  internally in
-  federated computations. This helper function can be used to wrap a variety of
-  Python objects as `federated_language.Value` instances to allow them to be
-  passed as
-  arguments, used as functions, or otherwise manipulated within bodies of
-  federated computations.
+  Instances of `federated_language.Value` represent values that appear
+  internally in federated computations. This helper function can be used to wrap
+  a variety of Python objects as `federated_language.Value` instances to allow
+  them to be passed as arguments, used as functions, or otherwise manipulated
+  within bodies of federated computations.
 
   At the moment, the supported types include:
 
   * Simple constants of `str`, `int`, `float`, and `bool` types, mapped to
-    values of a TFF tensor type.
+    values of a tensor type.
 
-  * Numpy arrays (`np.ndarray` objects), also mapped to TFF tensors.
+  * Numpy arrays (`np.ndarray` objects), also mapped to tensor type.
 
   * Dictionaries (`collections.OrderedDict` and unordered `dict`), `list`s,
     `tuple`s, `namedtuple`s, and `Struct`s, all of which are mapped to
-    TFF tuple type.
+    tuple type.
 
   * Computations (constructed with either the
     `federated_language.tensorflow.computation` or with the
     `federated_language.federated_computation` decorator), typically mapped to
-    TFF functions.
+    functions.
 
   * Placement literals (`federated_language.CLIENTS`,
-    `federated_language.SERVER`), mapped to values of the TFF placement type.
+    `federated_language.SERVER`), mapped to values of the placement type.
 
-  This function is also invoked when attempting to execute a TFF computation.
-  All arguments supplied in the invocation are converted into TFF values prior
-  to execution. The types of Python objects that can be passed as arguments to
+  This function is also invoked when attempting to execute a computation.
+  All arguments supplied in the invocation are converted into values prior to
+  execution. The types of Python objects that can be passed as arguments to
   computations thus matches the types listed here.
 
   Args:
-    arg: An instance of one of the Python types that are convertible to TFF
-      values (instances of `federated_language.Value`).
+    arg: An instance of one of the Python types that are convertible to values
+      (instances of `federated_language.Value`).
     type_spec: An optional type specifier that allows for disambiguating the
-      target type (e.g., when two TFF types can be mapped to the same Python
-      representations). If not specified, TFF tried to determine the type of the
-      TFF value automatically.
+      target type (e.g., when two types can be mapped to the same Python
+      representations). If not specified, tried to determine the type of the
+      value automatically.
     parameter_type_hint: An optional `federated_language.Type` or value
       convertible to it by `federated_language.to_type()` which specifies an
       argument type to use in the case that `arg` is a
@@ -298,9 +296,9 @@ def to_value(
 
   Raises:
     TypeError: if `arg` is of an unsupported type, or of a type that does not
-      match `type_spec`. Raises explicit error message if TensorFlow constructs
-      are encountered, as TensorFlow code should be sealed away from TFF
-      federated context.
+      match `type_spec`. Raises explicit error message if backend constructs
+      are encountered, as backend code should be sealed away from federated
+      context.
   """
   # TODO: b/224484886 - Downcasting to all handled types.
   arg = typing.cast(
@@ -341,8 +339,8 @@ def to_value(
             ' `federated_language.Value`s without a type hint. Consider'
             ' explicitly specifying the argument types of a computation before'
             ' passing it to a function that requires a'
-            ' `federated_language.Value` (such as a TFF intrinsic like'
-            ' `federated_map`). If you are a TFF developer and think this'
+            ' `federated_language.Value` (such as a intrinsic like'
+            ' `federated_map`). If you are a developer and think this'
             ' should be supported, consider providing `parameter_type_hint` as'
             ' an argument to the encompassing `to_value` conversion.'
         )
@@ -380,7 +378,7 @@ def to_value(
         'Expected a Python types that is convertible to a'
         f' `federated_language.Value`, found {type(arg)}. If this is'
         ' backend-specific constructs, it was encountered in a federated'
-        ' context and TFF does not support mixing backend-specific and'
+        ' context and does not support mixing backend-specific and'
         ' federated logic. Please wrap any  backend-specific constructs in a'
         ' computation function.'
     )
