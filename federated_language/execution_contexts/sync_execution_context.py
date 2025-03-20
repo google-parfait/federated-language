@@ -14,7 +14,7 @@
 """A context for execution based on an embedded executor instance."""
 
 from collections.abc import Callable
-from typing import Optional
+from typing import Generic, Optional, TypeVar
 
 from federated_language.common_libs import async_utils
 from federated_language.common_libs import py_typecheck
@@ -25,15 +25,16 @@ from federated_language.executors import cardinalities_utils
 from federated_language.executors import executor_factory
 
 
-class SyncExecutionContext(context.SyncContext):
+_Computation = TypeVar('_Computation', bound=computation_base.Computation)
+
+
+class SyncExecutionContext(context.SyncContext, Generic[_Computation]):
   """A synchronous execution context backed by an `executor_base.Executor`."""
 
   def __init__(
       self,
       executor_fn: executor_factory.ExecutorFactory,
-      compiler_fn: Optional[
-          Callable[[computation_base.Computation], object]
-      ] = None,
+      compiler_fn: Optional[Callable[[_Computation], object]] = None,
       *,
       transform_args: Optional[Callable[[object], object]] = None,
       transform_result: Optional[Callable[[object], object]] = None,
