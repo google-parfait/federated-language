@@ -25,7 +25,7 @@ class Computation(typed_object.TypedObject, abc.ABC):
   @property
   @abc.abstractmethod
   def type_signature(self) -> computation_types.FunctionType:
-    """Returns the TFF type of this object."""
+    """Returns the type of this object."""
     raise NotImplementedError
 
   @abc.abstractmethod
@@ -46,11 +46,11 @@ class Computation(typed_object.TypedObject, abc.ABC):
   def __hash__(self) -> int:
     """Hashes the computation.
 
-    TFF backends reserve the right to compile instances of
-    `federated_language.Computation`,
-    as they may need different representations or data structures altogether.
-    As these backends need to be able to cache the result of compilation, we
-    require that `federated_language.Computation` subclasses be hashable.
+    Backends reserve the right to compile instances of
+    `federated_language.Computation`, as they may need different
+    representations or data structures altogether. As these backends need to be
+    able to cache the result of compilation, we require that
+    `federated_language.Computation` subclasses be hashable.
 
     Returns:
       Integer representing the hash value of the

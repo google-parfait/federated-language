@@ -35,12 +35,12 @@ class PolymorphicComputation:
     """Crates a polymorphic function with a given function factory.
 
     Args:
-      concrete_function_factory: A callable that accepts a (non-None) TFF type
-        as an argument, as well as an optional boolean `unpack` argument which
-        should be treated as documented in
+      concrete_function_factory: A callable that accepts a (non-None) type as an
+        argument, as well as an optional boolean `unpack` argument which should
+        be treated as documented in
         `function_utils.wrap_as_zero_or_one_arg_callable`. The callable must
         return a `Computation` instance that's been created to accept a single
-        positional argument of this TFF type (to be reused for future calls with
+        positional argument of this type (to be reused for future calls with
         parameters of a matching type).
       infer_type_fn: A `Callable` used to convert a backend-specific value to a
         `federated_language.Type`.

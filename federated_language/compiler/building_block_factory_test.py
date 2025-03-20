@@ -1556,7 +1556,7 @@ class ZipUpToTest(absltest.TestCase):
     self.assertTrue(zipped.type_signature.is_equivalent_to(zippable_type))
 
   def test_assignability_with_names(self):
-    # This would correspond to an implicit downcast in TFF's typesystem; the
+    # This would correspond to an implicit downcast in the typesystem; the
     # result would not be assignable to the requested type.
     comp = building_blocks.Struct([
         building_blocks.Struct([

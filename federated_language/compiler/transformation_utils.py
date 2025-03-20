@@ -460,7 +460,7 @@ class BoundVariableTracker(abc.ABC):
     The initializer is likely to be overwritten by subclasses in order to
     attach more state to the `BoundVariableTracker`. Each of them must
     satisfy the same interface, however. This is simply because the
-    `BoundVariableTracker` represents a variable binding in a TFF AST;
+    `BoundVariableTracker` represents a variable binding in an AST;
     no more information is avaiable to it than the `name`-`value` pair
     being bound together.
 
@@ -559,8 +559,8 @@ class SymbolTree:
   bindings we currently have available as we walk the AST.
 
   `SymbolTree` is a hierarchical tree-like data structure. Its levels
-  correspond to nodes in the TFF AST it is tracking, meaning that walking into
-  or out of a scope-defining TFF node (a block or lambda) corresponds to
+  correspond to nodes in the AST it is tracking, meaning that walking into
+  or out of a scope-defining node (a block or lambda) corresponds to
   moving up or down a level in the `SymbolTree`. Block constructs (a.k.a.
   the let statement) binds variables sequentially, and this sequential binding
   corresponds to variables bound at the same level of the `SymbolTree`.
@@ -635,8 +635,7 @@ class SymbolTree:
 
     Args:
       name: A string; generally, this is the variable a walker has encountered
-        in a TFF AST, and which it is relying on `SymbolTable` to address
-        correctly.
+        in a AST, and which it is relying on `SymbolTable` to address correctly.
 
     Raises:
       ValueError: If `name` is not found among the bound names currently
@@ -696,14 +695,13 @@ class SymbolTree:
   def drop_scope_down(self, comp_id):
     """Constructs a new scope level for `self`.
 
-    Scope levels in `SymbolTree` correspond to scope-introducing nodes in TFF
-    ASTs; that is, either `building_blocks.Block` or
-    `building_blocks.Lambda` nodes. Inside of these levels,
-    variables are bound in sequence. The implementer of a transformation
-    function needing to interact with scope should never need to explicitly walk
-    the scope levels `drop_scope_down` constructs; `drop_scope_down` is simply
-    provided
-    for ease of exposing to a traversal function.
+    Scope levels in `SymbolTree` correspond to scope-introducing nodes in ASTs;
+    that is, either `building_blocks.Block` or `building_blocks.Lambda` nodes.
+    Inside of these levels, variables are bound in sequence. The implementer of
+    a transformation function needing to interact with scope should never need
+    to explicitly walk the scope levels `drop_scope_down` constructs;
+    `drop_scope_down` is simply provided for ease of exposing to a traversal
+    function.
 
     Args:
       comp_id: Integer representing a unique key for the
@@ -1030,8 +1028,8 @@ class SequentialBindingNode:
   def add_child(self, comp_id, node):
     """Sets the child scope of `self` indexed by `comp_id` to `node`.
 
-    This corresponds to encountering a node in a TFF AST which defines a
-    variable scope.
+    This corresponds to encountering a node in an AST which defines a variable
+    scope.
 
     If a child with this `comp_id` already exists, it is replaced, as in a
     `dict`.
@@ -1067,7 +1065,7 @@ class ReferenceCounter(BoundVariableTracker):
       `building_blocks.ComputationBuildingBlock` or None if this binding is
       simply a placeholder, e.g. in a Lambda.
     count: An integer tracking how many times the variable an instance of
-      `ReferenceCounter` represents is referenced in a TFF AST.
+      `ReferenceCounter` represents is referenced in an AST.
   """
 
   def __init__(self, name, value):

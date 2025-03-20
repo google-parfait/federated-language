@@ -74,15 +74,12 @@ class MaterializableValueReference(typed_object.TypedObject, abc.ABC):
 
     The Python type of the referenced value depends on the `type_signature`:
 
-    | TFF Type           | Python Type                                        |
-    | ------------------ | -------------------------------------------------- |
-    | `federated_language.TensorType`   | `bool`, `int`, `float`, `complex`,
-    `str`, `bytes`, |
-    |                    | `np.generic`, or `np.ndarray`                      |
-    | `federated_language.SequenceType` | `Iterable` of any Python type
-    corresponding to a   |
-    |                    | `federated_language.TensorType`
-    |
+    | Federated Language Type  | Python Type                                  |
+    | ------------------------ | -------------------------------------------- |
+    | `TensorType`             | `bool`, `int`, `float`, `complex`, `str`,    |
+    |                          | `bytes`, `np.generic`, or `np.ndarray`       |
+    | `SequenceType`           | `Iterable` of any Python type corresponding  |
+    |                          |  to a `federated_language.TensorType`        |
     """
     raise NotImplementedError
 

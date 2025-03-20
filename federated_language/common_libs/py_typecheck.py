@@ -101,8 +101,9 @@ def is_name_value_pair(
 ) -> TypeGuard[tuple[_NT, _VT]]:
   """Returns `True` if `obj` is a name value pair, otherwise `False`.
 
-  In TFF, a name value pair (or named field) is a `collection.abc.Sequence` of
-  exactly two elements, a `name` (which can be `None`) and a `value`.
+  In `federated_language`, a name value pair (or named field) is a
+  `collection.abc.Sequence` of exactly two elements, a `name` (which can be
+  `None`) and a `value`.
 
   Args:
     obj: The object to test.

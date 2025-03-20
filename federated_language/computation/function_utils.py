@@ -299,7 +299,7 @@ def _infer_unpack_needed(
 
   Args:
     fn: The function to be invoked.
-    parameter_type: The TFF type of the parameter bundle to be accepted by the
+    parameter_type: The type of the parameter bundle to be accepted by the
       returned callable, if any, or None if there's no parameter.
     should_unpack: Default or expected return value; None implies the inferred
       value should be returned. If either unpacking or packing could work, and
@@ -385,7 +385,7 @@ def wrap_as_zero_or_one_arg_callable(
     parameter_type: Optional[computation_types.Type] = None,
     unpack: Optional[bool] = None,
 ):
-  """Wraps around `fn` so it accepts up to one positional TFF-typed argument.
+  """Wraps around `fn` so it accepts up to one positional typed argument.
 
   This function helps to simplify dealing with functions and defuns that might
   have diverse and complex signatures, but that represent computations and as
@@ -413,7 +413,7 @@ def wrap_as_zero_or_one_arg_callable(
   Args:
     fn: The underlying backend function or defun to invoke with the unpacked
       arguments.
-    parameter_type: The TFF type of the parameter bundle to be accepted by the
+    parameter_type: The type of the parameter bundle to be accepted by the
       returned callable, if any, or None if there's no parameter.
     unpack: Whether to break the parameter down into constituent parts and feed
       them as arguments to `fn` (True), leave the parameter as is and pass it to
@@ -500,11 +500,11 @@ def unpack_arg(
     arg,
     unpack: Optional[bool] = None,
 ) -> tuple[list[object], dict[str, object]]:
-  """Converts TFF values into arguments to `fn`.
+  """Converts values into arguments to `fn`.
 
   Args:
     fn: The function to unpack arguments for.
-    parameter_type: The TFF type of the parameter bundle to be accepted by the
+    parameter_type: The type of the parameter bundle to be accepted by the
       returned callable.
     arg: The argument to unpack.
     unpack: Whether to break the parameter down into constituent parts (`True`),

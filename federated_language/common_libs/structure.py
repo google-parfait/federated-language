@@ -676,7 +676,8 @@ def update_struct(structure, **kwargs):
     raise TypeError(
         '`structure` must be a structure with named fields (e.g. '
         'dict, attrs class, collections.namedtuple, '
-        'tff.structure.Struct), but found {}'.format(type(structure))
+        'federated_language.structure.Struct), but '
+        'found {}'.format(type(structure))
     )
   if isinstance(structure, Struct):
     elements = [

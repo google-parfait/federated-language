@@ -61,12 +61,12 @@ class ComputationBuildingBlock(typed_object.TypedObject, abc.ABC):
   """The abstract base class for abstractions in the internal language.
 
   Instances of this class correspond roughly one-to-one to the abstractions
-  defined in the `Computation` message in TFF's `computation.proto`, and are
+  defined in the `Computation` message in the `computation.proto`, and are
   intended primarily for the ease of manipulating the abstract syntax trees
   (AST) of federated computations as they are transformed by the compiler
   pipeline to mold into the needs of a particular execution backend. The only
   abstraction that does not have a dedicated Python equivalent is a section
-  of TensorFlow code (it's represented by
+  of backend-specific code (it's represented by
   `federated_language.framework.CompiledComputation`).
   """
 
@@ -792,7 +792,7 @@ class Block(ComputationBuildingBlock):
   Blocks are technically a redundant abstraction, as they can be equally well
   represented by lambda expressions. A block of the form `let x=y in z` is
   roughly equivalent to `(x -> z)(y)`. Although redundant, blocks have a use
-  as a way to reduce TFF computation ASTs to a simpler, less nested and more
+  as a way to reduce computation ASTs to a simpler, less nested and more
   readable form, and are helpful in AST transformations as a mechanism that
   prevents possible naming conflicts.
 
@@ -817,7 +817,7 @@ class Block(ComputationBuildingBlock):
       local_symbols: Iterable[tuple[str, ComputationBuildingBlock]],
       result: ComputationBuildingBlock,
   ):
-    """Creates a block of TFF code.
+    """Creates a block of federated_language code.
 
     Args:
       local_symbols: The list of one or more local declarations, each of which

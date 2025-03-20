@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Utilities file for functions with TFF `Value`s as inputs and outputs."""
+"""Utilities file for functions with `Value`s as inputs and outputs."""
 
 from federated_language.common_libs import py_typecheck
 from federated_language.compiler import building_block_factory
@@ -31,7 +31,7 @@ def get_curried(fn):
   with `N` starting at 0.
 
   Args:
-    fn: A value of a functional TFF type.
+    fn: A value of a functional type.
 
   Returns:
     A value that represents the curried form of `fn`.

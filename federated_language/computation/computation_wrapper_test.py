@@ -183,7 +183,7 @@ class ComputationWrapperTest(absltest.TestCase):
     # backing Python function binds to the argument on the definition side.
     # Thus, the ordinary linter check is inapplicable, as there's exists no
     # direct connection between the signature of the call and that of the
-    # Python definition. The TFF type decouples one from the other.
+    # Python definition. The type decouples one from the other.
     @test_wrap([('x', np.int32), ('y', np.int32)])
     def my_fn(arg):
       """This is my fn."""

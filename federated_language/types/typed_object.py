@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Defines an abstract interface for things that possess TFF type signatures."""
+"""Defines an abstract interface for things that possess type signatures."""
 
 import abc
 
@@ -19,10 +19,10 @@ from federated_language.types import computation_types
 
 
 class TypedObject(abc.ABC):
-  """An abstract interface for things that possess TFF type signatures."""
+  """An abstract interface for things that possess type signatures."""
 
   @property
   @abc.abstractmethod
   def type_signature(self) -> computation_types.Type:
-    """Returns the TFF type of this object (an instance of `federated_language.Type`)."""
+    """Returns the instance of `federated_language.Type` of this object."""
     raise NotImplementedError

@@ -43,7 +43,7 @@ class Executor(abc.ABC):
 
     This function is used to embed a value within the executor. The argument
     can be one of the plain Python types, a nested structure, a representation
-    of a TFF computation, etc. Once embedded, the value can be further passed
+    of a computation, etc. Once embedded, the value can be further passed
     around within the executor. For functional values, embedding them prior to
     invocation potentially allows the executor to amortize overhead across
     multiple calls.

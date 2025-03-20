@@ -74,8 +74,8 @@ def infer_cardinalities(value, type_spec):
   rather ingestion functions lower in the stack.
 
   Args:
-    value: Python object from which to infer TFF placement cardinalities.
-    type_spec: The TFF type spec for `value`, determining the semantics for
+    value: Python object from which to infer placement cardinalities.
+    type_spec: The type spec for `value`, determining the semantics for
       inferring cardinalities. That is, we only pull the cardinality off of
       federated types.
 
