@@ -19,7 +19,6 @@ from federated_language.common_libs import py_typecheck
 from federated_language.compiler import building_blocks
 from federated_language.computation import computation_base
 from federated_language.computation import function_utils
-from federated_language.context_stack import context_stack_base
 from federated_language.context_stack import context_stack_impl
 from federated_language.proto import computation_pb2
 from federated_language.types import computation_types
@@ -61,7 +60,7 @@ class ConcreteComputation(computation_base.Computation):
       self,
       *,
       computation_proto: computation_pb2.Computation,
-      context_stack: context_stack_base.ContextStack,
+      context_stack: context_stack_impl.ContextStack,
       annotated_type: Optional[computation_types.FunctionType] = None,
   ):
     """Constructs a new instance of ConcreteComputation from the computation_proto.
@@ -79,7 +78,7 @@ class ConcreteComputation(computation_base.Computation):
       ValueError: If `computation_proto.type` is `None`.
     """
     py_typecheck.check_type(computation_proto, computation_pb2.Computation)
-    py_typecheck.check_type(context_stack, context_stack_base.ContextStack)
+    py_typecheck.check_type(context_stack, context_stack_impl.ContextStack)
     if computation_proto.type is None:
       raise ValueError('Expected `computation_proto.type` to not be `None`.')
     type_spec = computation_types.Type.from_proto(computation_proto.type)
@@ -122,7 +121,7 @@ class ConcreteComputation(computation_base.Computation):
     return self._type_signature
 
   @property
-  def context_stack(self) -> context_stack_base.ContextStack:
+  def context_stack(self) -> context_stack_impl.ContextStack:
     return self._context_stack
 
   def __call__(self, *args, **kwargs):

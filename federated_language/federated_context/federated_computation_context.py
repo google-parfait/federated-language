@@ -15,7 +15,7 @@
 
 from federated_language.common_libs import py_typecheck
 from federated_language.compiler import building_blocks
-from federated_language.context_stack import context_stack_base
+from federated_language.context_stack import context_stack_impl
 from federated_language.context_stack import symbol_binding_context
 from federated_language.federated_context import value_impl
 from federated_language.types import computation_types
@@ -56,7 +56,7 @@ class FederatedComputationContext(
       parent: The optional parent context. If not `None`, it must be an instance
         of `FederatedComputationContext`.
     """
-    py_typecheck.check_type(context_stack, context_stack_base.ContextStack)
+    py_typecheck.check_type(context_stack, context_stack_impl.ContextStack)
     if suggested_name:
       py_typecheck.check_type(suggested_name, str)
       suggested_name = str(suggested_name)

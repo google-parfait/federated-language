@@ -27,7 +27,7 @@ class ContextStackTest(absltest.TestCase):
 
   def test_set_default_context_with_context(self):
     default_context = _TestContext()
-    context_stack = context_stack_impl.ContextStackImpl(default_context)
+    context_stack = context_stack_impl.ContextStack(default_context)
     test_context = _TestContext()
     self.assertIsNot(context_stack.current, test_context)
 
@@ -37,7 +37,7 @@ class ContextStackTest(absltest.TestCase):
 
   def test_install_pushes_context_on_stack(self):
     default_context = _TestContext()
-    context_stack = context_stack_impl.ContextStackImpl(default_context)
+    context_stack = context_stack_impl.ContextStack(default_context)
     self.assertIs(context_stack.current, default_context)
 
     context_two = _TestContext()

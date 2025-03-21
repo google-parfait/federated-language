@@ -41,16 +41,10 @@ py_library(
 )
 
 py_library(
-    name = "context_stack_base",
-    srcs = ["context_stack_base.py"],
-)
-
-py_library(
     name = "context_stack_impl",
     srcs = ["context_stack_impl.py"],
     deps = [
         ":context",
-        ":context_stack_base",
         ":runtime_error_context",
     ],
 )

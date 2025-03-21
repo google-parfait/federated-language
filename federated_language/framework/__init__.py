@@ -121,7 +121,7 @@ from federated_language.computation.polymorphic_computation import PolymorphicCo
 from federated_language.context_stack.context import AsyncContext
 from federated_language.context_stack.context import ContextError
 from federated_language.context_stack.context import SyncContext
-from federated_language.context_stack.context_stack_base import ContextStack
+from federated_language.context_stack.context_stack_impl import ContextStack
 from federated_language.context_stack.context_stack_impl import get_context_stack
 from federated_language.context_stack.context_stack_impl import set_default_context
 from federated_language.context_stack.context_stack_impl import set_no_default_context

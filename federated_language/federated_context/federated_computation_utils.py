@@ -17,7 +17,7 @@ from typing import Optional
 from federated_language.common_libs import py_typecheck
 from federated_language.compiler import building_blocks
 from federated_language.computation import computation_wrapper
-from federated_language.context_stack import context_stack_base
+from federated_language.context_stack import context_stack_impl
 from federated_language.federated_context import federated_computation_context
 from federated_language.federated_context import value_impl
 from federated_language.types import computation_types
@@ -28,7 +28,7 @@ def zero_or_one_arg_fn_to_building_block(
     fn,
     parameter_name: Optional[str],
     parameter_type: Optional[computation_types.Type],
-    context_stack: context_stack_base.ContextStack,
+    context_stack: context_stack_impl.ContextStack,
     suggested_name: Optional[str] = None,
 ) -> tuple[
     building_blocks.ComputationBuildingBlock, computation_types.FunctionType
@@ -56,7 +56,7 @@ def zero_or_one_arg_fn_to_building_block(
   Raises:
     ValueError: if `fn` is incompatible with `parameter_type`.
   """
-  py_typecheck.check_type(context_stack, context_stack_base.ContextStack)
+  py_typecheck.check_type(context_stack, context_stack_impl.ContextStack)
   if suggested_name is not None:
     py_typecheck.check_type(suggested_name, str)
   if isinstance(

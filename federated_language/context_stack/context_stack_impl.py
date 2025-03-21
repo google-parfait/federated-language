@@ -19,15 +19,14 @@ import threading
 from typing import Union
 
 from federated_language.context_stack import context
-from federated_language.context_stack import context_stack_base
 from federated_language.context_stack import runtime_error_context
 
 
 _Context = Union[context.AsyncContext, context.SyncContext]
 
 
-class ContextStackImpl(context_stack_base.ContextStack, threading.local):
-  """An implementation of a common thread-local context stack to run against."""
+class ContextStack(threading.local):
+  """An thread-local context stack to run against."""
 
   def __init__(self, default_context: _Context):
     super().__init__()
@@ -39,10 +38,30 @@ class ContextStackImpl(context_stack_base.ContextStack, threading.local):
 
   @property
   def current(self) -> _Context:
+    """Returns the current context (one at the top of the context stack)."""
     return self._stack[-1]
 
   @contextlib.contextmanager
   def install(self, ctx: _Context) -> Iterator[_Context]:
+    """A context manager that temporarily installs a new context on the stack.
+
+    The installed context is placed at the top on the stack while in the context
+    manager's scope, and remove from the stack upon exiting the scope. This
+    method should only be used by the implementation code, and by the unit tests
+    for dependency injection.
+
+    Args:
+      ctx: The context to temporarily install at the top of the context stack,
+        an instance of `Context` defined in `context.py`.
+
+    Yields:
+      The installed context.
+
+    Raises:
+      TypeError: If `ctx` is not a valid instance of
+        `federated_language.framework.AsyncContext` or
+        `federated_language.framework.SyncContext`.
+    """
     self._stack.append(ctx)
     try:
       yield ctx
@@ -50,10 +69,10 @@ class ContextStackImpl(context_stack_base.ContextStack, threading.local):
       self._stack.pop()
 
 
-context_stack = ContextStackImpl(runtime_error_context.RuntimeErrorContext())
+context_stack = ContextStack(runtime_error_context.RuntimeErrorContext())
 
 
-def get_context_stack() -> ContextStackImpl:
+def get_context_stack() -> ContextStack:
   """Returns the global context stack."""
   return context_stack
 
