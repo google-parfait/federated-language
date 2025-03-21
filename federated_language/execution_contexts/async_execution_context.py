@@ -14,11 +14,10 @@
 """A context for execution based on an embedded executor instance."""
 
 import asyncio
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
 import contextlib
 from typing import Optional
 
-from federated_language.common_libs import py_typecheck
 from federated_language.common_libs import retrying
 from federated_language.common_libs import structure
 from federated_language.common_libs import tracing
@@ -31,15 +30,20 @@ from federated_language.executors import executor_base
 from federated_language.executors import executor_factory  # pylint: disable=unused-import
 from federated_language.executors import executor_value_base
 from federated_language.types import computation_types
+from federated_language.types import placements
 from federated_language.types import type_conversions
 import tree
 
 
-def _is_retryable_error(exception):
+def _is_retryable_error(exception: Exception) -> bool:
   return isinstance(exception, executor_base.RetryableError)
 
 
-async def _ingest(executor, val, type_spec):
+async def _ingest(
+    executor: executor_base.Executor,
+    val,
+    type_spec: computation_types.Type,
+) -> executor_value_base.ExecutorValue:
   """A coroutine that handles ingestion.
 
   Args:
@@ -89,7 +93,12 @@ async def _ingest(executor, val, type_spec):
     return await executor.create_value(val, type_spec)
 
 
-async def _invoke(executor, comp, arg, result_type: computation_types.Type):
+async def _invoke(
+    executor: executor_base.Executor,
+    comp,
+    arg: Optional[executor_value_base.ExecutorValue],
+    result_type: computation_types.Type,
+) -> object:
   """A coroutine that handles invocation.
 
   Args:
@@ -102,11 +111,8 @@ async def _invoke(executor, comp, arg, result_type: computation_types.Type):
   Returns:
     The result of the invocation.
   """
-  if arg is not None:
-    py_typecheck.check_type(arg, executor_value_base.ExecutorValue)
   comp = await executor.create_value(comp, comp.type_signature)
   result = await executor.create_call(comp, arg)
-  py_typecheck.check_type(result, executor_value_base.ExecutorValue)
   result_value = await result.compute()
   return type_conversions.type_to_py_container(result_value, result_type)
 
@@ -158,18 +164,21 @@ class AsyncExecutionContext(context.AsyncContext):
     self._transform_result = transform_result
     self._cardinality_inference_fn = cardinality_inference_fn
 
-  @contextlib.contextmanager
-  def _reset_factory_on_error(self, ex_factory, cardinalities):
-    try:
-      # We pass a copy down to prevent the caller from mutating.
-      yield ex_factory.create_executor({**cardinalities})
-    except Exception:
-      ex_factory.clean_up_executor({**cardinalities})
-      raise
-
   @property
   def executor_factory(self) -> executor_factory.ExecutorFactory:
     return self._executor_factory
+
+  @contextlib.contextmanager
+  def _reset_factory_on_error(
+      self,
+      cardinalities: Mapping[placements.PlacementLiteral, int],
+  ) -> Iterator[executor_base.Executor]:
+    try:
+      # We pass a copy down to prevent the caller from mutating.
+      yield self._executor_factory.create_executor({**cardinalities})
+    except Exception:
+      self._executor_factory.clean_up_executor({**cardinalities})
+      raise
 
   @retrying.retry(
       retry_on_exception_filter=_is_retryable_error,
@@ -235,10 +244,7 @@ class AsyncExecutionContext(context.AsyncContext):
       else:
         cardinalities = {}
 
-      with self._reset_factory_on_error(
-          self._executor_factory, cardinalities
-      ) as executor:
-        py_typecheck.check_type(executor, executor_base.Executor)
+      with self._reset_factory_on_error(cardinalities) as executor:
 
         if arg is not None:
           arg = await tracing.wrap_coroutine_in_current_trace_context(

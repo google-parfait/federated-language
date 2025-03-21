@@ -36,7 +36,6 @@ py_library(
     srcs = ["async_execution_context.py"],
     deps = [
         ":compiler_pipeline",
-        "//federated_language/common_libs:py_typecheck",
         "//federated_language/common_libs:retrying",
         "//federated_language/common_libs:structure",
         "//federated_language/common_libs:tracing",
@@ -48,6 +47,7 @@ py_library(
         "//federated_language/executors:executor_factory",
         "//federated_language/executors:executor_value_base",
         "//federated_language/types:computation_types",
+        "//federated_language/types:placements",
         "//federated_language/types:type_conversions",
         "@pypi//dm_tree",
     ],

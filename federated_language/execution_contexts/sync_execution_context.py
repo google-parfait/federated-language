@@ -64,7 +64,7 @@ class SyncExecutionContext(context.SyncContext):
     self._async_runner = async_utils.AsyncThreadRunner()
 
   @property
-  def executor_factory(self):
+  def executor_factory(self) -> executor_factory.ExecutorFactory:
     return self._executor_factory
 
   def invoke(self, comp, arg):
