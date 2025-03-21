@@ -211,7 +211,6 @@ py_library(
     name = "intrinsic_defs",
     srcs = ["intrinsic_defs.py"],
     deps = [
-        "//federated_language/common_libs:py_typecheck",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
         "//federated_language/types:type_factory",

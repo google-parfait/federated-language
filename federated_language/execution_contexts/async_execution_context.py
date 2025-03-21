@@ -28,7 +28,7 @@ from federated_language.context_stack import context
 from federated_language.execution_contexts import compiler_pipeline
 from federated_language.executors import cardinalities_utils
 from federated_language.executors import executor_base
-from federated_language.executors import executor_factory
+from federated_language.executors import executor_factory  # pylint: disable=unused-import
 from federated_language.executors import executor_value_base
 from federated_language.types import computation_types
 from federated_language.types import type_conversions
@@ -149,7 +149,6 @@ class AsyncExecutionContext(context.AsyncContext):
         instance.
     """
     super().__init__()
-    py_typecheck.check_type(executor_fn, executor_factory.ExecutorFactory)
     self._executor_factory = executor_fn
     if compiler_fn is not None:
       self._compiler_pipeline = compiler_pipeline.CompilerPipeline(compiler_fn)

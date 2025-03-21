@@ -177,8 +177,6 @@ def create_federated_getitem_call(
     of applying or mapping the appropriate `__getitem__` function, as defined
     by `idx`.
   """
-  py_typecheck.check_type(arg, building_blocks.ComputationBuildingBlock)
-  py_typecheck.check_type(idx, (int, slice))
   py_typecheck.check_type(arg.type_signature, computation_types.FederatedType)
   py_typecheck.check_type(
       arg.type_signature.member,  # pytype: disable=attribute-error
@@ -206,8 +204,6 @@ def create_federated_getattr_call(
     the result of applying or mapping the appropriate `__getattr__` function,
     as defined by `name`.
   """
-  py_typecheck.check_type(arg, building_blocks.ComputationBuildingBlock)
-  py_typecheck.check_type(name, str)
   py_typecheck.check_type(arg.type_signature, computation_types.FederatedType)
   py_typecheck.check_type(
       arg.type_signature.member,  # pytype: disable=attribute-error
@@ -236,13 +232,11 @@ def create_federated_getattr_comp(
     Instance of `building_blocks.Lambda` which grabs attribute
       according to `name` of its argument.
   """
-  py_typecheck.check_type(comp, building_blocks.ComputationBuildingBlock)
   py_typecheck.check_type(comp.type_signature, computation_types.FederatedType)
   py_typecheck.check_type(
       comp.type_signature.member,  # pytype: disable=attribute-error
       computation_types.StructType,
   )
-  py_typecheck.check_type(name, str)
   element_names = [
       x for x, _ in comp.type_signature.member.items()  # pytype: disable=attribute-error
   ]
@@ -281,13 +275,11 @@ def create_federated_getitem_comp(
     Instance of `building_blocks.Lambda` which grabs slice
       according to `key` of its argument.
   """
-  py_typecheck.check_type(comp, building_blocks.ComputationBuildingBlock)
   py_typecheck.check_type(comp.type_signature, computation_types.FederatedType)
   py_typecheck.check_type(
       comp.type_signature.member,  # pytype: disable=attribute-error
       computation_types.StructType,
   )
-  py_typecheck.check_type(key, (int, slice))
   apply_input = building_blocks.Reference('x', comp.type_signature.member)  # pytype: disable=attribute-error
   if isinstance(key, int):
     selected = building_blocks.Selection(apply_input, index=key)
@@ -349,15 +341,7 @@ def create_federated_aggregate(
 
   Returns:
     A `building_blocks.Call`.
-
-  Raises:
-    TypeError: If any of the types do not match.
   """
-  py_typecheck.check_type(value, building_blocks.ComputationBuildingBlock)
-  py_typecheck.check_type(zero, building_blocks.ComputationBuildingBlock)
-  py_typecheck.check_type(accumulate, building_blocks.ComputationBuildingBlock)
-  py_typecheck.check_type(merge, building_blocks.ComputationBuildingBlock)
-  py_typecheck.check_type(report, building_blocks.ComputationBuildingBlock)
   # Its okay if the first argument of accumulate is assignable from the zero,
   # without being the exact type. This occurs when accumulate has a type like
   # (<int32[?], int32> -> int32[?]) but zero is int32[0].
@@ -417,12 +401,7 @@ def create_federated_apply(
 
   Returns:
     A `building_blocks.Call`.
-
-  Raises:
-    TypeError: If any of the types do not match.
   """
-  py_typecheck.check_type(fn, building_blocks.ComputationBuildingBlock)
-  py_typecheck.check_type(arg, building_blocks.ComputationBuildingBlock)
   result_type = computation_types.FederatedType(
       fn.type_signature.result,  # pytype: disable=attribute-error
       placements.SERVER,
@@ -451,11 +430,7 @@ def create_federated_broadcast(
 
   Returns:
     A `building_blocks.Call`.
-
-  Raises:
-    TypeError: If any of the types do not match.
   """
-  py_typecheck.check_type(value, building_blocks.ComputationBuildingBlock)
   result_type = computation_types.FederatedType(
       value.type_signature.member,  # pytype: disable=attribute-error
       placements.CLIENTS,
@@ -490,7 +465,6 @@ def create_federated_eval(
   Raises:
     TypeError: If any of the types do not match.
   """
-  py_typecheck.check_type(fn, building_blocks.ComputationBuildingBlock)
   py_typecheck.check_type(fn.type_signature, computation_types.FunctionType)
   if placement is placements.CLIENTS:
     uri = intrinsic_defs.FEDERATED_EVAL_AT_CLIENTS.uri
@@ -530,12 +504,7 @@ def create_federated_map(
 
   Returns:
     A `building_blocks.Call`.
-
-  Raises:
-    TypeError: If any of the types do not match.
   """
-  py_typecheck.check_type(fn, building_blocks.ComputationBuildingBlock)
-  py_typecheck.check_type(arg, building_blocks.ComputationBuildingBlock)
   parameter_type = computation_types.FederatedType(
       arg.type_signature.member,  # pytype: disable=attribute-error
       placements.CLIENTS,
@@ -575,12 +544,7 @@ def create_federated_map_all_equal(
 
   Returns:
     A `building_blocks.Call`.
-
-  Raises:
-    TypeError: If any of the types do not match.
   """
-  py_typecheck.check_type(fn, building_blocks.ComputationBuildingBlock)
-  py_typecheck.check_type(arg, building_blocks.ComputationBuildingBlock)
   parameter_type = computation_types.FederatedType(
       arg.type_signature.member,  # pytype: disable=attribute-error
       placements.CLIENTS,
@@ -619,12 +583,7 @@ def create_federated_map_or_apply(
 
   Returns:
     A `building_blocks.Call`.
-
-  Raises:
-    TypeError: If any of the types do not match.
   """
-  py_typecheck.check_type(fn, building_blocks.ComputationBuildingBlock)
-  py_typecheck.check_type(arg, building_blocks.ComputationBuildingBlock)
   if arg.type_signature.placement is placements.CLIENTS:  # pytype: disable=attribute-error
     if arg.type_signature.all_equal:  # pytype: disable=attribute-error
       return create_federated_map_all_equal(fn, arg)
@@ -661,7 +620,6 @@ def create_federated_mean(
   Raises:
     TypeError: If any of the types do not match.
   """
-  py_typecheck.check_type(value, building_blocks.ComputationBuildingBlock)
   if weight is not None:
     py_typecheck.check_type(weight, building_blocks.ComputationBuildingBlock)
   result_type = computation_types.FederatedType(
@@ -797,12 +755,7 @@ def create_federated_secure_sum(
 
   Returns:
     A `building_blocks.Call`.
-
-  Raises:
-    TypeError: If any of the types do not match.
   """
-  py_typecheck.check_type(value, building_blocks.ComputationBuildingBlock)
-  py_typecheck.check_type(max_input, building_blocks.ComputationBuildingBlock)
   result_type = computation_types.FederatedType(
       value.type_signature.member,  # pytype: disable=attribute-error
       placements.SERVER,
@@ -842,12 +795,7 @@ def create_federated_secure_sum_bitwidth(
 
   Returns:
     A `building_blocks.Call`.
-
-  Raises:
-    TypeError: If any of the types do not match.
   """
-  py_typecheck.check_type(value, building_blocks.ComputationBuildingBlock)
-  py_typecheck.check_type(bitwidth, building_blocks.ComputationBuildingBlock)
   result_type = computation_types.FederatedType(
       value.type_signature.member,  # pytype: disable=attribute-error
       placements.SERVER,
@@ -882,7 +830,6 @@ def create_federated_select(
   py_typecheck.check_type(max_key, building_blocks.ComputationBuildingBlock)
   py_typecheck.check_type(server_val, building_blocks.ComputationBuildingBlock)
   py_typecheck.check_type(select_fn, building_blocks.ComputationBuildingBlock)
-  py_typecheck.check_type(secure, bool)
   single_key_type = max_key.type_signature.member
   select_fn_unnamed_param_type = computation_types.StructType([
       (None, server_val.type_signature.member),
@@ -929,11 +876,7 @@ def create_federated_sum(
 
   Returns:
     A `building_blocks.Call`.
-
-  Raises:
-    TypeError: If any of the types do not match.
   """
-  py_typecheck.check_type(value, building_blocks.ComputationBuildingBlock)
   result_type = computation_types.FederatedType(
       value.type_signature.member,  # pytype: disable=attribute-error
       placements.SERVER,
@@ -982,10 +925,8 @@ def create_federated_unzip(
     A `building_blocks.Block`.
 
   Raises:
-    TypeError: If any of the types do not match.
     ValueError: If `value` does not contain any elements.
   """
-  py_typecheck.check_type(value, building_blocks.ComputationBuildingBlock)
   named_type_signatures = list(value.type_signature.member.items())  # pytype: disable=attribute-error
   length = len(named_type_signatures)
   if length == 0:
@@ -1022,11 +963,7 @@ def create_federated_value(
 
   Returns:
     A `building_blocks.Call`.
-
-  Raises:
-    TypeError: If any of the types do not match.
   """
-  py_typecheck.check_type(value, building_blocks.ComputationBuildingBlock)
   if placement is placements.CLIENTS:
     uri = intrinsic_defs.FEDERATED_VALUE_AT_CLIENTS.uri
   elif placement is placements.SERVER:
@@ -1087,7 +1024,6 @@ def create_federated_zip(
     TypeError: If any of the types do not match.
     ValueError: If `value` does not contain any elements.
   """
-  py_typecheck.check_type(value, building_blocks.ComputationBuildingBlock)
   py_typecheck.check_type(value.type_signature, computation_types.StructType)
 
   all_placements = set()
@@ -1162,12 +1098,7 @@ def create_sequence_map(
 
   Returns:
     A `building_blocks.Call`.
-
-  Raises:
-    TypeError: If any of the types do not match.
   """
-  py_typecheck.check_type(fn, building_blocks.ComputationBuildingBlock)
-  py_typecheck.check_type(arg, building_blocks.ComputationBuildingBlock)
   result_type = computation_types.SequenceType(fn.type_signature.result)  # pytype: disable=attribute-error
   intrinsic_type = computation_types.FunctionType(
       (fn.type_signature, arg.type_signature), result_type
@@ -1200,13 +1131,7 @@ def create_sequence_reduce(
 
   Returns:
     A `building_blocks.Call`.
-
-  Raises:
-    TypeError: If any of the types do not match.
   """
-  py_typecheck.check_type(value, building_blocks.ComputationBuildingBlock)
-  py_typecheck.check_type(zero, building_blocks.ComputationBuildingBlock)
-  py_typecheck.check_type(op, building_blocks.ComputationBuildingBlock)
   op_parameter_type = computation_types.StructType([
       zero.type_signature,
       value.type_signature.element,  # pytype: disable=attribute-error
@@ -1241,11 +1166,7 @@ def create_sequence_sum(
 
   Returns:
     A `building_blocks.Call`.
-
-  Raises:
-    TypeError: If any of the types do not match.
   """
-  py_typecheck.check_type(value, building_blocks.ComputationBuildingBlock)
   intrinsic_type = computation_types.FunctionType(
       value.type_signature,
       value.type_signature.element,  # pytype: disable=attribute-error
@@ -1326,13 +1247,11 @@ def create_named_tuple(
   Raises:
     TypeError: If the types do not match.
   """
-  py_typecheck.check_type(names, (list, tuple))
   if not all(isinstance(x, (str, type(None))) for x in names):
     raise TypeError(
         'Expected `names` containing only instances of `str` or '
         '`None`, found {}'.format(names)
     )
-  py_typecheck.check_type(comp, building_blocks.ComputationBuildingBlock)
   py_typecheck.check_type(comp.type_signature, computation_types.StructType)
   fn = _create_naming_function(comp.type_signature, names, container_type)
   return building_blocks.Call(fn, comp)
@@ -1365,8 +1284,6 @@ def zip_to_match_type(
     depending on whether inserting a zip according to the semantics above
     can transformed `comp_to_zip` to the requested type.
   """
-  py_typecheck.check_type(comp_to_zip, building_blocks.ComputationBuildingBlock)
-  py_typecheck.check_type(target_type, computation_types.Type)
 
   def _can_be_zipped_into(
       source_type: computation_types.Type, target_type: computation_types.Type

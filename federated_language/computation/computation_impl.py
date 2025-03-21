@@ -15,7 +15,6 @@
 
 from typing import Optional
 
-from federated_language.common_libs import py_typecheck
 from federated_language.compiler import building_blocks
 from federated_language.computation import computation_base
 from federated_language.computation import function_utils
@@ -37,9 +36,6 @@ class ConcreteComputation(computation_base.Computation):
       cls, building_block: building_blocks.ComputationBuildingBlock
   ) -> 'ConcreteComputation':
     """Converts a computation building block to a computation impl."""
-    py_typecheck.check_type(
-        building_block, building_blocks.ComputationBuildingBlock
-    )
     return cls(
         computation_proto=building_block.to_proto(),
         context_stack=context_stack_impl.context_stack,
@@ -77,8 +73,6 @@ class ConcreteComputation(computation_base.Computation):
         `computation_proto.type`.
       ValueError: If `computation_proto.type` is `None`.
     """
-    py_typecheck.check_type(computation_proto, computation_pb2.Computation)
-    py_typecheck.check_type(context_stack, context_stack_impl.ContextStack)
     if computation_proto.type is None:
       raise ValueError('Expected `computation_proto.type` to not be `None`.')
     type_spec = computation_types.Type.from_proto(computation_proto.type)

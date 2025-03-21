@@ -14,7 +14,6 @@
 
 from collections.abc import Callable
 
-from federated_language.common_libs import py_typecheck
 from federated_language.types import computation_types
 
 
@@ -54,7 +53,6 @@ def transform_type_postorder(
   Raises:
     NotImplementedError: If the types don't match the specification above.
   """
-  py_typecheck.check_type(type_signature, computation_types.Type)
   if isinstance(type_signature, computation_types.FederatedType):
     transformed_member, member_mutated = transform_type_postorder(
         type_signature.member, transform_fn

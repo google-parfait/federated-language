@@ -16,7 +16,6 @@
 import enum
 from typing import Optional
 
-from federated_language.common_libs import py_typecheck
 from federated_language.types import computation_types
 from federated_language.types import placements
 from federated_language.types import type_factory
@@ -62,9 +61,6 @@ class IntrinsicDef:
       aggregation_kind: Optional kind of aggregation performed by calls.
       broadcast_kind: Optional kind of broadcast performed by calls.
     """
-    py_typecheck.check_type(name, str)
-    py_typecheck.check_type(uri, str)
-    py_typecheck.check_type(type_signature, computation_types.Type)
     self._name = str(name)
     self._uri = str(uri)
     self._type_signature = type_signature

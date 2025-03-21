@@ -82,9 +82,6 @@ py_test(
 py_library(
     name = "retrying",
     srcs = ["retrying.py"],
-    deps = [
-        ":py_typecheck",
-    ],
 )
 
 py_test(
@@ -126,10 +123,7 @@ py_test(
 py_library(
     name = "tracing",
     srcs = ["tracing.py"],
-    deps = [
-        ":py_typecheck",
-        "@pypi//absl_py",
-    ],
+    deps = ["@pypi//absl_py"],
 )
 
 py_test(

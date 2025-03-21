@@ -101,7 +101,6 @@ py_library(
     deps = [
         ":federated_computation_context",
         ":value_impl",
-        "//federated_language/common_libs:py_typecheck",
         "//federated_language/compiler:building_blocks",
         "//federated_language/computation:computation_wrapper",
         "//federated_language/context_stack:context_stack_impl",

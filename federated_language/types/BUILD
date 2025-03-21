@@ -133,7 +133,6 @@ py_library(
         ":array_shape",
         ":computation_types",
         ":placements",
-        "//federated_language/common_libs:py_typecheck",
         "@pypi//ml_dtypes",
         "@pypi//numpy",
     ],
@@ -205,10 +204,7 @@ py_test(
 py_library(
     name = "type_transformations",
     srcs = ["type_transformations.py"],
-    deps = [
-        ":computation_types",
-        "//federated_language/common_libs:py_typecheck",
-    ],
+    deps = [":computation_types"],
 )
 
 py_test(

@@ -102,19 +102,11 @@ class StripPlacementTest(parameterized.TestCase):
 
 class TransformTypePostorderTest(absltest.TestCase):
 
-  def test_raises_on_none_type(self):
-    with self.assertRaises(TypeError):
-      type_transformations.transform_type_postorder(None, lambda x: x)
-
   def test_raises_on_none_function(self):
     with self.assertRaises(TypeError):
       type_transformations.transform_type_postorder(
           computation_types.TensorType(np.int32), None
       )
-
-  def test_raises_on_non_type_first_arg(self):
-    with self.assertRaises(TypeError):
-      type_transformations.transform_type_postorder(np.int32, None)
 
   def test_transforms_tensor(self):
     orig_type = computation_types.TensorType(np.int32)

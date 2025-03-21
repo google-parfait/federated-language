@@ -38,7 +38,6 @@ import time
 from typing import Generic, Optional, TypeVar, Union
 
 from absl import logging
-from federated_language.common_libs import py_typecheck
 
 
 class TracedSpan:
@@ -428,15 +427,11 @@ def with_trace_context_from_rpc():
 
 def add_tracing_provider(tracing_provider: TracingProvider):
   """Add to the global list of tracing providers."""
-  py_typecheck.check_type(tracing_provider, TracingProvider)
   _global_tracing_providers.append(tracing_provider)
 
 
 def set_tracing_providers(tracing_providers: list[TracingProvider]):
   """Set the global list of tracing providers, replacing any existing."""
-  py_typecheck.check_type(tracing_providers, list)
-  for tp in tracing_providers:
-    py_typecheck.check_type(tp, TracingProvider)
   global _global_tracing_providers
   _global_tracing_providers = tracing_providers
 

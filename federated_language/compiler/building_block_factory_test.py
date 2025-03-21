@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import collections
-from unittest import mock
 
 from absl.testing import absltest
 from absl.testing import parameterized
@@ -103,10 +102,6 @@ class UniqueNameGeneratorTest(absltest.TestCase):
 
 class CreateFederatedGetitemCompTest(parameterized.TestCase):
 
-  def test_raises_type_error_on_none(self):
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_getitem_comp(None, 0)
-
   @parameterized.named_parameters(
       ('clients', placements.CLIENTS), ('server', placements.SERVER)
   )
@@ -128,10 +123,6 @@ class CreateFederatedGetitemCompTest(parameterized.TestCase):
 
 
 class CreateFederatedGetattrCompTest(parameterized.TestCase):
-
-  def test_raises_type_error_on_none(self):
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_getattr_comp(None, 'x')
 
   @parameterized.named_parameters(
       ('clients', placements.CLIENTS), ('server', placements.SERVER)
@@ -165,10 +156,6 @@ class CreateFederatedGetattrCompTest(parameterized.TestCase):
 
 
 class CreateFederatedGetattrCallTest(parameterized.TestCase):
-
-  def test_raises_type_error_on_none(self):
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_getattr_call(None, 'x')
 
   @parameterized.named_parameters(
       ('clients', placements.CLIENTS),
@@ -222,10 +209,6 @@ class CreateFederatedGetattrCallTest(parameterized.TestCase):
 
 
 class CreateFederatedGetitemCallTest(parameterized.TestCase):
-
-  def test_fails_value(self):
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_getitem_call(None, 0)
 
   @parameterized.named_parameters(
       ('clients', placements.CLIENTS),
@@ -343,112 +326,6 @@ class CreateFederatedGetitemCallTest(parameterized.TestCase):
 
 class CreateFederatedAggregateTest(absltest.TestCase):
 
-  def test_raises_type_error_with_none_value(self):
-    zero = building_blocks.Literal(0, computation_types.TensorType(np.int32))
-    accumulate_type = computation_types.StructType((np.int32, np.int32))
-    accumulate_result = building_blocks.Literal(
-        1, computation_types.TensorType(np.int32)
-    )
-    accumulate = building_blocks.Lambda('x', accumulate_type, accumulate_result)
-    merge_type = computation_types.StructType((np.int32, np.int32))
-    merge_result = building_blocks.Literal(
-        2, computation_types.TensorType(np.int32)
-    )
-    merge = building_blocks.Lambda('x', merge_type, merge_result)
-    report_ref = building_blocks.Reference('r', np.int32)
-    report = building_blocks.Lambda(
-        report_ref.name, report_ref.type_signature, report_ref
-    )
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_aggregate(
-          None, zero, accumulate, merge, report
-      )
-
-  def test_raises_type_error_with_none_zero(self):
-    value = building_block_factory.create_federated_value(
-        building_blocks.Literal(0, computation_types.TensorType(np.int32)),
-        placement=placements.CLIENTS,
-    )
-    accumulate_type = computation_types.StructType((np.int32, np.int32))
-    accumulate_result = building_blocks.Literal(
-        1, computation_types.TensorType(np.int32)
-    )
-    accumulate = building_blocks.Lambda('x', accumulate_type, accumulate_result)
-    merge_type = computation_types.StructType((np.int32, np.int32))
-    merge_result = building_blocks.Literal(
-        2, computation_types.TensorType(np.int32)
-    )
-    merge = building_blocks.Lambda('x', merge_type, merge_result)
-    report_ref = building_blocks.Reference('r', np.int32)
-    report = building_blocks.Lambda(
-        report_ref.name, report_ref.type_signature, report_ref
-    )
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_aggregate(
-          value, None, accumulate, merge, report
-      )
-
-  def test_raises_type_error_with_none_accumulate(self):
-    value = building_block_factory.create_federated_value(
-        building_blocks.Literal(0, computation_types.TensorType(np.int32)),
-        placement=placements.CLIENTS,
-    )
-    zero = building_blocks.Literal(1, computation_types.TensorType(np.int32))
-    merge_type = computation_types.StructType((np.int32, np.int32))
-    merge_result = building_blocks.Literal(
-        2, computation_types.TensorType(np.int32)
-    )
-    merge = building_blocks.Lambda('x', merge_type, merge_result)
-    report_ref = building_blocks.Reference('r', np.int32)
-    report = building_blocks.Lambda(
-        report_ref.name, report_ref.type_signature, report_ref
-    )
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_aggregate(
-          value, zero, None, merge, report
-      )
-
-  def test_raises_type_error_with_none_merge(self):
-    value = building_block_factory.create_federated_value(
-        building_blocks.Literal(0, computation_types.TensorType(np.int32)),
-        placement=placements.CLIENTS,
-    )
-    zero = building_blocks.Literal(1, computation_types.TensorType(np.int32))
-    accumulate_type = computation_types.StructType((np.int32, np.int32))
-    accumulate_result = building_blocks.Literal(
-        2, computation_types.TensorType(np.int32)
-    )
-    accumulate = building_blocks.Lambda('x', accumulate_type, accumulate_result)
-    report_ref = building_blocks.Reference('r', np.int32)
-    report = building_blocks.Lambda(
-        report_ref.name, report_ref.type_signature, report_ref
-    )
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_aggregate(
-          value, zero, accumulate, None, report
-      )
-
-  def test_raises_type_error_with_none_report(self):
-    value = building_block_factory.create_federated_value(
-        building_blocks.Literal(0, computation_types.TensorType(np.int32)),
-        placement=placements.CLIENTS,
-    )
-    zero = building_blocks.Literal(1, computation_types.TensorType(np.int32))
-    accumulate_type = computation_types.StructType((np.int32, np.int32))
-    accumulate_result = building_blocks.Literal(
-        2, computation_types.TensorType(np.int32)
-    )
-    accumulate = building_blocks.Lambda('x', accumulate_type, accumulate_result)
-    merge_type = computation_types.StructType((np.int32, np.int32))
-    merge_result = building_blocks.Literal(
-        3, computation_types.TensorType(np.int32)
-    )
-    merge = building_blocks.Lambda('x', merge_type, merge_result)
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_aggregate(
-          value, zero, accumulate, merge, None
-      )
-
   def test_returns_federated_aggregate(self):
     value = building_block_factory.create_federated_value(
         building_blocks.Literal(0, computation_types.TensorType(np.int32)),
@@ -482,17 +359,6 @@ class CreateFederatedAggregateTest(absltest.TestCase):
 
 class CreateFederatedApplyTest(absltest.TestCase):
 
-  def test_raises_type_error_with_none_fn(self):
-    arg = building_blocks.Literal(1, computation_types.TensorType(np.int32))
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_apply(None, arg)
-
-  def test_raises_type_error_with_none_arg(self):
-    ref = building_blocks.Reference('x', np.int32)
-    fn = building_blocks.Lambda(ref.name, ref.type_signature, ref)
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_apply(fn, None)
-
   def test_returns_federated_apply(self):
     ref = building_blocks.Reference('x', np.int32)
     fn = building_blocks.Lambda(ref.name, ref.type_signature, ref)
@@ -510,10 +376,6 @@ class CreateFederatedApplyTest(absltest.TestCase):
 
 class CreateFederatedBroadcastTest(absltest.TestCase):
 
-  def test_raises_type_error_with_none_value(self):
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_broadcast(None)
-
   def test_returns_federated_broadcast(self):
     value = building_block_factory.create_federated_value(
         building_blocks.Literal(1, computation_types.TensorType(np.int32)),
@@ -529,16 +391,10 @@ class CreateFederatedBroadcastTest(absltest.TestCase):
 
 class CreateFederatedEvalTest(absltest.TestCase):
 
-  def assert_type_error(self, fn, placement):
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_eval(fn, placement)
-
-  def test_raises_type_error_with_none_fn(self):
-    self.assert_type_error(None, placements.CLIENTS)
-
   def test_raises_type_error_with_nonfunctional_fn(self):
     fn = building_blocks.Literal(1, computation_types.TensorType(np.int32))
-    self.assert_type_error(fn, placements.CLIENTS)
+    with self.assertRaises(TypeError):
+      building_block_factory.create_federated_eval(fn, placements.CLIENTS)
 
   def test_returns_federated_eval(self):
     fn = building_blocks.Reference(
@@ -552,17 +408,6 @@ class CreateFederatedEvalTest(absltest.TestCase):
 
 
 class CreateFederatedMapTest(absltest.TestCase):
-
-  def test_raises_type_error_with_none_fn(self):
-    arg = building_blocks.Literal(1, computation_types.TensorType(np.int32))
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_map(None, arg)
-
-  def test_raises_type_error_with_none_arg(self):
-    ref = building_blocks.Reference('x', np.int32)
-    fn = building_blocks.Lambda(ref.name, ref.type_signature, ref)
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_map(fn, None)
 
   def test_returns_federated_map(self):
     ref = building_blocks.Reference('x', np.int32)
@@ -581,17 +426,6 @@ class CreateFederatedMapTest(absltest.TestCase):
 
 class CreateFederatedMapAllEqualTest(absltest.TestCase):
 
-  def test_raises_type_error_with_none_fn(self):
-    arg = building_blocks.Literal(1, computation_types.TensorType(np.int32))
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_map_all_equal(None, arg)
-
-  def test_raises_type_error_with_none_arg(self):
-    ref = building_blocks.Reference('x', np.int32)
-    fn = building_blocks.Lambda(ref.name, ref.type_signature, ref)
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_map_all_equal(fn, None)
-
   def test_returns_federated_map_all_equal(self):
     ref = building_blocks.Reference('x', np.int32)
     fn = building_blocks.Lambda(ref.name, ref.type_signature, ref)
@@ -608,17 +442,6 @@ class CreateFederatedMapAllEqualTest(absltest.TestCase):
 
 
 class CreateFederatedMapOrApplyTest(absltest.TestCase):
-
-  def test_raises_type_error_with_none_fn(self):
-    arg = building_blocks.Literal(1, computation_types.TensorType(np.int32))
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_map_or_apply(None, arg)
-
-  def test_raises_type_error_with_none_arg(self):
-    ref = building_blocks.Reference('x', np.int32)
-    fn = building_blocks.Lambda(ref.name, ref.type_signature, ref)
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_map_or_apply(fn, None)
 
   def test_returns_federated_apply(self):
     ref = building_blocks.Reference('x', np.int32)
@@ -650,10 +473,6 @@ class CreateFederatedMapOrApplyTest(absltest.TestCase):
 
 
 class CreateFederatedMeanTest(absltest.TestCase):
-
-  def test_raises_type_error_with_none_value(self):
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_mean(None, None)
 
   def test_returns_federated_mean(self):
     value = building_block_factory.create_federated_value(
@@ -720,23 +539,6 @@ class CreateFederatedMaxTest(absltest.TestCase):
 
 class CreateFederatedSecureSumTest(absltest.TestCase):
 
-  def test_raises_type_error_with_none_value(self):
-    max_input = mock.create_autospec(
-        building_blocks.CompiledComputation, spec_set=True, instance=True
-    )
-
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_secure_sum(None, max_input)
-
-  def test_raises_type_error_with_none_max_input(self):
-    value = building_block_factory.create_federated_value(
-        building_blocks.Literal(1, computation_types.TensorType(np.int32)),
-        placement=placements.CLIENTS,
-    )
-
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_secure_sum(value, None)
-
   def test_returns_federated_sum(self):
     value = building_block_factory.create_federated_value(
         building_blocks.Literal(1, computation_types.TensorType(np.int32)),
@@ -755,25 +557,6 @@ class CreateFederatedSecureSumTest(absltest.TestCase):
 
 
 class CreateFederatedSecureSumBitwidthTest(absltest.TestCase):
-
-  def test_raises_type_error_with_none_value(self):
-    bitwidth = mock.create_autospec(
-        building_blocks.CompiledComputation, spec_set=True, instance=True
-    )
-
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_secure_sum_bitwidth(
-          None, bitwidth
-      )
-
-  def test_raises_type_error_with_none_bitwidth(self):
-    value = building_block_factory.create_federated_value(
-        building_blocks.Literal(1, computation_types.TensorType(np.int32)),
-        placement=placements.CLIENTS,
-    )
-
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_secure_sum_bitwidth(value, None)
 
   def test_returns_federated_sum(self):
     value = building_block_factory.create_federated_value(
@@ -842,10 +625,6 @@ class CreateFederatedSelectTest(parameterized.TestCase):
 
 class CreateFederatedSumTest(absltest.TestCase):
 
-  def test_raises_type_error_with_none_value(self):
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_sum(None)
-
   def test_returns_federated_sum(self):
     value = building_block_factory.create_federated_value(
         building_blocks.Literal(1, computation_types.TensorType(np.int32)),
@@ -860,10 +639,6 @@ class CreateFederatedSumTest(absltest.TestCase):
 
 
 class CreateFederatedUnzipTest(absltest.TestCase):
-
-  def test_raises_type_error_with_none_value(self):
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_unzip(None)
 
   def test_returns_tuple_federated_map_with_empty_value(self):
     value_type = computation_types.FederatedType([], placements.CLIENTS)
@@ -1008,15 +783,6 @@ class CreateFederatedUnzipTest(absltest.TestCase):
 
 class CreateFederatedValueTest(absltest.TestCase):
 
-  def test_raises_type_error_with_none_value(self):
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_value(None, placements.CLIENTS)
-
-  def test_raises_type_error_with_none_placement(self):
-    value = building_blocks.Literal(1, computation_types.TensorType(np.int32))
-    with self.assertRaises(TypeError):
-      building_block_factory.create_federated_value(value, None)
-
   def test_raises_type_error_with_unknown_placement(self):
     value = building_blocks.Literal(1, computation_types.TensorType(np.int32))
     with self.assertRaises(TypeError):
@@ -1050,10 +816,6 @@ BOOL_AT_SERVER = computation_types.FederatedType(np.bool_, placements.SERVER)
 
 
 class CreateFederatedZipTest(parameterized.TestCase, absltest.TestCase):
-
-  def test_raises_type_error_with_none_value(self):
-    with self.assertRaisesRegex(TypeError, 'found NoneType'):
-      building_block_factory.create_federated_zip(None)
 
   def test_raises_type_error_with_empty_value(self):
     value_type = computation_types.StructType([])
@@ -1236,18 +998,6 @@ class CreateFederatedZipTest(parameterized.TestCase, absltest.TestCase):
 
 class CreateSequenceMapTest(absltest.TestCase):
 
-  def test_raises_type_error_with_none_fn(self):
-    arg_type = computation_types.SequenceType(np.int32)
-    arg = building_blocks.Reference('y', arg_type)
-    with self.assertRaises(TypeError):
-      building_block_factory.create_sequence_map(None, arg)
-
-  def test_raises_type_error_with_none_arg(self):
-    ref = building_blocks.Reference('x', np.int32)
-    fn = building_blocks.Lambda(ref.name, ref.type_signature, ref)
-    with self.assertRaises(TypeError):
-      building_block_factory.create_sequence_map(fn, None)
-
   def test_returns_sequence_map(self):
     ref = building_blocks.Reference('x', np.int32)
     fn = building_blocks.Lambda(ref.name, ref.type_signature, ref)
@@ -1261,30 +1011,6 @@ class CreateSequenceMapTest(absltest.TestCase):
 
 
 class CreateSequenceReduceTest(absltest.TestCase):
-
-  def test_raises_type_error_with_none_value(self):
-    zero = building_blocks.Reference('z', np.int32)
-    op_type = computation_types.StructType((np.int32, np.int32))
-    op_result = building_blocks.Reference('o', np.int32)
-    op = building_blocks.Lambda('x', op_type, op_result)
-    with self.assertRaises(TypeError):
-      building_block_factory.create_sequence_reduce(None, zero, op)
-
-  def test_raises_type_error_with_none_zero(self):
-    value_type = computation_types.SequenceType(np.int32)
-    value = building_blocks.Reference('v', value_type)
-    op_type = computation_types.StructType((np.int32, np.int32))
-    op_result = building_blocks.Reference('o', np.int32)
-    op = building_blocks.Lambda('x', op_type, op_result)
-    with self.assertRaises(TypeError):
-      building_block_factory.create_sequence_reduce(value, None, op)
-
-  def test_raises_type_error_with_none_op(self):
-    value_type = computation_types.SequenceType(np.int32)
-    value = building_blocks.Reference('v', value_type)
-    zero = building_blocks.Reference('z', np.int32)
-    with self.assertRaises(TypeError):
-      building_block_factory.create_sequence_reduce(value, zero, None)
 
   def test_returns_sequence_reduce(self):
     value_type = computation_types.SequenceType(np.int32)
@@ -1302,10 +1028,6 @@ class CreateSequenceReduceTest(absltest.TestCase):
 
 class CreateSequenceSumTest(absltest.TestCase):
 
-  def test_raises_type_error_with_none_value(self):
-    with self.assertRaises(TypeError):
-      building_block_factory.create_sequence_sum(None)
-
   def test_returns_federated_sum(self):
     value_type = computation_types.SequenceType(np.int32)
     value = building_blocks.Reference('v', value_type)
@@ -1316,26 +1038,10 @@ class CreateSequenceSumTest(absltest.TestCase):
 
 class CreateNamedTupleTest(absltest.TestCase):
 
-  def test_raises_type_error_with_none_comp(self):
-    with self.assertRaises(TypeError):
-      building_block_factory.create_named_tuple(None, ('a',))
-
   def test_raises_type_error_with_wrong_comp_type(self):
     comp = building_blocks.Reference('data', np.int32)
     with self.assertRaises(TypeError):
       building_block_factory.create_named_tuple(comp, ('a',))
-
-  def test_raises_type_error_with_wrong_names_type_string(self):
-    type_signature = computation_types.StructType((np.int32, np.int32))
-    comp = building_blocks.Reference('data', type_signature)
-    with self.assertRaises(TypeError):
-      building_block_factory.create_named_tuple(comp, 'a')
-
-  def test_raises_type_error_with_wrong_names_type_ints(self):
-    type_signature = computation_types.StructType((np.int32, np.int32))
-    comp = building_blocks.Reference('data', type_signature)
-    with self.assertRaises(TypeError):
-      building_block_factory.create_named_tuple(comp, 'a')
 
   def test_raises_value_error_with_wrong_lengths(self):
     type_signature = computation_types.StructType((np.int32, np.int32))

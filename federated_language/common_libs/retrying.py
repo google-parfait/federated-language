@@ -20,8 +20,6 @@ import inspect
 import time
 from typing import Union
 
-from federated_language.common_libs import py_typecheck
-
 
 def retry(
     fn=None,
@@ -57,8 +55,6 @@ def retry(
     the semantics above. If `fn` is not provided, returns a callable which can
     be used to decorate a function or coroutine function at a later time.
   """
-  py_typecheck.check_type(wait_max_ms, (float, int))
-  py_typecheck.check_type(wait_multiplier, (float, int))
   if not inspect.isfunction(retry_on_exception_filter):
     raise TypeError(
         'Expected function to be passed as retry_on_exception_filter; '

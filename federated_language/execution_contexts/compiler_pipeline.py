@@ -17,7 +17,6 @@ from collections.abc import Callable
 import functools
 from typing import Generic, TypeVar
 
-from federated_language.common_libs import py_typecheck
 from federated_language.computation import computation_base
 
 _Computation = TypeVar('_Computation', bound=computation_base.Computation)
@@ -48,5 +47,4 @@ class CompilerPipeline(Generic[_Computation]):
   @functools.lru_cache()
   def compile(self, comp: _Computation) -> object:
     """Compiles `comp`."""
-    py_typecheck.check_type(comp, computation_base.Computation)
     return self._compiler_fn(comp)

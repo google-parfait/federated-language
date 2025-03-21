@@ -256,14 +256,6 @@ class CheckFederatedTypeTest(absltest.TestCase):
         TypeError,
         type_analysis.check_federated_type,
         type_spec,
-        np.bool_,
-        None,
-        None,
-    )
-    self.assertRaises(
-        TypeError,
-        type_analysis.check_federated_type,
-        type_spec,
         None,
         placements.SERVER,
         None,
@@ -429,12 +421,6 @@ class IsSingleIntegerOrMatchesStructure(parameterized.TestCase):
 
 
 class CheckConcreteInstanceOf(absltest.TestCase):
-
-  def test_raises_with_int_first_argument(self):
-    with self.assertRaises(TypeError):
-      type_analysis.check_concrete_instance_of(
-          1, computation_types.TensorType(np.int32)
-      )
 
   def test_raises_with_int_second_argument(self):
     with self.assertRaises(TypeError):

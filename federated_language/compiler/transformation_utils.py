@@ -163,12 +163,8 @@ def transform_preorder(
     A two-tuple, whose first element is modified version of `comp`, and
     whose second element is a Boolean indicating whether `comp` was transformed
     during the walk.
-
-  Raises:
-    TypeError: If the argument types don't match those specified above.
   """
 
-  py_typecheck.check_type(comp, building_blocks.ComputationBuildingBlock)
   inner_comp, modified = transform(comp)
   if modified:
     return inner_comp, modified
@@ -1130,7 +1126,6 @@ def get_map_of_unbound_references(
     values are a Python `set` of the names of the unbound references in the
     subtree of that computation.
   """
-  py_typecheck.check_type(comp, building_blocks.ComputationBuildingBlock)
   references = {}
 
   def _update(comp):

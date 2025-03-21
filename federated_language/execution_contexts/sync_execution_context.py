@@ -17,12 +17,11 @@ from collections.abc import Callable
 from typing import Optional
 
 from federated_language.common_libs import async_utils
-from federated_language.common_libs import py_typecheck
 from federated_language.computation import computation_base
 from federated_language.context_stack import context
 from federated_language.execution_contexts import async_execution_context
 from federated_language.executors import cardinalities_utils
-from federated_language.executors import executor_factory
+from federated_language.executors import executor_factory  # pylint: disable=unused-import
 
 
 class SyncExecutionContext(context.SyncContext):
@@ -54,7 +53,6 @@ class SyncExecutionContext(context.SyncContext):
         of `executor_fn` to construct a `federated_language.framework.Executor`
         instance.
     """
-    py_typecheck.check_type(executor_fn, executor_factory.ExecutorFactory)
     self._executor_factory = executor_fn
     self._async_context = async_execution_context.AsyncExecutionContext(
         executor_fn=executor_fn,

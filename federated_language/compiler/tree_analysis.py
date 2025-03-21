@@ -36,7 +36,6 @@ def visit_preorder(
     tree: building_blocks.ComputationBuildingBlock,
     function: Callable[[building_blocks.ComputationBuildingBlock], None],
 ):
-  py_typecheck.check_type(tree, building_blocks.ComputationBuildingBlock)
 
   def _visit(building_block):
     function(building_block)
@@ -49,7 +48,6 @@ def visit_postorder(
     tree: building_blocks.ComputationBuildingBlock,
     function: Callable[[building_blocks.ComputationBuildingBlock], None],
 ):
-  py_typecheck.check_type(tree, building_blocks.ComputationBuildingBlock)
 
   def _visit(building_block):
     function(building_block)
@@ -338,9 +336,6 @@ def _extract_calls_with_fn_consuming_arg(
   Returns:
     A list of `building_block.Calls` matching the description above.
   """
-
-  py_typecheck.check_type(tree, building_blocks.ComputationBuildingBlock)
-
   nodes_dependent_on_arg_predicate = _extract_nodes_consuming(
       tree, arg_predicate
   )

@@ -17,7 +17,6 @@ import collections
 from collections.abc import Callable
 from typing import Optional
 
-from federated_language.common_libs import py_typecheck
 from federated_language.types import array_shape
 from federated_language.types import computation_types
 from federated_language.types import placements
@@ -180,7 +179,6 @@ def is_structure_of_floats(type_spec: computation_types.Type) -> bool:
   Returns:
     `True` iff `type_spec` is a structure of floats, otherwise `False`.
   """
-  py_typecheck.check_type(type_spec, computation_types.Type)
   if isinstance(type_spec, computation_types.TensorType):
     return np.issubdtype(type_spec.dtype, np.floating)
   elif isinstance(type_spec, computation_types.StructType):
@@ -203,7 +201,6 @@ def is_structure_of_integers(type_spec: computation_types.Type) -> bool:
   Returns:
     `True` iff `type_spec` is a structure of integers, otherwise `False`.
   """
-  py_typecheck.check_type(type_spec, computation_types.Type)
   if isinstance(type_spec, computation_types.TensorType):
     return np.issubdtype(type_spec.dtype, np.integer)
   elif isinstance(type_spec, computation_types.StructType):
@@ -227,10 +224,6 @@ def is_single_integer_or_matches_structure(
     type_sig: computation_types.Type, shape_type: computation_types.Type
 ) -> bool:
   """If `type_sig` is an integer or integer structure matching `shape_type`."""
-
-  py_typecheck.check_type(type_sig, computation_types.Type)
-  py_typecheck.check_type(shape_type, computation_types.Type)
-
   if isinstance(type_sig, computation_types.TensorType):
     # This condition applies to both `shape_type` being a tensor or structure,
     # as the same integer bitwidth can be used for all values in the structure.
@@ -276,12 +269,9 @@ def check_federated_type(
   Raises:
     TypeError: if `type_spec` is not a federated type of the given kind.
   """
-  py_typecheck.check_type(type_spec, computation_types.FederatedType)
   if member is not None:
-    py_typecheck.check_type(member, computation_types.Type)
     member.check_assignable_from(type_spec.member)
   if placement is not None:
-    py_typecheck.check_type(placement, placements.PlacementLiteral)
     if type_spec.placement is not placement:
       raise TypeError(
           'Expected federated type placed at {}, got one placed at {}.'.format(
@@ -289,7 +279,6 @@ def check_federated_type(
           )
       )
   if all_equal is not None:
-    py_typecheck.check_type(all_equal, bool)
     if type_spec.all_equal != all_equal:
       raise TypeError(
           'Expected federated type with all_equal {}, got one with {}.'.format(
@@ -311,7 +300,6 @@ def is_average_compatible(type_spec: computation_types.Type) -> bool:
   Returns:
     `True` iff `type_spec` is average-compatible, `False` otherwise.
   """
-  py_typecheck.check_type(type_spec, computation_types.Type)
   if isinstance(type_spec, computation_types.TensorType):
     return np.issubdtype(type_spec, np.inexact)
   elif isinstance(type_spec, computation_types.StructType):
@@ -452,9 +440,6 @@ def check_concrete_instance_of(
   Raises:
     TypeError: If `concrete_type` is not a valid substitution of `generic_type`.
   """
-  py_typecheck.check_type(concrete_type, computation_types.Type)
-  py_typecheck.check_type(generic_type, computation_types.Type)
-
   for t in preorder_types(concrete_type):
     if isinstance(t, computation_types.AbstractType):
       raise NotConcreteTypeError(concrete_type, t)

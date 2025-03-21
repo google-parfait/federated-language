@@ -1445,13 +1445,6 @@ class TransformationUtilsTest(parameterized.TestCase):
 
 class TransformPreorderTest(parameterized.TestCase):
 
-  def test_transform_preorder_fails_on_none_comp(self):
-    def transform(comp):
-      return comp, False
-
-    with self.assertRaises(TypeError):
-      transformation_utils.transform_preorder(None, transform)
-
   def test_transform_preorder_fails_on_none_transform(self):
     comp = building_blocks.Literal(1, computation_types.TensorType(np.int32))
     with self.assertRaises(TypeError):

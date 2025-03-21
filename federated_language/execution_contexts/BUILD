@@ -67,10 +67,7 @@ py_test(
 py_library(
     name = "compiler_pipeline",
     srcs = ["compiler_pipeline.py"],
-    deps = [
-        "//federated_language/common_libs:py_typecheck",
-        "//federated_language/computation:computation_base",
-    ],
+    deps = ["//federated_language/computation:computation_base"],
 )
 
 py_test(
@@ -90,7 +87,6 @@ py_library(
     deps = [
         ":async_execution_context",
         "//federated_language/common_libs:async_utils",
-        "//federated_language/common_libs:py_typecheck",
         "//federated_language/computation:computation_base",
         "//federated_language/context_stack:context",
         "//federated_language/executors:cardinalities_utils",

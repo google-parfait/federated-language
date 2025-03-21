@@ -95,7 +95,6 @@ class Value(typed_object.TypedObject, abc.ABC):
         contains the logic that computes this value.
     """
     super()
-    py_typecheck.check_type(comp, building_blocks.ComputationBuildingBlock)
     self._comp = comp
 
   @property
@@ -160,7 +159,6 @@ class Value(typed_object.TypedObject, abc.ABC):
     return len(type_signature)
 
   def __getitem__(self, key: Union[int, str, slice]):
-    py_typecheck.check_type(key, (int, str, slice))
     if isinstance(key, str):
       return getattr(self, key)
     if _is_federated_struct(self.type_signature):
@@ -346,7 +344,6 @@ def to_value(
         )
       parameter_type_hint = computation_types.to_type(parameter_type_hint)
       arg = arg.fn_for_argument_type(parameter_type_hint)
-    py_typecheck.check_type(arg, computation_impl.ConcreteComputation)
     result = Value(arg.to_compiled_building_block())
   elif isinstance(arg, structure.Struct):
     items = structure.iter_elements(arg)

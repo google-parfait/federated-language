@@ -44,20 +44,8 @@ class ConcreteComputationTest(absltest.TestCase):
           context_stack=context_stack_impl.context_stack,
       )
 
-    # This should fail, as "10" is not an instance of
-    # `computation_pb2.Computation`.
-    with self.assertRaises(TypeError):
-      computation_impl.ConcreteComputation(
-          computation_proto=10,
-          context_stack=context_stack_impl.context_stack,
-      )
-
 
 class FromBuildingBlockTest(absltest.TestCase):
-
-  def test_raises_on_none(self):
-    with self.assertRaises(TypeError):
-      computation_impl.ConcreteComputation.from_building_block(None)
 
   def test_converts_building_block_to_computation(self):
     buiding_block = building_blocks.Lambda(

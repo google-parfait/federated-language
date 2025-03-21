@@ -14,7 +14,6 @@
 
 from typing import Optional
 
-from federated_language.common_libs import py_typecheck
 from federated_language.compiler import building_blocks
 from federated_language.computation import computation_wrapper
 from federated_language.context_stack import context_stack_impl
@@ -56,9 +55,6 @@ def zero_or_one_arg_fn_to_building_block(
   Raises:
     ValueError: if `fn` is incompatible with `parameter_type`.
   """
-  py_typecheck.check_type(context_stack, context_stack_impl.ContextStack)
-  if suggested_name is not None:
-    py_typecheck.check_type(suggested_name, str)
   if isinstance(
       context_stack.current,
       federated_computation_context.FederatedComputationContext,
@@ -70,7 +66,6 @@ def zero_or_one_arg_fn_to_building_block(
       context_stack, suggested_name=suggested_name, parent=parent_context
   )
   if parameter_name is not None:
-    py_typecheck.check_type(parameter_name, str)
     parameter_name = '{}_{}'.format(context.name, str(parameter_name))
   with context_stack.install(context):
     if parameter_type is not None:

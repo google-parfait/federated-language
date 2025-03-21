@@ -61,7 +61,6 @@ py_library(
     deps = [
         ":computation_base",
         ":function_utils",
-        "//federated_language/common_libs:py_typecheck",
         "//federated_language/compiler:building_blocks",
         "//federated_language/context_stack:context_stack_impl",
         "//federated_language/proto:computation_py_pb2",

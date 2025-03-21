@@ -104,7 +104,6 @@ def federated_aggregate(
   )
 
   zero = value_impl.to_value(zero, type_spec=None)
-  py_typecheck.check_type(zero, value_impl.Value)
   accumulate = value_impl.to_value(
       accumulate,
       type_spec=None,
@@ -127,7 +126,6 @@ def federated_aggregate(
       parameter_type_hint=merge.type_signature.result,  # pytype: disable=attribute-error
   )
   for op in [accumulate, merge, report]:
-    py_typecheck.check_type(op, value_impl.Value)
     py_typecheck.check_type(op.type_signature, computation_types.FunctionType)
 
   if not accumulate.type_signature.parameter[0].is_assignable_from(  # pytype: disable=attribute-error
@@ -218,7 +216,6 @@ def federated_eval(fn, placement):
   # are of a federated type.
 
   fn = value_impl.to_value(fn, type_spec=None)
-  py_typecheck.check_type(fn, value_impl.Value)
   py_typecheck.check_type(fn.type_signature, computation_types.FunctionType)
 
   if fn.type_signature.parameter is not None:  # pytype: disable=attribute-error
@@ -270,7 +267,6 @@ def federated_map(fn, arg):
       fn, type_spec=None, parameter_type_hint=arg.type_signature.member  # pytype: disable=attribute-error
   )
 
-  py_typecheck.check_type(fn, value_impl.Value)
   py_typecheck.check_type(fn.type_signature, computation_types.FunctionType)
   if not fn.type_signature.parameter.is_assignable_from(  # pytype: disable=attribute-error
       arg.type_signature.member  # pytype: disable=attribute-error
@@ -322,7 +318,6 @@ def federated_map_all_equal(fn, arg):
       fn, type_spec=None, parameter_type_hint=arg.type_signature.member  # pytype: disable=attribute-error
   )
 
-  py_typecheck.check_type(fn, value_impl.Value)
   py_typecheck.check_type(fn.type_signature, computation_types.FunctionType)
   if not fn.type_signature.parameter.is_assignable_from(
       arg.type_signature.member  # pytype: disable=attribute-error
@@ -581,7 +576,6 @@ def federated_zip(value):
   # this problem (e.g. having the operator act on sequences and thereby
   # sidestepping the issue) which we may want to explore.
   value = value_impl.to_value(value, type_spec=None)
-  py_typecheck.check_type(value, value_impl.Value)
   py_typecheck.check_type(value.type_signature, computation_types.StructType)
 
   comp = building_block_factory.create_federated_zip(value.comp)

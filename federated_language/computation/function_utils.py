@@ -191,7 +191,6 @@ def pack_args_into_struct(
         [(None, arg) for arg in args] + list(kwargs.items())
     )
   else:
-    py_typecheck.check_type(type_spec, computation_types.StructType)
     if not _is_argument_struct(type_spec):
       raise TypeError(
           'Parameter type {} does not have a structure of an argument struct, '
