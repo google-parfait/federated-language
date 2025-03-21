@@ -18,7 +18,6 @@ import inspect
 import types
 from typing import Optional
 
-from federated_language.common_libs import py_typecheck
 from federated_language.common_libs import structure
 from federated_language.types import computation_types
 from federated_language.types import type_conversions
@@ -291,7 +290,7 @@ def pack_args(
 
 def _infer_unpack_needed(
     fn: types.FunctionType,
-    parameter_type: Optional[computation_types.Type],
+    parameter_type: computation_types.Type,
     should_unpack: Optional[bool] = None,
 ) -> bool:
   """Returns whether parameter_type must be unpacked when calling fn.
@@ -313,7 +312,6 @@ def _infer_unpack_needed(
             should_unpack
         )
     )
-  py_typecheck.check_type(parameter_type, computation_types.Type)
   unpack = should_unpack  # Default return value.
   signature = inspect.signature(fn)
 

@@ -90,9 +90,7 @@ py_library(
     srcs = ["computation_wrapper.py"],
     deps = [
         ":computation_base",
-        ":computation_impl",
         ":polymorphic_computation",
-        "//federated_language/common_libs:py_typecheck",
         "//federated_language/types:computation_types",
         "//federated_language/types:type_conversions",
     ],
@@ -119,7 +117,6 @@ py_library(
     name = "function_utils",
     srcs = ["function_utils.py"],
     deps = [
-        "//federated_language/common_libs:py_typecheck",
         "//federated_language/common_libs:structure",
         "//federated_language/types:computation_types",
         "//federated_language/types:type_conversions",
