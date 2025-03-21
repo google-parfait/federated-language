@@ -32,29 +32,11 @@ from federated_language.executors import executor_factory
 from federated_language.executors import executor_value_base
 from federated_language.types import computation_types
 from federated_language.types import type_conversions
-from federated_language.types import typed_object
 import tree
 
 
 def _is_retryable_error(exception):
   return isinstance(exception, executor_base.RetryableError)
-
-
-class AsyncExecutionContextValue(typed_object.TypedObject):
-  """Wrapper class for values produced by `ExecutionContext`."""
-
-  def __init__(self, value, type_spec):
-    py_typecheck.check_type(type_spec, computation_types.Type)
-    self._value = value
-    self._type_spec = type_spec
-
-  @property
-  def type_signature(self):
-    return self._type_spec
-
-  @property
-  def value(self):
-    return self._value
 
 
 async def _ingest(executor, val, type_spec):

@@ -49,7 +49,6 @@ py_library(
         "//federated_language/executors:executor_value_base",
         "//federated_language/types:computation_types",
         "//federated_language/types:type_conversions",
-        "//federated_language/types:typed_object",
         "@pypi//dm_tree",
     ],
 )
