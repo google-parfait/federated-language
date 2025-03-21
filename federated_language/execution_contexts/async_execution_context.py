@@ -16,7 +16,7 @@
 import asyncio
 from collections.abc import Callable, Mapping, Sequence
 import contextlib
-from typing import Generic, Optional, TypeVar
+from typing import Optional
 
 from federated_language.common_libs import py_typecheck
 from federated_language.common_libs import retrying
@@ -34,9 +34,6 @@ from federated_language.types import computation_types
 from federated_language.types import type_conversions
 from federated_language.types import typed_object
 import tree
-
-
-_Computation = TypeVar('_Computation', bound=computation_base.Computation)
 
 
 def _is_retryable_error(exception):
@@ -132,7 +129,7 @@ async def _invoke(executor, comp, arg, result_type: computation_types.Type):
   return type_conversions.type_to_py_container(result_value, result_type)
 
 
-class AsyncExecutionContext(context.AsyncContext, Generic[_Computation]):
+class AsyncExecutionContext(context.AsyncContext):
   """An asynchronous execution context backed by an `executor_base.Executor`.
 
   This context's `ingest` and `invoke` methods return Python coroutine objects
@@ -146,7 +143,9 @@ class AsyncExecutionContext(context.AsyncContext, Generic[_Computation]):
   def __init__(
       self,
       executor_fn: executor_factory.ExecutorFactory,
-      compiler_fn: Optional[Callable[[_Computation], object]] = None,
+      compiler_fn: Optional[
+          Callable[[computation_base.Computation], object]
+      ] = None,
       *,
       transform_args: Optional[Callable[[object], object]] = None,
       transform_result: Optional[Callable[[object], object]] = None,
