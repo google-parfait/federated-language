@@ -19,6 +19,7 @@ import collections
 from collections.abc import Hashable, Iterable, Iterator, Mapping, MutableMapping, Sequence
 from typing import Optional, TypeVar, Union
 import weakref
+
 import attrs
 from federated_language.common_libs import py_typecheck
 from federated_language.common_libs import structure
@@ -840,6 +841,7 @@ class FunctionType(Type, metaclass=_Intern):
     # Note that function parameters are contravariant, so we invert the check.
     if (
         self.parameter is not None
+        and source_type.parameter is not None
         and not source_type.parameter.is_assignable_from(self.parameter)
     ):
       return False

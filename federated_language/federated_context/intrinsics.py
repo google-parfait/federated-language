@@ -16,7 +16,6 @@
 from typing import NoReturn
 import warnings
 
-from federated_language.common_libs import py_typecheck
 from federated_language.common_libs import structure
 from federated_language.compiler import building_block_factory
 from federated_language.compiler import building_blocks
@@ -104,6 +103,7 @@ def federated_aggregate(
   )
 
   zero = value_impl.to_value(zero, type_spec=None)
+
   accumulate = value_impl.to_value(
       accumulate,
       type_spec=None,
@@ -112,21 +112,35 @@ def federated_aggregate(
           value.type_signature.member,  # pytype: disable=attribute-error
       ]),
   )
+  if not isinstance(accumulate.type_signature, computation_types.FunctionType):
+    raise ValueError(
+        'Expected `accumulate.type_signature` to be a `FunctionType`,'
+        f' found {type(accumulate.type_signature)}.'
+    )
+
   merge = value_impl.to_value(
       merge,
       type_spec=None,
       parameter_type_hint=computation_types.StructType(
-          [accumulate.type_signature.result]  # pytype: disable=attribute-error
-          * 2
+          [accumulate.type_signature.result] * 2
       ),
   )
+  if not isinstance(merge.type_signature, computation_types.FunctionType):
+    raise ValueError(
+        'Expected `merge.type_signature` to be a `FunctionType`,'
+        f' found {type(merge.type_signature)}.'
+    )
+
   report = value_impl.to_value(
       report,
       type_spec=None,
-      parameter_type_hint=merge.type_signature.result,  # pytype: disable=attribute-error
+      parameter_type_hint=merge.type_signature.result,
   )
-  for op in [accumulate, merge, report]:
-    py_typecheck.check_type(op.type_signature, computation_types.FunctionType)
+  if not isinstance(report.type_signature, computation_types.FunctionType):
+    raise ValueError(
+        'Expected `report.type_signature` to be a `FunctionType`,'
+        f' found {type(report.type_signature)}.'
+    )
 
   if not accumulate.type_signature.parameter[0].is_assignable_from(  # pytype: disable=attribute-error
       zero.type_signature
@@ -138,16 +152,14 @@ def federated_aggregate(
     )
 
   accumulate_type_expected = type_factory.reduction_op(
-      accumulate.type_signature.result,  # pytype: disable=attribute-error
+      accumulate.type_signature.result,
       value.type_signature.member,  # pytype: disable=attribute-error
   )
   merge_type_expected = type_factory.reduction_op(
-      accumulate.type_signature.result,  # pytype: disable=attribute-error
-      accumulate.type_signature.result,  # pytype: disable=attribute-error
+      accumulate.type_signature.result, accumulate.type_signature.result
   )
   report_type_expected = computation_types.FunctionType(
-      merge.type_signature.result,  # pytype: disable=attribute-error
-      report.type_signature.result,  # pytype: disable=attribute-error
+      merge.type_signature.result, report.type_signature.result
   )
   for op_name, op, type_expected in [
       ('accumulate', accumulate, accumulate_type_expected),
@@ -216,12 +228,16 @@ def federated_eval(fn, placement):
   # are of a federated type.
 
   fn = value_impl.to_value(fn, type_spec=None)
-  py_typecheck.check_type(fn.type_signature, computation_types.FunctionType)
 
-  if fn.type_signature.parameter is not None:  # pytype: disable=attribute-error
-    raise TypeError(
-        '`federated_eval` expects a `fn` that accepts no arguments, but the'
-        f' `fn` provided has a parameter of type {fn.type_signature.parameter}.'  # pytype: disable=attribute-error
+  if not isinstance(fn.type_signature, computation_types.FunctionType):
+    raise ValueError(
+        'Expected `fn.type_signature` to be a `FunctionType`,'
+        f' found {type(fn.type_signature)}.'
+    )
+  if fn.type_signature.parameter is not None:
+    raise ValueError(
+        'Expected `fn.type_signature` to have no parameters, found'
+        f' {fn.type_signature.parameter}.'
     )
 
   comp = building_block_factory.create_federated_eval(fn.comp, placement)
@@ -266,15 +282,23 @@ def federated_map(fn, arg):
   fn = value_impl.to_value(
       fn, type_spec=None, parameter_type_hint=arg.type_signature.member  # pytype: disable=attribute-error
   )
+  if not isinstance(fn.type_signature, computation_types.FunctionType):
+    raise ValueError(
+        'Expected `fn.type_signature` to be a `FunctionType`,'
+        f' found {type(fn.type_signature)}.'
+    )
+  if fn.type_signature.parameter is None:
+    raise ValueError(
+        'Expected `fn.type_signature` to have a parameter, found none.'
+    )
 
-  py_typecheck.check_type(fn.type_signature, computation_types.FunctionType)
-  if not fn.type_signature.parameter.is_assignable_from(  # pytype: disable=attribute-error
+  if not fn.type_signature.parameter.is_assignable_from(
       arg.type_signature.member  # pytype: disable=attribute-error
   ):
     raise TypeError(
         'The mapping function expects a parameter of type {}, but member '
         'constituents of the mapped value are of incompatible type {}.'.format(
-            fn.type_signature.parameter,  # pytype: disable=attribute-error
+            fn.type_signature.parameter,
             arg.type_signature.member,  # pytype: disable=attribute-error
         )
     )
@@ -317,15 +341,23 @@ def federated_map_all_equal(fn, arg):
   fn = value_impl.to_value(
       fn, type_spec=None, parameter_type_hint=arg.type_signature.member  # pytype: disable=attribute-error
   )
+  if not isinstance(fn.type_signature, computation_types.FunctionType):
+    raise ValueError(
+        'Expected `fn.type_signature` to be a `FunctionType`,'
+        f' found {type(fn.type_signature)}.'
+    )
+  if fn.type_signature.parameter is None:
+    raise ValueError(
+        'Expected `fn.type_signature` to have a parameter, found none.'
+    )
 
-  py_typecheck.check_type(fn.type_signature, computation_types.FunctionType)
   if not fn.type_signature.parameter.is_assignable_from(
       arg.type_signature.member  # pytype: disable=attribute-error
-  ):  # pytype: disable=attribute-error
+  ):
     raise TypeError(
         'The mapping function expects a parameter of type {}, but member '
         'constituents of the mapped value are of incompatible type {}.'.format(
-            fn.type_signature.parameter,  # pytype: disable=attribute-error
+            fn.type_signature.parameter,
             arg.type_signature.member,  # pytype: disable=attribute-error
         )
     )
@@ -576,7 +608,11 @@ def federated_zip(value):
   # this problem (e.g. having the operator act on sequences and thereby
   # sidestepping the issue) which we may want to explore.
   value = value_impl.to_value(value, type_spec=None)
-  py_typecheck.check_type(value.type_signature, computation_types.StructType)
+  if not isinstance(value.type_signature, computation_types.StructType):
+    raise ValueError(
+        'Expected `value.type_signature` to be a `StructType`,'
+        f' found {type(value.type_signature)}.'
+    )
 
   comp = building_block_factory.create_federated_zip(value.comp)
   comp = _bind_comp_as_reference(comp)
@@ -743,7 +779,7 @@ def _federated_select(client_keys, max_key, server_val, select_fn, secure):
   )
   if not isinstance(
       select_fn.type_signature, computation_types.FunctionType
-  ) or not select_fn.type_signature.parameter.is_assignable_from(
+  ) or not select_fn.type_signature.parameter.is_assignable_from(  # pytype: disable=attribute-error
       select_fn_param_type
   ):
     _select_parameter_mismatch(
@@ -959,7 +995,12 @@ def sequence_map(fn, arg):
     TypeError: If the arguments are not of the appropriate types.
   """
   fn = value_impl.to_value(fn, type_spec=None)
-  py_typecheck.check_type(fn.type_signature, computation_types.FunctionType)
+  if not isinstance(fn.type_signature, computation_types.FunctionType):
+    raise ValueError(
+        'Expected `fn.type_signature` to be a `FunctionType`,'
+        f' found {type(fn.type_signature)}.'
+    )
+
   arg = value_impl.to_value(arg, type_spec=None)
 
   if isinstance(arg.type_signature, computation_types.SequenceType):
@@ -967,8 +1008,8 @@ def sequence_map(fn, arg):
     comp = _bind_comp_as_reference(comp)
     return value_impl.Value(comp)
   elif isinstance(arg.type_signature, computation_types.FederatedType):
-    parameter_type = computation_types.SequenceType(fn.type_signature.parameter)  # pytype: disable=attribute-error
-    result_type = computation_types.SequenceType(fn.type_signature.result)  # pytype: disable=attribute-error
+    parameter_type = computation_types.SequenceType(fn.type_signature.parameter)
+    result_type = computation_types.SequenceType(fn.type_signature.result)
     intrinsic_type = computation_types.FunctionType(
         (fn.type_signature, parameter_type), result_type
     )
@@ -1035,7 +1076,7 @@ def sequence_reduce(value, zero, op):
           'Expected a `federated_language.SequenceType`, found'
           f' {value_member_type}.'
       )
-    zero_member_type = zero.type_signature.member
+    zero_member_type = zero.type_signature.member  # pytype: disable=attribute-error
     ref_type = computation_types.StructType(
         [value_member_type, zero_member_type]
     )
@@ -1078,15 +1119,19 @@ def sequence_sum(value):
   if isinstance(value.type_signature, computation_types.SequenceType):
     element_type = value.type_signature.element
   else:
-    py_typecheck.check_type(
-        value.type_signature,  # pytype: disable=attribute-error
-        computation_types.FederatedType,
-    )
-    py_typecheck.check_type(
-        value.type_signature.member,  # pytype: disable=attribute-error
-        computation_types.SequenceType,
-    )
-    element_type = value.type_signature.member.element  # pytype: disable=attribute-error
+    if not isinstance(value.type_signature, computation_types.FederatedType):
+      raise ValueError(
+          'Expected `value.type_signature` to be a `FederatedType`,'
+          f' found {type(value.type_signature)}.'
+      )
+    if not isinstance(
+        value.type_signature.member, computation_types.SequenceType
+    ):
+      raise ValueError(
+          'Expected `value.type_signature.member` to be a `SequenceType`,'
+          f' found {type(value.type_signature.member)}.'
+      )
+    element_type = value.type_signature.member.element
   type_analysis.check_is_sum_compatible(element_type)
 
   if isinstance(value.type_signature, computation_types.SequenceType):

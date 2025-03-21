@@ -13,7 +13,8 @@
 # limitations under the License.
 """The implementation of a context to use in building federated computations."""
 
-from federated_language.common_libs import py_typecheck
+from typing import Optional
+
 from federated_language.compiler import building_blocks
 from federated_language.context_stack import context_stack_impl
 from federated_language.context_stack import symbol_binding_context
@@ -45,7 +46,12 @@ class FederatedComputationContext(
   are appropriately packaged in the result.
   """
 
-  def __init__(self, context_stack, suggested_name=None, parent=None):
+  def __init__(
+      self,
+      context_stack: context_stack_impl.ContextStack,
+      suggested_name: Optional[str] = None,
+      parent: Optional['FederatedComputationContext'] = None,
+  ):
     """Creates this context.
 
     Args:
@@ -56,14 +62,8 @@ class FederatedComputationContext(
       parent: The optional parent context. If not `None`, it must be an instance
         of `FederatedComputationContext`.
     """
-    py_typecheck.check_type(context_stack, context_stack_impl.ContextStack)
-    if suggested_name:
-      py_typecheck.check_type(suggested_name, str)
-      suggested_name = str(suggested_name)
-    else:
+    if suggested_name is None or not suggested_name:
       suggested_name = 'FEDERATED'
-    if parent is not None:
-      py_typecheck.check_type(parent, FederatedComputationContext)
     ancestor = parent
     ancestor_names = set()
     while ancestor is not None:

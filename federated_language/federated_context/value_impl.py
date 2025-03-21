@@ -118,8 +118,7 @@ class Value(typed_object.TypedObject, abc.ABC):
       attributes.extend(dir(type_signature))
     return attributes
 
-  def __getattr__(self, name):
-    py_typecheck.check_type(name, str)
+  def __getattr__(self, name: str) -> 'Value':
     _check_struct_or_federated_struct(self, name)
     if _is_federated_struct(self.type_signature):
       if name not in structure.name_list(self.type_signature.member):  # pytype: disable=attribute-error
@@ -379,7 +378,7 @@ def to_value(
         ' federated logic. Please wrap any  backend-specific constructs in a'
         ' computation function.'
     )
-  py_typecheck.check_type(result, Value)
+
   if type_spec is not None and not type_spec.is_assignable_from(
       result.type_signature
   ):

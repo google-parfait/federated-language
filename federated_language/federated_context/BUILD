@@ -67,7 +67,6 @@ py_library(
     srcs = ["federated_computation_context.py"],
     deps = [
         ":value_impl",
-        "//federated_language/common_libs:py_typecheck",
         "//federated_language/compiler:building_blocks",
         "//federated_language/context_stack:context_stack_impl",
         "//federated_language/context_stack:symbol_binding_context",
@@ -130,7 +129,6 @@ py_library(
     deps = [
         ":value_impl",
         ":value_utils",
-        "//federated_language/common_libs:py_typecheck",
         "//federated_language/common_libs:structure",
         "//federated_language/compiler:building_block_factory",
         "//federated_language/compiler:building_blocks",
@@ -213,10 +211,10 @@ py_library(
     srcs = ["value_utils.py"],
     deps = [
         ":value_impl",
-        "//federated_language/common_libs:py_typecheck",
         "//federated_language/compiler:building_block_factory",
         "//federated_language/compiler:building_blocks",
         "//federated_language/types:computation_types",
+        "//federated_language/types:placements",
     ],
 )
 

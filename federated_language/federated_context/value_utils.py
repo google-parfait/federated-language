@@ -13,11 +13,13 @@
 # limitations under the License.
 """Utilities file for functions with `Value`s as inputs and outputs."""
 
-from federated_language.common_libs import py_typecheck
+from typing import Optional
+
 from federated_language.compiler import building_block_factory
 from federated_language.compiler import building_blocks
 from federated_language.federated_context import value_impl
 from federated_language.types import computation_types
+from federated_language.types import placements
 
 
 def get_curried(fn: value_impl.Value):
@@ -56,7 +58,11 @@ def get_curried(fn: value_impl.Value):
   return value_impl.Value(result)
 
 
-def ensure_federated_value(value, placement=None, label=None):
+def ensure_federated_value(
+    value: value_impl.Value,
+    placement: Optional[placements.PlacementLiteral] = None,
+    label: Optional[str] = None,
+):
   """Ensures `value` is a federated value placed at `placement`.
 
   If `value` is not a `computation_types.FederatedType` but is a
@@ -77,9 +83,6 @@ def ensure_federated_value(value, placement=None, label=None):
     TypeError: if `value` is not a `FederatedType` and cannot be converted to
       a `FederatedType` with `federated_zip`.
   """
-  py_typecheck.check_type(value, value_impl.Value)
-  if label is not None:
-    py_typecheck.check_type(label, str)
 
   if not isinstance(value.type_signature, computation_types.FederatedType):
     comp = value.comp

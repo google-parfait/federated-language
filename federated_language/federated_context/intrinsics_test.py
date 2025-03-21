@@ -616,6 +616,13 @@ class FederatedZipTest(parameterized.TestCase):
       ('int_unplaced', _create_fake_value(_INT)),
       ('int_clients', _create_fake_value(_INT_CLIENTS)),
       ('int_server', _create_fake_value(_INT_SERVER)),
+  )
+  @context_stack_test_utils.with_context(_create_context)
+  def test_raises_value_error(self, value):
+    with self.assertRaises(ValueError):
+      intrinsics.federated_zip(value)
+
+  @parameterized.named_parameters(
       (
           'struct_different_placements',
           [
