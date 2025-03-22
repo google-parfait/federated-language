@@ -13,31 +13,38 @@
 # limitations under the License.
 """Utilities for cardinality inference and handling."""
 
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Mapping
 
+from federated_language.common_libs import py_typecheck
+from federated_language.common_libs import structure
 from federated_language.types import computation_types
 from federated_language.types import placements
 
 
-def _merge_cardinalities(
-    existing: Mapping[placements.PlacementLiteral, int],
-    update: Mapping[placements.PlacementLiteral, int],
-) -> Mapping[placements.PlacementLiteral, int]:
-  """Returns the merged cardinalities after checking for conflicts."""
-  if not update:
+def merge_cardinalities(existing, to_add):
+  """Merges dicts `existing` and `to_add`, checking for conflicts."""
+  py_typecheck.check_type(existing, dict)
+  py_typecheck.check_type(to_add, dict)
+  for key, val in existing.items():
+    py_typecheck.check_type(key, placements.PlacementLiteral)
+    py_typecheck.check_type(val, int)
+  if not to_add:
     return existing
   elif not existing:
-    return update
-
-  for k, v in update.items():
-    if k in existing and existing[k] != v:
-      raise ValueError(
-          f'Conflicting cardinalities for {k}: {v} vs {existing[k]}'
-      )
-
+    return to_add
   cardinalities = {}
   cardinalities.update(existing)
-  cardinalities.update(update)
+  for key, val in to_add.items():
+    py_typecheck.check_type(key, placements.PlacementLiteral)
+    py_typecheck.check_type(val, int)
+    if key not in cardinalities:
+      cardinalities[key] = val
+    elif cardinalities[key] != val:
+      raise ValueError(
+          'Conflicting cardinalities for {}: {} vs {}'.format(
+              key, val, cardinalities[key]
+          )
+      )
   return cardinalities
 
 
@@ -55,14 +62,11 @@ class InvalidNonAllEqualValueError(TypeError):
 # We define this type here to avoid having to redeclare it wherever we
 # parameterize by a cardinality inference fn.
 CardinalityInferenceFnType = Callable[
-    [object, computation_types.Type],
-    Mapping[placements.PlacementLiteral, int],
+    [object, computation_types.Type], Mapping[placements.PlacementLiteral, int]
 ]
 
 
-def infer_cardinalities(
-    value: object, type_spec: computation_types.Type
-) -> dict[placements.PlacementLiteral, int]:
+def infer_cardinalities(value, type_spec):
   """Infers cardinalities from Python `value`.
 
   Allows for any Python object to represent a federated value; enforcing
@@ -86,18 +90,20 @@ def infer_cardinalities(
   """
   if value is None:
     return {}
-
+  py_typecheck.check_type(type_spec, computation_types.Type)
   if isinstance(type_spec, computation_types.FederatedType):
     if type_spec.all_equal:
       return {}
-    if not isinstance(value, Sequence):
+    if not isinstance(value, (list, tuple)):
       raise InvalidNonAllEqualValueError(value, type_spec)
     return {type_spec.placement: len(value)}
   elif isinstance(type_spec, computation_types.StructType):
-    cardinalities = {}
-    for element, (_, element_type) in zip(value, type_spec.items()):
-      update = infer_cardinalities(element, element_type)
-      cardinalities = _merge_cardinalities(cardinalities, update)
-    return cardinalities
+    structure_value = structure.from_container(value, recursive=False)
+    cardinality_dict = {}
+    for idx, (_, elem_type) in enumerate(type_spec.items()):
+      cardinality_dict = merge_cardinalities(
+          cardinality_dict, infer_cardinalities(structure_value[idx], elem_type)
+      )
+    return cardinality_dict
   else:
     return {}

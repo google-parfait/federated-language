@@ -36,6 +36,8 @@ py_library(
     name = "cardinalities_utils",
     srcs = ["cardinalities_utils.py"],
     deps = [
+        "//federated_language/common_libs:py_typecheck",
+        "//federated_language/common_libs:structure",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
     ],
