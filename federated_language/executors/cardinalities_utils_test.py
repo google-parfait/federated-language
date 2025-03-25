@@ -20,6 +20,30 @@ from federated_language.types import placements
 import numpy as np
 
 
+class MergeCardinalitiesTest(absltest.TestCase):
+
+  def test_raises_merge_conflicting_cardinalities(self):
+    with self.assertRaisesRegex(ValueError, 'Conflicting cardinalities'):
+      cardinalities_utils._merge_cardinalities(
+          {placements.CLIENTS: 10}, {placements.CLIENTS: 11}
+      )
+
+  def test_noops_no_conflict(self):
+    clients_placed_cardinality = {placements.CLIENTS: 10}
+    noop = cardinalities_utils._merge_cardinalities(
+        clients_placed_cardinality, clients_placed_cardinality
+    )
+    self.assertEqual(noop, clients_placed_cardinality)
+
+  def test_merges_different_placements(self):
+    clients_placed_cardinality = {placements.CLIENTS: 10}
+    server_placed_cardinality = {placements.SERVER: 1}
+    merged = cardinalities_utils._merge_cardinalities(
+        clients_placed_cardinality, server_placed_cardinality
+    )
+    self.assertEqual(merged, {placements.CLIENTS: 10, placements.SERVER: 1})
+
+
 class InferCardinalitiesTest(absltest.TestCase):
 
   def test_returns_empty_dict_none_value(self):
@@ -27,10 +51,6 @@ class InferCardinalitiesTest(absltest.TestCase):
     self.assertEqual(
         cardinalities_utils.infer_cardinalities(None, type_signature), {}
     )
-
-  def test_raises_none_type(self):
-    with self.assertRaises(TypeError):
-      cardinalities_utils.infer_cardinalities(1, None)
 
   def test_noops_on_int(self):
     type_signature = computation_types.TensorType(np.int32)
@@ -185,44 +205,6 @@ class InferCardinalitiesTest(absltest.TestCase):
               computation_types.TensorType(np.int32), placements.CLIENTS
           ),
       )
-
-
-class MergeCardinalitiesTest(absltest.TestCase):
-
-  def test_raises_non_dict_arg(self):
-    with self.assertRaises(TypeError):
-      cardinalities_utils.merge_cardinalities({}, 1)
-
-  def test_raises_non_placement_keyed_dict(self):
-    with self.assertRaises(TypeError):
-      cardinalities_utils.merge_cardinalities(
-          {'a': 1}, {placements.CLIENTS: 10}
-      )
-    with self.assertRaises(TypeError):
-      cardinalities_utils.merge_cardinalities(
-          {placements.CLIENTS: 10}, {'a': 1}
-      )
-
-  def test_raises_merge_conflicting_cardinalities(self):
-    with self.assertRaisesRegex(ValueError, 'Conflicting cardinalities'):
-      cardinalities_utils.merge_cardinalities(
-          {placements.CLIENTS: 10}, {placements.CLIENTS: 11}
-      )
-
-  def test_noops_no_conflict(self):
-    clients_placed_cardinality = {placements.CLIENTS: 10}
-    noop = cardinalities_utils.merge_cardinalities(
-        clients_placed_cardinality, clients_placed_cardinality
-    )
-    self.assertEqual(noop, clients_placed_cardinality)
-
-  def test_merges_different_placements(self):
-    clients_placed_cardinality = {placements.CLIENTS: 10}
-    server_placed_cardinality = {placements.SERVER: 1}
-    merged = cardinalities_utils.merge_cardinalities(
-        clients_placed_cardinality, server_placed_cardinality
-    )
-    self.assertEqual(merged, {placements.CLIENTS: 10, placements.SERVER: 1})
 
 
 if __name__ == '__main__':
