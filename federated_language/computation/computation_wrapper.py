@@ -14,25 +14,23 @@
 """Utilities for constructing decorators for functions and `tf.function`s."""
 
 import collections
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Mapping
 import inspect
 from typing import Optional
 
-from federated_language.common_libs import py_typecheck
 from federated_language.computation import computation_base
-from federated_language.computation import computation_impl
 from federated_language.computation import polymorphic_computation
 from federated_language.types import computation_types
 from federated_language.types import type_conversions
 
 
-def _parameters(fn):
-  return inspect.signature(fn).parameters.values()
+def _parameters(fn) -> Mapping[str, inspect.Parameter]:
+  return inspect.signature(fn).parameters
 
 
-def _check_parameters(parameters):
+def _check_parameters(parameters: Mapping[str, inspect.Parameter]) -> None:
   """Ensure only non-varargs positional-or-keyword arguments."""
-  for parameter in parameters:
+  for parameter in parameters.values():
     if parameter.default is not inspect.Parameter.empty:
       # We don't have a way to build defaults into the function's type.
       raise TypeError(
@@ -67,7 +65,9 @@ def _check_parameters(parameters):
 
 
 def _wrap_polymorphic(
-    fn, wrapper_fn, infer_type_fn
+    fn,
+    wrapper_fn: Callable[..., computation_base.Computation],
+    infer_type_fn,
 ) -> polymorphic_computation.PolymorphicComputation:
   """Wraps `fn` in `wrapper_fn` at invocation time."""
   try:
@@ -86,8 +86,10 @@ def _wrap_polymorphic(
 
 
 def _wrap_concrete(
-    fn, wrapper_fn, parameter_type
-) -> computation_impl.ConcreteComputation:
+    fn,
+    wrapper_fn: Callable[..., computation_base.Computation],
+    parameter_type,
+) -> computation_base.Computation:
   """Wraps `fn` in `wrapper_fn` given the provided `parameter_type`."""
   try:
     name = fn.__name__
@@ -95,11 +97,6 @@ def _wrap_concrete(
     name = None
 
   concrete_fn = wrapper_fn(fn, parameter_type, unpack=None, name=name)
-  py_typecheck.check_type(
-      concrete_fn,
-      computation_impl.ConcreteComputation,
-      'value returned by the wrapper',
-  )
   result_parameter_type = concrete_fn.type_signature.parameter
   if (
       result_parameter_type is not None
@@ -115,10 +112,11 @@ def _wrap_concrete(
 
 
 def _parameter_type(
-    parameters, parameter_types: tuple[computation_types.Type, ...]
+    parameters: Mapping[str, inspect.Parameter],
+    parameter_types: tuple[computation_types.Type, ...],
 ) -> Optional[computation_types.Type]:
   """Bundle any user-provided parameter types into a single argument type."""
-  parameter_names = [parameter.name for parameter in parameters]
+  parameter_names = parameters.keys()
   if not parameter_types and not parameters:
     return None
   if len(parameter_types) == 1:
@@ -180,7 +178,7 @@ def _parameter_type(
 
 def _wrap(
     fn,
-    wrapper_fn,
+    wrapper_fn: Callable[..., computation_base.Computation],
     parameter_types: tuple[computation_types.Type, ...],
     infer_type_fn: Callable[[object], computation_types.Type],
 ):
@@ -242,7 +240,7 @@ def _wrap(
   return wrapped_fn
 
 
-def _is_function(obj):
+def _is_function(obj: object) -> bool:
   # Type specifications are supported (i.e. objects that can be turned into a
   # `federated_language.Type`) as arguments to a computation decorator. In some
   # cases those type specifications (e.g. np.int32) are a `type`, making them
