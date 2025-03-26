@@ -76,7 +76,6 @@ py_library(
         ":building_blocks",
         ":intrinsic_defs",
         ":transformation_utils",
-        "//federated_language/common_libs:py_typecheck",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
         "//federated_language/types:type_transformations",
@@ -233,7 +232,6 @@ py_library(
     srcs = ["transformation_utils.py"],
     deps = [
         ":building_blocks",
-        "//federated_language/common_libs:py_typecheck",
         "//federated_language/common_libs:structure",
     ],
 )
@@ -262,7 +260,6 @@ py_library(
         ":building_blocks",
         ":intrinsic_defs",
         ":transformation_utils",
-        "//federated_language/common_libs:py_typecheck",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
         "//federated_language/types:type_analysis",

@@ -145,11 +145,11 @@ class CreateFederatedGetattrCompTest(parameterized.TestCase):
     non_federated_arg = building_blocks.Reference(
         'test', computation_types.StructType([('a', np.int32), ('b', np.bool_)])
     )
-    with self.assertRaises(TypeError):
+    with self.assertRaises(ValueError):
       _ = building_block_factory.create_federated_getattr_comp(
           non_federated_arg, 'a'
       )
-    with self.assertRaisesRegex(ValueError, 'has no element of name `c`'):
+    with self.assertRaises(ValueError):
       _ = building_block_factory.create_federated_getattr_comp(
           federated_value, 'c'
       )
@@ -391,9 +391,9 @@ class CreateFederatedBroadcastTest(absltest.TestCase):
 
 class CreateFederatedEvalTest(absltest.TestCase):
 
-  def test_raises_type_error_with_nonfunctional_fn(self):
+  def test_raises_value_error_with_nonfunctional_fn(self):
     fn = building_blocks.Literal(1, computation_types.TensorType(np.int32))
-    with self.assertRaises(TypeError):
+    with self.assertRaises(ValueError):
       building_block_factory.create_federated_eval(fn, placements.CLIENTS)
 
   def test_returns_federated_eval(self):
@@ -1038,9 +1038,9 @@ class CreateSequenceSumTest(absltest.TestCase):
 
 class CreateNamedTupleTest(absltest.TestCase):
 
-  def test_raises_type_error_with_wrong_comp_type(self):
+  def test_raises_value_error_with_wrong_comp_type(self):
     comp = building_blocks.Reference('data', np.int32)
-    with self.assertRaises(TypeError):
+    with self.assertRaises(ValueError):
       building_block_factory.create_named_tuple(comp, ('a',))
 
   def test_raises_value_error_with_wrong_lengths(self):

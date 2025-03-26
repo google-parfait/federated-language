@@ -268,13 +268,6 @@ def _get_number_of_nodes_via_transform_preorder(comp, predicate=None):
 
 class TransformationUtilsTest(parameterized.TestCase):
 
-  def test_transform_postorder_fails_on_none_comp(self):
-    def transform(comp):
-      return comp, False
-
-    with self.assertRaises(TypeError):
-      transformation_utils.transform_postorder(None, transform)
-
   def test_transform_postorder_fails_on_none_transform(self):
     comp = building_blocks.Literal(1, computation_types.TensorType(np.int32))
     with self.assertRaises(TypeError):
@@ -454,18 +447,6 @@ class TransformationUtilsTest(parameterized.TestCase):
 
     self.assertEqual(leaf_name_order, list(postorder_nodes))
 
-  def test_transform_postorder_with_symbol_bindings_fails_on_none_comp(self):
-    empty_context_tree = transformation_utils.SymbolTree(FakeTracker)
-
-    def transform(comp, ctxt_tree):
-      del ctxt_tree
-      return comp, False
-
-    with self.assertRaises(TypeError):
-      transformation_utils.transform_postorder_with_symbol_bindings(
-          None, transform, empty_context_tree
-      )
-
   def test_transform_postorder_with_symbol_bindings_fails_on_none_transform(
       self,
   ):
@@ -475,20 +456,6 @@ class TransformationUtilsTest(parameterized.TestCase):
     with self.assertRaises(TypeError):
       transformation_utils.transform_postorder_with_symbol_bindings(
           whimsy_comp, None, empty_symbol_tree
-      )
-
-  def test_transform_postorder_with_symbol_bindings_fails_on_none_symbol_tree(
-      self,
-  ):
-    whimsy_comp = building_blocks.Reference('x', np.int32)
-
-    def transform(comp, ctxt_tree):
-      del ctxt_tree
-      return comp, False
-
-    with self.assertRaises(TypeError):
-      transformation_utils.transform_postorder_with_symbol_bindings(
-          whimsy_comp, transform, None
       )
 
   @parameterized.named_parameters(
@@ -980,10 +947,6 @@ class TransformationUtilsTest(parameterized.TestCase):
 
   def test_typechecking_in_symbol_tree_resolve_methods(self):
     symbol_tree = transformation_utils.SymbolTree(FakeTracker)
-    with self.assertRaises(TypeError):
-      symbol_tree.get_payload_with_name(0)
-    with self.assertRaises(TypeError):
-      symbol_tree.update_payload_with_name(0)
     with self.assertRaises(ValueError):
       symbol_tree.update_payload_with_name('x')
 
@@ -1022,11 +985,6 @@ class TransformationUtilsTest(parameterized.TestCase):
     symbol_tree.drop_scope_down(0)
     symbol_tree.pop_scope_up()
     self.assertIsInstance(symbol_tree.active_node.payload, FakeTracker)
-
-  def test_symbol_tree_drop_scope_down_fails_bad_type(self):
-    symbol_tree = transformation_utils.SymbolTree(FakeTracker)
-    with self.assertRaises(TypeError):
-      symbol_tree.drop_scope_down('a')
 
   def test_symbol_tree_drop_scope_down_moves_to_sentinel(self):
     symbol_tree = transformation_utils.SymbolTree(FakeTracker)
@@ -1069,15 +1027,6 @@ class TransformationUtilsTest(parameterized.TestCase):
     symbol_tree.walk_down_one_variable_binding()
     self.assertEqual(symbol_tree.get_payload_with_name('x').name, 'x')
     self.assertIsNone(symbol_tree.get_payload_with_name('x').value)
-
-  def test_symbol_tree_ingest_variable_binding_bad_args_fails(self):
-    symbol_tree = transformation_utils.SymbolTree(FakeTracker)
-    with self.assertRaises(TypeError):
-      symbol_tree.ingest_variable_binding(
-          0, building_blocks.Reference('x', np.int32)
-      )
-    with self.assertRaises(TypeError):
-      symbol_tree.ingest_variable_binding('x', 0)
 
   def test_drop_scope_down_and_ingest_variable_binding_adds_node_to_empty_tree(
       self,
@@ -1293,12 +1242,6 @@ class TransformationUtilsTest(parameterized.TestCase):
     self.assertEqual(x.name, 'x')
     self.assertIsNone(x.value)
 
-  def test_sequential_binding_node_fails_bad_args(self):
-    with self.assertRaises(TypeError):
-      transformation_utils.SequentialBindingNode(None)
-    with self.assertRaises(TypeError):
-      transformation_utils.SequentialBindingNode(0)
-
   def test_sequential_binding_node_initialization(self):
     trivial_instance = transformation_utils.SequentialBindingNode(
         TrivialBoundVariableTracker('trivial_name', None)
@@ -1310,12 +1253,6 @@ class TransformationUtilsTest(parameterized.TestCase):
     self.assertIsNone(trivial_instance.parent)
     self.assertIsNone(trivial_instance.younger_sibling)
     self.assertIsNone(trivial_instance.older_sibling)
-
-  def test_bound_variable_tracker_trivial_subclass_init_bad_args(self):
-    with self.assertRaises(TypeError):
-      TrivialBoundVariableTracker(0, None)
-    with self.assertRaises(TypeError):
-      TrivialBoundVariableTracker('x', 0)
 
   def test_sequential_binding_node_parent_child_relationship(self):
     trivial_instance = transformation_utils.SequentialBindingNode(
@@ -1331,10 +1268,6 @@ class TransformationUtilsTest(parameterized.TestCase):
     self.assertEqual(trivial_instance.get_child(0), second_trivial_instance)
     self.assertIsNone(trivial_instance.get_child(1))
     self.assertEqual(second_trivial_instance.parent, trivial_instance)
-    with self.assertRaises(TypeError):
-      trivial_instance.set_parent(0)
-    with self.assertRaises(TypeError):
-      second_trivial_instance.add_child(0, 0)
 
   def test_sequential_binding_node_sibling_relationship(self):
     trivial_instance = transformation_utils.SequentialBindingNode(
@@ -1349,10 +1282,6 @@ class TransformationUtilsTest(parameterized.TestCase):
     self.assertEqual(trivial_instance.younger_sibling, second_trivial_instance)
     second_trivial_instance.set_older_sibling(trivial_instance)
     self.assertEqual(second_trivial_instance.older_sibling, trivial_instance)
-    with self.assertRaises(TypeError):
-      trivial_instance.set_younger_sibling(0)
-    with self.assertRaises(TypeError):
-      second_trivial_instance.set_older_sibling(0)
 
   def test_sequential_binding_nodes_cousin_relationship(self):
     trivial_instance = transformation_utils.SequentialBindingNode(
@@ -1633,10 +1562,6 @@ class TransformPreorderTest(parameterized.TestCase):
 
 
 class GetUniqueNamesTest(absltest.TestCase):
-
-  def test_raises_on_none(self):
-    with self.assertRaises(TypeError):
-      transformation_utils.get_unique_names(None)
 
   def test_returns_names_single_lambda(self):
     ref = building_blocks.Reference('x', np.int32)

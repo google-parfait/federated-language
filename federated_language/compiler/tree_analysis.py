@@ -13,10 +13,9 @@
 # limitations under the License.
 """A library of static analysis functions for ASTs."""
 
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from typing import Optional, Union
 
-from federated_language.common_libs import py_typecheck
 from federated_language.compiler import building_block_analysis
 from federated_language.compiler import building_blocks
 from federated_language.compiler import intrinsic_defs
@@ -99,7 +98,10 @@ def contains_only(
   return not contains(tree, lambda x: not predicate(x))
 
 
-def check_has_single_placement(comp, single_placement):
+def check_has_single_placement(
+    comp: building_blocks.ComputationBuildingBlock,
+    single_placement: placements.PlacementLiteral,
+) -> None:
   """Checks that the AST of `comp` contains only `single_placement`.
 
   Args:
@@ -111,8 +113,6 @@ def check_has_single_placement(comp, single_placement):
     ValueError: If the AST under `comp` contains any
     `computation_types.FederatedType` other than `single_placement`.
   """
-  py_typecheck.check_type(comp, building_blocks.ComputationBuildingBlock)
-  py_typecheck.check_type(single_placement, placements.PlacementLiteral)
 
   def _check_single_placement(comp):
     """Checks that the placement in `type_spec` matches `single_placement`."""
@@ -186,7 +186,9 @@ class NonuniqueNameError(ValueError):
     super().__init__(message)
 
 
-def check_has_unique_names(comp):
+def check_has_unique_names(
+    comp: building_blocks.ComputationBuildingBlock,
+) -> None:
   """Checks that each variable of `comp` is bound at most once.
 
   Additionally, checks that `comp` does not mask any names which are unbound
@@ -199,7 +201,6 @@ def check_has_unique_names(comp):
     NonuniqueNameError: If we encounter a name that is bound multiple times or a
       binding which would shadow an unbound reference.
   """
-  py_typecheck.check_type(comp, building_blocks.ComputationBuildingBlock)
   # Initializing `names` to unbound names in `comp` ensures that `comp` does not
   # mask any names from its parent scope.
   names = transformation_utils.get_map_of_unbound_references(comp)[comp]
@@ -222,7 +223,10 @@ def check_has_unique_names(comp):
   visit_postorder(comp, _visit)
 
 
-def _extract_nodes_consuming(tree, predicate: _BuildingBlockPredicate):
+def _extract_nodes_consuming(
+    tree: building_blocks.ComputationBuildingBlock,
+    predicate: _BuildingBlockPredicate,
+) -> set[building_blocks.ComputationBuildingBlock]:
   """Returns the set of AST nodes which consume nodes matching `predicate`.
 
   Notice we adopt the convention that a node which itself satisfies the
@@ -241,7 +245,6 @@ def _extract_nodes_consuming(tree, predicate: _BuildingBlockPredicate):
     A `set` of `building_blocks.ComputationBuildingBlock` instances
     representing the nodes in `tree` dependent on nodes matching `predicate`.
   """
-  py_typecheck.check_type(tree, building_blocks.ComputationBuildingBlock)
 
   class _NodeSet:
 
@@ -354,7 +357,9 @@ def _extract_calls_with_fn_consuming_arg(
   return instances
 
 
-def check_broadcast_not_dependent_on_aggregate(tree):
+def check_broadcast_not_dependent_on_aggregate(
+    tree: building_blocks.ComputationBuildingBlock,
+) -> None:
   """Raises if any broadcast in `tree` ingests the result of an aggregate.
 
   We explicitly check for this pattern since if it occurs, `tree` is not
@@ -368,8 +373,6 @@ def check_broadcast_not_dependent_on_aggregate(tree):
   Raises:
     ValueError: If a broadcast in `tree` consumes the result of an aggregate.
   """
-
-  py_typecheck.check_type(tree, building_blocks.ComputationBuildingBlock)
 
   def aggregate_predicate(x):
     return (
@@ -394,7 +397,9 @@ def check_broadcast_not_dependent_on_aggregate(tree):
     )
 
 
-def check_aggregate_not_dependent_on_aggregate(tree):
+def check_aggregate_not_dependent_on_aggregate(
+    tree: building_blocks.ComputationBuildingBlock,
+) -> None:
   """Raises if any aggregation in `tree` ingests the result of an aggregate.
 
   We explicitly check for this pattern since if it occurs, `tree` is not
@@ -408,8 +413,6 @@ def check_aggregate_not_dependent_on_aggregate(tree):
   Raises:
     ValueError: If a broadcast in `tree` consumes the result of an aggregate.
   """
-
-  py_typecheck.check_type(tree, building_blocks.ComputationBuildingBlock)
 
   def aggregate_predicate(x):
     return (
@@ -481,7 +484,10 @@ def contains_called_intrinsic(tree, uri=None):
   return count(tree, predicate) > 0
 
 
-def contains_no_unbound_references(tree, excluding=None):
+def contains_no_unbound_references(
+    tree: building_blocks.ComputationBuildingBlock,
+    excluding: Optional[Union[str, Iterable[str]]] = None,
+) -> bool:
   """Tests if all the references in `tree` are bound by `tree`.
 
   Args:
@@ -494,7 +500,6 @@ def contains_no_unbound_references(tree, excluding=None):
     `True` if there are no unbound references in `tree` excluding those
     specified by `excluding`, otherwise `False`.
   """
-  py_typecheck.check_type(tree, building_blocks.ComputationBuildingBlock)
   if isinstance(excluding, str):
     excluding = [excluding]
   unbound_references = transformation_utils.get_map_of_unbound_references(tree)
@@ -511,7 +516,7 @@ _DEFAULT_KIND_PREDICATE = lambda k: k is not None
 
 
 def find_aggregations_in_tree(
-    comp,
+    comp: building_blocks.ComputationBuildingBlock,
     kind_predicate: Callable[
         [intrinsic_defs.AggregationKind], bool
     ] = _DEFAULT_KIND_PREDICATE,
@@ -535,7 +540,6 @@ def find_aggregations_in_tree(
       identified. This may result from calls to references or other
       indirect structures.
   """
-  py_typecheck.check_type(comp, building_blocks.ComputationBuildingBlock)
   aggregation_calls: list[building_blocks.Call] = []
 
   def record_intrinsic_calls(comp):
@@ -547,6 +551,10 @@ def find_aggregations_in_tree(
     if isinstance(comp.function, building_blocks.Lambda):
       return
     # Aggregation cannot be occurring if the output type is not federated
+    if not isinstance(
+        comp.function.type_signature, computation_types.FunctionType
+    ):
+      return
     if not type_analysis.contains_federated_types(
         comp.function.type_signature.result
     ):

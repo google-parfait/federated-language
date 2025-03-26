@@ -49,10 +49,6 @@ def _create_test_federated_broadcast():
 
 class TestCheckContainsOnlyReducibleIntrinsics(absltest.TestCase):
 
-  def test_raises_on_none(self):
-    with self.assertRaises(TypeError):
-      tree_analysis.check_contains_only_reducible_intrinsics(None)
-
   def test_passes_with_federated_map(self):
     intrinsic = building_blocks.Intrinsic(
         intrinsic_defs.FEDERATED_MAP.uri,
@@ -86,10 +82,6 @@ def whimsy_intrinsic_predicate(x):
 
 
 class NodesDependentOnPredicateTest(absltest.TestCase):
-
-  def test_raises_on_none_comp(self):
-    with self.assertRaises(TypeError):
-      tree_analysis._extract_nodes_consuming(None, lambda x: True)
 
   def test_raises_on_none_predicate(self):
     data = building_blocks.Literal(1, computation_types.TensorType(np.int32))
@@ -210,10 +202,6 @@ class NodesDependentOnPredicateTest(absltest.TestCase):
 
 class BroadcastDependentOnAggregateTest(absltest.TestCase):
 
-  def test_raises_on_none_comp(self):
-    with self.assertRaises(TypeError):
-      tree_analysis.check_broadcast_not_dependent_on_aggregate(None)
-
   def test_does_not_find_aggregate_dependent_on_broadcast(self):
     broadcast = _create_test_federated_broadcast()
     value_type = broadcast.type_signature
@@ -264,10 +252,6 @@ class BroadcastDependentOnAggregateTest(absltest.TestCase):
 
 class AggregateDependentOnAggregateTest(absltest.TestCase):
 
-  def test_raises_on_none_comp(self):
-    with self.assertRaises(TypeError):
-      tree_analysis.check_aggregate_not_dependent_on_aggregate(None)
-
   def test_does_not_find_aggregate_dependent_on_broadcast(self):
     broadcast = _create_test_federated_broadcast()
     value_type = broadcast.type_signature
@@ -309,10 +293,6 @@ class AggregateDependentOnAggregateTest(absltest.TestCase):
 
 class ContainsCalledIntrinsic(absltest.TestCase):
 
-  def test_raises_type_error_with_none_tree(self):
-    with self.assertRaises(TypeError):
-      tree_analysis.contains_called_intrinsic(None)
-
   def test_returns_true_with_none_uri(self):
     comp = _create_test_federated_broadcast()
     self.assertTrue(tree_analysis.contains_called_intrinsic(comp))
@@ -334,10 +314,6 @@ class ContainsCalledIntrinsic(absltest.TestCase):
 
 
 class ContainsNoUnboundReferencesTest(absltest.TestCase):
-
-  def test_raises_type_error_with_none_tree(self):
-    with self.assertRaises(TypeError):
-      tree_analysis.contains_no_unbound_references(None)
 
   def test_raises_type_error_with_int_excluding(self):
     ref = building_blocks.Reference('a', np.int32)
@@ -364,10 +340,6 @@ class ContainsNoUnboundReferencesTest(absltest.TestCase):
 
 
 class CheckHasUniqueNamesTest(absltest.TestCase):
-
-  def test_raises_on_none(self):
-    with self.assertRaises(TypeError):
-      tree_analysis.check_has_unique_names(None)
 
   def test_ok_on_single_lambda(self):
     ref_to_x = building_blocks.Reference('x', np.int32)

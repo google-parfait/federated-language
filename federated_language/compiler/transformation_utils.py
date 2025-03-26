@@ -19,13 +19,15 @@ from collections.abc import Callable
 import itertools
 import operator
 import typing
+from typing import Optional
 
-from federated_language.common_libs import py_typecheck
 from federated_language.common_libs import structure
 from federated_language.compiler import building_blocks
 
 
-def transform_postorder(comp, transform):
+def transform_postorder(
+    comp: building_blocks.ComputationBuildingBlock, transform
+):
   """Traverses `comp` recursively postorder and replaces its constituents.
 
   For each element of `comp` viewed as an expression tree, the transformation
@@ -63,7 +65,6 @@ def transform_postorder(comp, transform):
     NotImplementedError: If the argument is a kind of computation building block
       that is currently not recognized.
   """
-  py_typecheck.check_type(comp, building_blocks.ComputationBuildingBlock)
   if isinstance(
       comp,
       (
@@ -252,7 +253,14 @@ def transform_preorder(
     )
 
 
-def transform_postorder_with_symbol_bindings(comp, transform, symbol_tree):
+def transform_postorder_with_symbol_bindings(
+    comp: building_blocks.ComputationBuildingBlock,
+    transform: Callable[
+        [building_blocks.ComputationBuildingBlock, 'SymbolTree'],
+        building_blocks.ComputationBuildingBlock,
+    ],
+    symbol_tree: 'SymbolTree',
+):
   """Uses symbol binding hooks to execute transformations.
 
   `transform_postorder_with_symbol_bindings` hooks into the preorder traversal
@@ -302,18 +310,10 @@ def transform_postorder_with_symbol_bindings(comp, transform, symbol_tree):
     Boolean with the value `True` if `comp` was transformed and `False` if it
     was not.
   """
-  py_typecheck.check_type(comp, building_blocks.ComputationBuildingBlock)
-  py_typecheck.check_type(symbol_tree, SymbolTree)
-  if not callable(transform):
-    raise TypeError(
-        'Argument `transform` to '
-        '`transform_postorder_with_symbol_bindings` must '
-        'be callable.'
-    )
   identifier_seq = itertools.count(start=1)
 
   def _transform_postorder_with_symbol_bindings_switch(
-      comp, transform_fn, ctxt_tree, identifier_sequence
+      comp, transform, ctxt_tree, identifier_sequence
   ):
     """Recursive helper function delegated to after binding comp_id sequence."""
     if isinstance(
@@ -327,7 +327,7 @@ def transform_postorder_with_symbol_bindings(comp, transform, symbol_tree):
             building_blocks.Reference,
         ),
     ):
-      return _traverse_leaf(comp, transform_fn, ctxt_tree, identifier_sequence)
+      return _traverse_leaf(comp, transform, ctxt_tree, identifier_sequence)
     elif isinstance(comp, building_blocks.Selection):
       return _traverse_selection(
           comp, transform, ctxt_tree, identifier_sequence
@@ -450,7 +450,9 @@ def transform_postorder_with_symbol_bindings(comp, transform, symbol_tree):
 class BoundVariableTracker(abc.ABC):
   """Abstract class representing a mutable variable binding."""
 
-  def __init__(self, name, value):
+  def __init__(
+      self, name: str, value: Optional[building_blocks.ComputationBuildingBlock]
+  ):
     """Initializes `BoundVariableTracker`.
 
     The initializer is likely to be overwritten by subclasses in order to
@@ -469,9 +471,6 @@ class BoundVariableTracker(abc.ABC):
         `BoundVariableTracker` represents merely a variable declaration (e.g. in
         a lambda).
     """
-    py_typecheck.check_type(name, str)
-    if value is not None:
-      py_typecheck.check_type(value, building_blocks.ComputationBuildingBlock)
     self.name = name
     self.value = value
 
@@ -578,7 +577,7 @@ class SymbolTree:
     self.payload_type = payload_type
     self._node_ids = {id(initial_node): 1}
 
-  def get_payload_with_name(self, name):
+  def get_payload_with_name(self, name: str) -> Optional[BoundVariableTracker]:
     """Returns payload corresponding to `name` in active variable bindings.
 
     Note that this method obeys `dict.get`-like semantics; instead of raising
@@ -592,7 +591,6 @@ class SymbolTree:
       in context represented by `active_comp`, or `None` if the requested
       name is unbound in the current context.
     """
-    py_typecheck.check_type(name, str)
     comp = typing.cast(SequentialBindingNode, self.active_node)
     while comp.parent is not None or comp.older_sibling is not None:
       if name == comp.payload.name:
@@ -624,7 +622,7 @@ class SymbolTree:
         node = node.parent
     return payloads
 
-  def update_payload_with_name(self, name):
+  def update_payload_with_name(self, name: str):
     """Calls `update` if `name` is found among the available symbols.
 
     If there is no such available symbol, simply does nothing.
@@ -637,12 +635,11 @@ class SymbolTree:
       ValueError: If `name` is not found among the bound names currently
         available in `self`.
     """
-    py_typecheck.check_type(name, str)
     comp = typing.cast(SequentialBindingNode, self.active_node)
     while comp.parent is not None or comp.older_sibling is not None:
       if name == comp.payload.name:
         comp.payload.update(name)
-        return
+        return None
       if comp.older_sibling is not None:
         comp = comp.older_sibling
       elif comp.parent is not None:
@@ -688,7 +685,7 @@ class SymbolTree:
           'You have tried to pop out of the highest level in this `SymbolTree`.'
       )
 
-  def drop_scope_down(self, comp_id):
+  def drop_scope_down(self, comp_id: int) -> None:
     """Constructs a new scope level for `self`.
 
     Scope levels in `SymbolTree` correspond to scope-introducing nodes in ASTs;
@@ -705,7 +702,6 @@ class SymbolTree:
         Used to differentiate between scopes which both branch from the same
         point in the tree.
     """
-    py_typecheck.check_type(comp_id, int)
     self.active_node = typing.cast(SequentialBindingNode, self.active_node)
     if self.active_node.children.get(comp_id) is None:
       node = SequentialBindingNode(_BeginScopePointer())
@@ -735,7 +731,11 @@ class SymbolTree:
           .format(self)
       )
 
-  def ingest_variable_binding(self, name, value):
+  def ingest_variable_binding(
+      self,
+      name: Optional[str],
+      value: Optional[building_blocks.ComputationBuildingBlock],
+  ) -> None:
     """Constructs or updates node in symbol tree as AST is walked.
 
     Passes `name` and `value` onto the symbol tree's node constructor, with
@@ -764,9 +764,7 @@ class SymbolTree:
     """
     if (name is None or not name) and value is None:
       return
-    py_typecheck.check_type(name, str)
-    if value is not None:
-      py_typecheck.check_type(value, building_blocks.ComputationBuildingBlock)
+
     node = SequentialBindingNode(self.payload_type(name=name, value=value))
     self.active_node = typing.cast(SequentialBindingNode, self.active_node)
     if self.active_node.younger_sibling is None:
@@ -783,9 +781,8 @@ class SymbolTree:
       self.walk_down_one_variable_binding()
       self.active_node.payload.value = value
 
-  def _add_younger_sibling(self, comp_tracker):
+  def _add_younger_sibling(self, comp_tracker: 'SequentialBindingNode') -> None:
     """Appends comp as younger sibling of current `active_node`."""
-    py_typecheck.check_type(comp_tracker, SequentialBindingNode)
     if self._node_ids.get(id(comp_tracker)):
       raise ValueError(
           'Each instance of {} can only appear once in a given symbol tree.'
@@ -798,7 +795,11 @@ class SymbolTree:
     self.active_node.set_younger_sibling(comp_tracker)
     self._node_ids[id(comp_tracker)] = 1
 
-  def _add_child(self, constructing_comp_id, comp_tracker):
+  def _add_child(
+      self,
+      constructing_comp_id: int,
+      comp_tracker: 'SequentialBindingNode',
+  ) -> None:
     """Writes `comp_tracker` to children of active node.
 
     Each `SequentialBindingNode` keeps a `dict` of its children; `_add_child`
@@ -815,7 +816,6 @@ class SymbolTree:
       comp_tracker: Instance of `SequentialBindingNode`, the node to add as a
         child of `active_node`.
     """
-    py_typecheck.check_type(comp_tracker, SequentialBindingNode)
     if self._node_ids.get(id(comp_tracker)):
       raise ValueError(
           'Each node can only appear once in a given'
@@ -886,9 +886,8 @@ class SymbolTree:
   def __ne__(self, other):
     return not self == other
 
-  def _string_under_node(self, node) -> str:
+  def _string_under_node(self, node: 'SequentialBindingNode') -> str:
     """Rescursive helper function to generate string reps of `SymbolTree`s."""
-    py_typecheck.check_type(node, SequentialBindingNode)
     if node is self.active_node:
       active_node_indicator = '*'
     else:
@@ -954,14 +953,13 @@ class SequentialBindingNode:
   `SequentialBindingNode` to its (unique) younger sibling.
   """
 
-  def __init__(self, payload):
+  def __init__(self, payload: BoundVariableTracker):
     """Initializes `SequentialBindingNode`.
 
     Args:
       payload: Instance of BoundVariableTracker representing the payload of this
         node.
     """
-    py_typecheck.check_type(payload, BoundVariableTracker)
     self.payload = payload
     self._children = collections.OrderedDict()
     self._parent = None
@@ -984,7 +982,7 @@ class SequentialBindingNode:
   def younger_sibling(self):
     return self._younger_sibling
 
-  def set_parent(self, node):
+  def set_parent(self, node: 'SequentialBindingNode') -> None:
     """Sets the _parent scope of `self` to the binding embodied by `node`.
 
     This method should not be assumed to be efficient.
@@ -992,10 +990,9 @@ class SequentialBindingNode:
     Args:
       node: Instance of `SequentialBindingNode` to set as parent of `self`.
     """
-    py_typecheck.check_type(node, SequentialBindingNode)
     self._parent = node
 
-  def set_older_sibling(self, node):
+  def set_older_sibling(self, node: 'SequentialBindingNode') -> None:
     """Sets the older sibling scope of `self` to `node`.
 
     This method should not be assumed to be efficient.
@@ -1004,10 +1001,9 @@ class SequentialBindingNode:
       node: Instance of `SequentialBindingNode` to set as older sibling of
         `self`.
     """
-    py_typecheck.check_type(node, SequentialBindingNode)
     self._older_sibling = node
 
-  def set_younger_sibling(self, node):
+  def set_younger_sibling(self, node: 'SequentialBindingNode') -> None:
     """Sets the younger sibling scope of `self` to `node`.
 
     This corresponds to binding a new variable in a
@@ -1018,10 +1014,9 @@ class SequentialBindingNode:
     Args:
       node: Instance of `SequentialBindingNode` representing this new binding.
     """
-    py_typecheck.check_type(node, SequentialBindingNode)
     self._younger_sibling = node
 
-  def add_child(self, comp_id, node):
+  def add_child(self, comp_id: int, node: 'SequentialBindingNode') -> None:
     """Sets the child scope of `self` indexed by `comp_id` to `node`.
 
     This corresponds to encountering a node in an AST which defines a variable
@@ -1034,7 +1029,6 @@ class SequentialBindingNode:
       comp_id: The identifier of the computation generating this scope.
       node: Instance of `SequentialBindingNode` representing this new binding.
     """
-    py_typecheck.check_type(node, SequentialBindingNode)
     self._children[comp_id] = node
 
   def get_child(self, comp_id):
@@ -1090,9 +1084,10 @@ class ReferenceCounter(BoundVariableTracker):
     return self.count == other.count
 
 
-def get_unique_names(comp):
+def get_unique_names(
+    comp: building_blocks.ComputationBuildingBlock,
+) -> set[str]:
   """Returns the unique names bound or referred to in `comp`."""
-  py_typecheck.check_type(comp, building_blocks.ComputationBuildingBlock)
   names = set()
 
   def _update(comp):
