@@ -211,9 +211,7 @@ class Value(typed_object.TypedObject, abc.ABC):
       args = [to_value(x, None) for x in args]
       kwargs = {k: to_value(v, None) for k, v in kwargs.items()}
       arg = function_utils.pack_args(
-          self.type_signature.parameter,  # pytype: disable=attribute-error
-          args,
-          kwargs,
+          self.type_signature.parameter, args, kwargs
       )
       arg = to_value(arg, None).comp
     else:
