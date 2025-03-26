@@ -35,7 +35,6 @@ py_library(
     name = "async_execution_context",
     srcs = ["async_execution_context.py"],
     deps = [
-        ":compiler_pipeline",
         "//federated_language/common_libs:retrying",
         "//federated_language/common_libs:structure",
         "//federated_language/common_libs:tracing",
@@ -60,23 +59,6 @@ py_test(
     deps = [
         ":async_execution_context",
         "//federated_language/executors:executor_base",
-        "@pypi//absl_py",
-    ],
-)
-
-py_library(
-    name = "compiler_pipeline",
-    srcs = ["compiler_pipeline.py"],
-    deps = ["//federated_language/computation:computation_base"],
-)
-
-py_test(
-    name = "compiler_pipeline_test",
-    size = "small",
-    srcs = ["compiler_pipeline_test.py"],
-    deps = [
-        ":compiler_pipeline",
-        "//federated_language/computation:computation_base",
         "@pypi//absl_py",
     ],
 )

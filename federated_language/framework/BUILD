@@ -48,7 +48,6 @@ py_library(
         "//federated_language/context_stack:runtime_error_context",
         "//federated_language/context_stack:symbol_binding_context",
         "//federated_language/execution_contexts:async_execution_context",
-        "//federated_language/execution_contexts:compiler_pipeline",
         "//federated_language/execution_contexts:sync_execution_context",
         "//federated_language/executors:cardinalities_utils",
         "//federated_language/executors:executor_base",

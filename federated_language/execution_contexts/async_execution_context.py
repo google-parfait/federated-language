@@ -16,6 +16,7 @@
 import asyncio
 from collections.abc import Callable, Iterator, Mapping, Sequence
 import contextlib
+import functools
 from typing import Optional
 
 from federated_language.common_libs import retrying
@@ -24,7 +25,6 @@ from federated_language.common_libs import tracing
 from federated_language.computation import computation_base
 from federated_language.computation import function_utils
 from federated_language.context_stack import context
-from federated_language.execution_contexts import compiler_pipeline
 from federated_language.executors import cardinalities_utils
 from federated_language.executors import executor_base
 from federated_language.executors import executor_factory  # pylint: disable=unused-import
@@ -111,7 +111,10 @@ async def _invoke(
   Returns:
     The result of the invocation.
   """
-  comp = await executor.create_value(comp, comp.type_signature)
+  comp = await executor.create_value(
+      comp,
+      comp.type_signature,  # pytype: disable=attribute-error
+  )
   result = await executor.create_call(comp, arg)
   result_value = await result.compute()
   return type_conversions.type_to_py_container(result_value, result_type)
@@ -157,9 +160,10 @@ class AsyncExecutionContext(context.AsyncContext):
     super().__init__()
     self._executor_factory = executor_fn
     if compiler_fn is not None:
-      self._compiler_pipeline = compiler_pipeline.CompilerPipeline(compiler_fn)
+      cache_decorator = functools.lru_cache()
+      self._compiler = cache_decorator(compiler_fn)
     else:
-      self._compiler_pipeline = None
+      self._compiler = None
     self._transform_args = transform_args
     self._transform_result = transform_result
     self._cardinality_inference_fn = cardinality_inference_fn
@@ -232,14 +236,15 @@ class AsyncExecutionContext(context.AsyncContext):
     # container types, so we must remember them here so that they can be
     # restored in the output.
     result_type = comp.type_signature.result
-    if self._compiler_pipeline is not None:
+    if self._compiler is not None:
       with tracing.span('ExecutionContext', 'Compile', span=True):
-        comp = self._compiler_pipeline.compile(comp)
+        comp = self._compiler(comp)
 
     with tracing.span('ExecutionContext', 'Invoke', span=True):
       if arg is not None:
         cardinalities = self._cardinality_inference_fn(
-            arg, comp.type_signature.parameter
+            arg,
+            comp.type_signature.parameter,  # pytype: disable=attribute-error
         )
       else:
         cardinalities = {}
@@ -248,7 +253,11 @@ class AsyncExecutionContext(context.AsyncContext):
 
         if arg is not None:
           arg = await tracing.wrap_coroutine_in_current_trace_context(
-              _ingest(executor, arg, comp.type_signature.parameter)
+              _ingest(
+                  executor,
+                  arg,
+                  comp.type_signature.parameter,  # pytype: disable=attribute-error
+              )
           )
 
         result = await tracing.wrap_coroutine_in_current_trace_context(
