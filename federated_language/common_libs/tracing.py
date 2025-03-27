@@ -417,19 +417,6 @@ def wrap_rpc_in_trace_context():
     yield None
 
 
-@contextlib.contextmanager
-def with_trace_context_from_rpc():
-  """Attempts to pick up the trace context from the receiving RPC call."""
-  span_yields_from_rpc = [tp.receive_rpc() for tp in _global_tracing_providers]
-  with _with_span_yields(span_yields_from_rpc):
-    yield None
-
-
-def add_tracing_provider(tracing_provider: TracingProvider):
-  """Add to the global list of tracing providers."""
-  _global_tracing_providers.append(tracing_provider)
-
-
 def set_tracing_providers(tracing_providers: list[TracingProvider]):
   """Set the global list of tracing providers, replacing any existing."""
   global _global_tracing_providers
