@@ -13,6 +13,8 @@
 # limitations under the License.
 
 load("@rules_python//python:defs.bzl", "py_library")
+load("//devtools/python/blaze:pytype.bzl", "pytype_strict_library")
+load("//devtools/python/blaze:strict.bzl", "py_library_providing_imports_info")
 
 package(
     default_applicable_licenses = ["//:package_license"],
@@ -21,9 +23,10 @@ package(
 
 licenses(["notice"])
 
-py_library(
+py_library_providing_imports_info(
     name = "federated_language",
     srcs = ["__init__.py"],
+    lib_rule = pytype_strict_library,
     visibility = ["//visibility:public"],
     deps = [
         ":version",
