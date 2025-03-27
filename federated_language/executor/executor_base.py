@@ -16,7 +16,7 @@
 import abc
 from typing import Optional
 
-from federated_language.executors import executor_value_base
+from federated_language.executor import executor_value_base
 
 
 class RetryableError(Exception):

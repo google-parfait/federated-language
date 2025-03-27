@@ -25,10 +25,10 @@ from federated_language.common_libs import tracing
 from federated_language.computation import computation_base
 from federated_language.computation import function_utils
 from federated_language.context_stack import context
-from federated_language.executors import cardinalities_utils
-from federated_language.executors import executor_base
-from federated_language.executors import executor_factory  # pylint: disable=unused-import
-from federated_language.executors import executor_value_base
+from federated_language.executor import cardinalities_utils
+from federated_language.executor import executor_base
+from federated_language.executor import executor_factory  # pylint: disable=unused-import
+from federated_language.executor import executor_value_base
 from federated_language.types import computation_types
 from federated_language.types import placements
 from federated_language.types import type_conversions

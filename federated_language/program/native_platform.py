@@ -19,7 +19,7 @@ from typing import Optional, Union
 
 from federated_language.common_libs import structure
 from federated_language.computation import computation_base
-from federated_language.execution_contexts import async_execution_context
+from federated_language.executor import async_execution_context
 from federated_language.program import federated_context
 from federated_language.program import structure_utils
 from federated_language.program import value_reference

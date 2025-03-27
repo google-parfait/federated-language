@@ -19,7 +19,7 @@ from unittest import mock
 from absl.testing import absltest
 from absl.testing import parameterized
 from federated_language.computation import computation_impl
-from federated_language.execution_contexts import async_execution_context
+from federated_language.executor import async_execution_context
 from federated_language.federated_context import federated_computation
 from federated_language.program import native_platform
 from federated_language.program import program_test_utils

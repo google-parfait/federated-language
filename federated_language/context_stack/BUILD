@@ -19,8 +19,7 @@ package(
     default_visibility = [
         "//federated_language:__pkg__",
         "//federated_language/computation:__subpackages__",
-        "//federated_language/execution_contexts:__subpackages__",
-        "//federated_language/executors:__subpackages__",
+        "//federated_language/executor:__subpackages__",
         "//federated_language/federated_context:__subpackages__",
         "//federated_language/framework:__subpackages__",
         "//federated_language/program:__subpackages__",

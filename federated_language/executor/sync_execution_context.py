@@ -19,9 +19,9 @@ from typing import Optional
 from federated_language.common_libs import async_utils
 from federated_language.computation import computation_base
 from federated_language.context_stack import context
-from federated_language.execution_contexts import async_execution_context
-from federated_language.executors import cardinalities_utils
-from federated_language.executors import executor_factory  # pylint: disable=unused-import
+from federated_language.executor import async_execution_context
+from federated_language.executor import cardinalities_utils
+from federated_language.executor import executor_factory  # pylint: disable=unused-import
 
 
 class SyncExecutionContext(context.SyncContext):

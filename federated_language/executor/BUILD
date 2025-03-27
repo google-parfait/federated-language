@@ -18,7 +18,6 @@ package(
     default_applicable_licenses = ["//:package_license"],
     default_visibility = [
         "//federated_language:__pkg__",
-        "//federated_language/execution_contexts:__subpackages__",
         "//federated_language/framework:__subpackages__",
         "//federated_language/program:__subpackages__",
     ],
@@ -27,9 +26,41 @@ package(
 licenses(["notice"])
 
 py_library(
-    name = "executors",
+    name = "executor",
     srcs = ["__init__.py"],
     visibility = ["//tools:__subpackages__"],
+)
+
+py_library(
+    name = "async_execution_context",
+    srcs = ["async_execution_context.py"],
+    deps = [
+        "//federated_language/common_libs:retrying",
+        "//federated_language/common_libs:structure",
+        "//federated_language/common_libs:tracing",
+        "//federated_language/computation:computation_base",
+        "//federated_language/computation:function_utils",
+        "//federated_language/context_stack:context",
+        "//federated_language/executor:cardinalities_utils",
+        "//federated_language/executor:executor_base",
+        "//federated_language/executor:executor_factory",
+        "//federated_language/executor:executor_value_base",
+        "//federated_language/types:computation_types",
+        "//federated_language/types:placements",
+        "//federated_language/types:type_conversions",
+        "@pypi//dm_tree",
+    ],
+)
+
+py_test(
+    name = "async_execution_context_test",
+    size = "small",
+    srcs = ["async_execution_context_test.py"],
+    deps = [
+        ":async_execution_context",
+        "//federated_language/executor:executor_base",
+        "@pypi//absl_py",
+    ],
 )
 
 py_library(
@@ -73,4 +104,17 @@ py_library(
     name = "executor_value_base",
     srcs = ["executor_value_base.py"],
     deps = ["//federated_language/types:typed_object"],
+)
+
+py_library(
+    name = "sync_execution_context",
+    srcs = ["sync_execution_context.py"],
+    deps = [
+        ":async_execution_context",
+        "//federated_language/common_libs:async_utils",
+        "//federated_language/computation:computation_base",
+        "//federated_language/context_stack:context",
+        "//federated_language/executor:cardinalities_utils",
+        "//federated_language/executor:executor_factory",
+    ],
 )

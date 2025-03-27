@@ -16,7 +16,7 @@
 import abc
 from collections.abc import MutableMapping
 
-from federated_language.executors import executor_base
+from federated_language.executor import executor_base
 from federated_language.types import placements
 
 CardinalitiesType = MutableMapping[placements.PlacementLiteral, int]

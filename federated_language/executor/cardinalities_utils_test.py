@@ -14,7 +14,7 @@
 
 from absl.testing import absltest
 from federated_language.common_libs import structure
-from federated_language.executors import cardinalities_utils
+from federated_language.executor import cardinalities_utils
 from federated_language.types import computation_types
 from federated_language.types import placements
 import numpy as np

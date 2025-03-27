@@ -13,8 +13,8 @@
 # limitations under the License.
 
 from absl.testing import absltest
-from federated_language.execution_contexts import async_execution_context
-from federated_language.executors import executor_base
+from federated_language.executor import async_execution_context
+from federated_language.executor import executor_base
 
 
 class RetryableErrorTest(absltest.TestCase):
