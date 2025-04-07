@@ -19,52 +19,6 @@ from absl.testing import parameterized
 from federated_language.common_libs import py_typecheck
 
 
-class PyTypeCheckTest(parameterized.TestCase):
-
-  def test_check_type(self):
-    try:
-      self.assertEqual('foo', py_typecheck.check_type('foo', str))
-      py_typecheck.check_type('foo', str)
-      py_typecheck.check_type(10, int)
-      py_typecheck.check_type(10, (str, int))
-      py_typecheck.check_type(10, (str, int, bool, float))
-    except TypeError:
-      self.fail(
-          'Function {} raised TypeError unexpectedly.'.format(
-              py_typecheck.check_type.__name__
-          )
-      )
-    self.assertRaisesRegex(
-        TypeError,
-        'Expected .*TestCase, found int.',
-        py_typecheck.check_type,
-        10,
-        parameterized.TestCase,
-    )
-    self.assertRaisesRegex(
-        TypeError,
-        'Expected foo to be of type int, found __main__.PyTypeCheckTest.',
-        py_typecheck.check_type,
-        self,
-        int,
-        label='foo',
-    )
-    self.assertRaisesRegex(
-        TypeError,
-        'Expected int or bool, found str.',
-        py_typecheck.check_type,
-        'a',
-        (int, bool),
-    )
-    self.assertRaisesRegex(
-        TypeError,
-        'Expected int, bool, or float, found str.',
-        py_typecheck.check_type,
-        'a',
-        (int, bool, float),
-    )
-
-
 class IsNameValuePairTest(parameterized.TestCase):
 
   @parameterized.named_parameters([

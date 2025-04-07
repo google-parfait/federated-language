@@ -13,69 +13,12 @@
 # limitations under the License.
 """Utility functions for checking Python types."""
 
-import builtins
 from collections.abc import Sequence
 import sys
 import typing
 from typing import Optional, Protocol, TypeVar, Union
 
 from typing_extensions import TypeGuard
-
-
-def check_type(target, type_spec, label=None):
-  """Checks that `target` is of Python type or types `type_spec`.
-
-  Args:
-    target: An object, the Python type of which to check.
-    type_spec: Either a Python type, or a tuple of Python types; the same as
-      what's accepted by isinstance.
-    label: An optional label associated with the target, used to create a more
-      human-readable error message.
-
-  Returns:
-    The target.
-
-  Raises:
-    TypeError: when the target is not of one of the types in `type_spec`.
-  """
-  if not isinstance(target, type_spec):
-    raise TypeError(
-        'Expected {}{}, found {}.'.format(
-            '{} to be of type '.format(label) if label is not None else '',
-            _type_string(type_spec),
-            _type_string(type(target)),
-        )
-    )
-  return target
-
-
-def _type_string(type_spec):
-  """Creates a string representation of `type_spec` for error reporting.
-
-  Args:
-    type_spec: Either a Python type, or a tuple of Python types; the same as
-      what's accepted by isinstance.
-
-  Returns:
-    A string representation for use in error reporting.
-
-  Raises:
-    TypeError: if the `type_spec` is not of the right type.
-  """
-  if isinstance(type_spec, type):
-    if type_spec.__module__ == builtins.__name__:
-      return type_spec.__name__
-    else:
-      return '{}.{}'.format(type_spec.__module__, type_spec.__name__)
-  else:
-    assert isinstance(type_spec, (tuple, list))
-    type_names = [_type_string(x) for x in type_spec]
-    if len(type_names) == 1:
-      return type_names[0]
-    elif len(type_names) == 2:
-      return '{} or {}'.format(*type_names)
-    else:
-      return ', '.join(type_names[0:-1] + ['or {}'.format(type_names[-1])])
 
 
 @typing.runtime_checkable
