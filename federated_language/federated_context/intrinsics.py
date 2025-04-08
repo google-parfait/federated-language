@@ -16,7 +16,6 @@
 from typing import NoReturn
 import warnings
 
-from federated_language.common_libs import structure
 from federated_language.compiler import building_block_factory
 from federated_language.compiler import building_blocks
 from federated_language.compiler import intrinsic_defs
@@ -31,6 +30,7 @@ from federated_language.types import placements
 from federated_language.types import type_analysis
 from federated_language.types import type_factory
 import numpy as np
+import tree
 
 
 def _bind_comp_as_reference(comp):
@@ -843,6 +843,7 @@ def federated_secure_sum(value, max_input):
     TypeError: If the argument is not a federated value placed at
       `federated_language.CLIENTS`.
   """
+  original_value = value
   value = value_impl.to_value(value, type_spec=None)
   value = value_utils.ensure_federated_value(
       value, placements.CLIENTS, 'value to be summed'
@@ -865,7 +866,7 @@ def federated_secure_sum(value, max_input):
       value_member_type, computation_types.StructType
   ):
     max_input_value = value_impl.to_value(
-        structure.map_structure(lambda _: max_input, value_member_type),
+        tree.map_structure(lambda _: max_input, original_value),
         type_spec=None,
     )
   comp = building_block_factory.create_federated_secure_sum(
@@ -926,6 +927,7 @@ def federated_secure_sum_bitwidth(value, bitwidth):
     TypeError: If the argument is not a federated value placed at
       `federated_language.CLIENTS`.
   """
+  original_value = value
   value = value_impl.to_value(value, type_spec=None)
   value = value_utils.ensure_federated_value(
       value, placements.CLIENTS, 'value to be summed'
@@ -948,7 +950,7 @@ def federated_secure_sum_bitwidth(value, bitwidth):
       value_member_type, computation_types.StructType
   ):
     bitwidth_value = value_impl.to_value(
-        structure.map_structure(lambda _: bitwidth, value_member_type),
+        tree.map_structure(lambda _: bitwidth, original_value),
         type_spec=None,
     )
   comp = building_block_factory.create_federated_secure_sum_bitwidth(

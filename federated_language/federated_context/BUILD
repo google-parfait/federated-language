@@ -129,7 +129,6 @@ py_library(
     deps = [
         ":value_impl",
         ":value_utils",
-        "//federated_language/common_libs:structure",
         "//federated_language/compiler:building_block_factory",
         "//federated_language/compiler:building_blocks",
         "//federated_language/compiler:intrinsic_defs",
@@ -141,6 +140,7 @@ py_library(
         "//federated_language/types:placements",
         "//federated_language/types:type_analysis",
         "//federated_language/types:type_factory",
+        "@pypi//dm_tree",
         "@pypi//numpy",
     ],
 )
