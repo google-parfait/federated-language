@@ -128,13 +128,11 @@ py_library(
         ":federated_context",
         ":structure_utils",
         ":value_reference",
-        "//federated_language/common_libs:structure",
         "//federated_language/computation:computation_base",
         "//federated_language/executor:async_execution_context",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
         "//federated_language/types:type_conversions",
-        "@pypi//dm_tree",
     ],
 )
 

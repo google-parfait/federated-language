@@ -17,7 +17,6 @@ import asyncio
 from collections.abc import Mapping
 from typing import Optional, Union
 
-from federated_language.common_libs import structure
 from federated_language.computation import computation_base
 from federated_language.executor import async_execution_context
 from federated_language.program import federated_context
@@ -26,7 +25,6 @@ from federated_language.program import value_reference
 from federated_language.types import computation_types
 from federated_language.types import placements
 from federated_language.types import type_conversions
-import tree
 
 
 class NativeValueReference(value_reference.MaterializableValueReference):
@@ -185,14 +183,6 @@ class NativeFederatedContext(federated_context.FederatedContext):
         arg: value_reference.MaterializableStructure,
     ) -> value_reference.MaterializedStructure:
       if comp.type_signature.parameter is not None:
-
-        def _to_python(obj):
-          if isinstance(obj, structure.Struct):
-            return structure.to_odict_or_tuple(obj)
-          else:
-            return None
-
-        arg = tree.traverse(_to_python, arg)
         arg = await value_reference.materialize_value(arg)
 
       return await context.invoke(comp, arg)
