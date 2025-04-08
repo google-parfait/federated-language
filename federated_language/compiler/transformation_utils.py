@@ -86,7 +86,7 @@ def transform_postorder(
   elif isinstance(comp, building_blocks.Struct):
     elements = []
     elements_modified = False
-    for key, value in structure.iter_elements(comp):
+    for key, value in comp.items():
       value, value_modified = transform_postorder(value, transform)
       elements.append((key, value))
       elements_modified = elements_modified or value_modified
@@ -198,7 +198,7 @@ def transform_preorder(
   elif isinstance(inner_comp, building_blocks.Struct):
     elements_modified = False
     elements = []
-    for name, val in structure.iter_elements(inner_comp):
+    for name, val in inner_comp.items():
       result, result_modified = transform_preorder(val, transform)
       elements_modified = elements_modified or result_modified
       elements.append((name, result))
@@ -374,7 +374,7 @@ def transform_postorder_with_symbol_bindings(
     _ = next(identifier_seq)
     elements = []
     elements_modified = False
-    for key, value in structure.iter_elements(comp):
+    for key, value in comp.items():
       value, value_modified = _transform_postorder_with_symbol_bindings_switch(
           value, transform, context_tree, identifier_seq
       )
