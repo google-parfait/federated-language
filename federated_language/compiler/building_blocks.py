@@ -1470,7 +1470,7 @@ def _string_representation(
     elif isinstance(comp, Struct):
       if not comp:
         return ['<>']
-      elements = structure.to_elements(comp)
+      elements = comp.items()
       elements_lines = _lines_for_named_comps(elements, formatted)
       if formatted:
         elements_lines = _indent(elements_lines)
@@ -1840,7 +1840,7 @@ def _structural_representation(comp: ComputationBuildingBlock):
       edge_line = '{}|'.format(padding_char * leading_padding)
       return _concatenate([node_line, edge_line], source_lines, Alignment.LEFT)
     elif isinstance(comp, Struct):
-      elements = structure.to_elements(comp)
+      elements = comp.items()
       elements_lines = _lines_for_named_comps(elements)
       leading_padding = _get_leading_padding(elements_lines[0])
       node_line = '{}{}'.format(padding_char * leading_padding, node_label)
