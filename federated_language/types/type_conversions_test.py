@@ -135,34 +135,6 @@ class InferTypeTest(parameterized.TestCase):
     self.assertIsInstance(t, computation_types.StructWithPythonType)
     self.assertIs(t.python_container, list)
 
-  def test_with_structure(self):
-    t = type_conversions.infer_type(
-        structure.Struct([
-            ('a', 10),
-            (None, False),
-        ])
-    )
-    self.assertEqual(str(t), '<a=int32,bool>')
-    self.assertIsInstance(t, computation_types.StructType)
-    self.assertNotIsInstance(t, computation_types.StructWithPythonType)
-
-  def test_with_nested_structure(self):
-    t = type_conversions.infer_type(
-        structure.Struct([
-            ('a', 10),
-            (
-                None,
-                structure.Struct([
-                    (None, True),
-                    (None, 0.5),
-                ]),
-            ),
-        ])
-    )
-    self.assertEqual(str(t), '<a=int32,<bool,float32>>')
-    self.assertIsInstance(t, computation_types.StructType)
-    self.assertNotIsInstance(t, computation_types.StructWithPythonType)
-
   def test_with_namedtuple(self):
     test_named_tuple = collections.namedtuple('TestNamedTuple', 'y x')
     t = type_conversions.infer_type(test_named_tuple(1, True))

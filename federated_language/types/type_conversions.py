@@ -47,12 +47,12 @@ def infer_type(arg: object) -> Optional[computation_types.Type]:
     Either an instance of `computation_types.Type`, or `None` if the argument is
     `None`.
   """
+
   # TODO: b/224484886 - Downcasting to all handled types.
   arg = typing.cast(
       Union[
           None,
           typed_object.TypedObject,
-          structure.Struct,
           py_typecheck.SupportsNamedTuple,
           Mapping[Hashable, object],
           tuple[object, ...],
@@ -64,11 +64,6 @@ def infer_type(arg: object) -> Optional[computation_types.Type]:
     return None
   elif isinstance(arg, typed_object.TypedObject):
     return arg.type_signature
-  elif isinstance(arg, structure.Struct):
-    return computation_types.StructType([
-        (k, infer_type(v)) if k else infer_type(v)
-        for k, v in structure.iter_elements(arg)
-    ])
   elif attrs.has(type(arg)):
     items = attrs.asdict(arg, recurse=False).items()
     return computation_types.StructWithPythonType(
@@ -205,9 +200,6 @@ def to_structure_with_type(
       )
 
   def _to_structure(path: tuple[Union[str, int], ...], obj: object) -> object:
-
-    if isinstance(obj, structure.Struct):
-      raise RuntimeError()
 
     if tree.is_nested(obj):
       container_type = functools.reduce(_get_item, path, type_spec)
