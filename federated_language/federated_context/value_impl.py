@@ -121,7 +121,7 @@ class Value(typed_object.TypedObject, abc.ABC):
   def __getattr__(self, name: str) -> 'Value':
     _check_struct_or_federated_struct(self, name)
     if _is_federated_struct(self.type_signature):
-      if name not in structure.name_list(self.type_signature.member):  # pytype: disable=attribute-error
+      if name not in self.type_signature.member.fields():  # pytype: disable=attribute-error
         raise AttributeError(
             f"There is no such attribute '{name}' in this federated tuple."
             f" Valid attributes: ({', '.join(dir(self.type_signature.member))})"  # pytype: disable=attribute-error

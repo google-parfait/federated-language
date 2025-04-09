@@ -289,10 +289,10 @@ class Selection(ComputationBuildingBlock):
         raise ValueError('The name of the selected element cannot be empty.')
       # Normalize, in case we are dealing with a Unicode type or some such.
       name = str(name)
-      if not structure.has_field(source_type, name):
+      if name not in source_type.fields():
         raise ValueError(
             f'Error selecting named field `{name}` from type `{source_type}`, '
-            f'whose only named fields are {structure.name_list(source_type)}.'
+            f'whose only named fields are {source_type.fields()}.'
         )
       type_signature = source_type[name]
     elif index is not None:

@@ -563,6 +563,9 @@ class StructType(structure.Struct, Type, metaclass=_Intern):
   def items(self) -> Iterator[tuple[Optional[str], Type]]:
     return structure.iter_elements(self)
 
+  def fields(self) -> list[str]:
+    return structure.name_list(self)
+
   def __repr__(self):
     members = _format_struct_type_members(self)
     return f'StructType([{members}])'
