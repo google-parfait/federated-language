@@ -137,7 +137,7 @@ class Value(typed_object.TypedObject, abc.ABC):
           f'attributes: ({attributes})'
       )
     if isinstance(self._comp, building_blocks.Struct):
-      return Value(getattr(self._comp, name))
+      return Value(self._comp[name])
     return Value(building_blocks.Selection(self._comp, name=name))
 
   def __bool__(self):
