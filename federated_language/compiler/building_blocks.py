@@ -14,14 +14,13 @@
 """A library of classes representing computations in a deserialized form."""
 
 import abc
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterable, Iterator, Sequence
 import enum
 import typing
 from typing import Optional, Union
 import zlib
 
 from federated_language.common_libs import py_typecheck
-from federated_language.common_libs import structure
 from federated_language.compiler import array
 from federated_language.compiler import intrinsic_defs
 from federated_language.proto import computation_pb2
@@ -388,7 +387,7 @@ class Selection(ComputationBuildingBlock):
       return f'Selection({self._source!r}, index={self._index!r})'
 
 
-class Struct(ComputationBuildingBlock, structure.Struct):
+class Struct(ComputationBuildingBlock):
   """A struct with named or unnamed elements in the internal language.
 
   The concise notation for structs is `<name_1=value_1, ...., name_n=value_n>`
@@ -401,7 +400,16 @@ class Struct(ComputationBuildingBlock, structure.Struct):
   pointwise could be represented as `(arg -> <fn(arg[0]),fn(arg[1])>)`.
   """
 
-  def __init__(self, elements, container_type=None):
+  def __init__(
+      self,
+      elements: Sequence[
+          Union[
+              ComputationBuildingBlock,
+              tuple[Optional[str], ComputationBuildingBlock],
+          ]
+      ],
+      container_type: Optional[type[object]] = None,
+  ):
     """Constructs a struct from the given list of elements.
 
     Args:
@@ -415,37 +423,37 @@ class Struct(ComputationBuildingBlock, structure.Struct):
       TypeError: if arguments are of the wrong types.
     """
 
-    # Not using super() here and below, as the two base classes have different
-    # signatures of their constructors, and the struct implementation
-    # of selection interfaces should override that in the generic class 'Value'
-    # to favor simplified expressions where simplification is possible.
-    def _map_element(e):
+    def _normalize_element(
+        element: Union[
+            ComputationBuildingBlock,
+            tuple[Optional[str], ComputationBuildingBlock],
+        ],
+    ) -> tuple[Optional[str], ComputationBuildingBlock]:
       """Returns a named or unnamed element."""
-      if isinstance(e, ComputationBuildingBlock):
-        return (None, e)
+      if isinstance(element, ComputationBuildingBlock):
+        return (None, element)
       elif py_typecheck.is_name_value_pair(
-          e, value_type=ComputationBuildingBlock
+          element, value_type=ComputationBuildingBlock
       ):
-        if e[0] is not None and not e[0]:
-          raise ValueError('Unexpected struct element with empty string name.')
-        return (e[0], e[1])
+        name, value = element
+        if name is not None and not name:
+          raise ValueError('Expected element name to not be empty.')
+        return (name, value)
       else:
-        raise TypeError('Unexpected struct element: {}.'.format(e))
+        raise ValueError('Unexpected element found: {}.'.format(element))
 
-    elements = [_map_element(e) for e in elements]
-    element_pairs = [
-        ((e[0], e[1].type_signature) if e[0] else e[1].type_signature)
-        for e in elements
-    ]
+    elements = [_normalize_element(e) for e in elements]
+    element_types = [(n, e.type_signature) for n, e in elements]
 
     if container_type is None:
-      type_signature = computation_types.StructType(element_pairs)
+      type_signature = computation_types.StructType(element_types)
     else:
       type_signature = computation_types.StructWithPythonType(
-          element_pairs, container_type
+          element_types, container_type
       )
-    ComputationBuildingBlock.__init__(self, type_signature)
-    structure.Struct.__init__(self, elements)
+
+    super().__init__(type_signature)
+    self._elements = elements
     self._type_signature = type_signature
 
   @classmethod
@@ -486,25 +494,48 @@ class Struct(ComputationBuildingBlock, structure.Struct):
     return self._type_signature
 
   def children(self) -> Iterator[ComputationBuildingBlock]:
-    return (element for _, element in structure.iter_elements(self))
+    return (element for _, element in self._elements)
 
   def items(self) -> Iterator[tuple[Optional[str], ComputationBuildingBlock]]:
-    return structure.iter_elements(self)
+    return iter(self._elements)
+
+  def __getitem__(self, key: Union[int, str]) -> ComputationBuildingBlock:
+    if isinstance(key, str):
+      names = [n for n, _ in self._elements]
+      key = names.index(key)
+
+    if key < 0 or key >= len(self._elements):
+      raise IndexError('Struct index out of range.')
+
+    _, element = self._elements[key]
+    return element
+
+  def __iter__(self) -> Iterator[ComputationBuildingBlock]:
+    return iter([e for _, e in self._elements])
+
+  def __len__(self) -> int:
+    return len(self._elements)
 
   def __eq__(self, other: object) -> bool:
     if self is other:
       return True
     elif not isinstance(other, Struct):
       return NotImplemented
-    if self._type_signature != other._type_signature:
-      return False
-    return structure.Struct.__eq__(self, other)
+
+    return (
+        self._type_signature,
+        self._elements,
+    ) == (
+        other._type_signature,
+        other._elements,
+    )
 
   def __hash__(self):
     if self._hash is None:
       self._hash = hash((
-          structure.Struct.__hash__(self),
+          'Struct',  # Salt to avoid type mismatch.
           self._type_signature,
+          tuple(self._elements),
       ))
     return self._hash
 

@@ -14,7 +14,6 @@
 
 from absl.testing import absltest
 from absl.testing import parameterized
-from federated_language.common_libs import structure
 from federated_language.compiler import array
 from federated_language.compiler import building_block_factory
 from federated_language.compiler import building_blocks
@@ -130,7 +129,6 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
     z = building_blocks.Struct([x, ('y', y)])
     with self.assertRaises(ValueError):
       _ = building_blocks.Struct([('', y)])
-    self.assertIsInstance(z, structure.Struct)
     self.assertEqual(str(z.type_signature), '<int32,y=float64>')
     self.assertEqual(
         repr(z),
@@ -140,8 +138,7 @@ class ComputationBuildingBlocksTest(absltest.TestCase):
         ),
     )
     self.assertEqual(z.compact_representation(), '<foo,y=bar>')
-    self.assertEqual(dir(z), ['y'])
-    self.assertIs(z.y, y)
+    self.assertIs(z['y'], y)
     self.assertLen(z, 2)
     self.assertIs(z[0], x)
     self.assertIs(z[1], y)
