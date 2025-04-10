@@ -229,10 +229,7 @@ py_test(
 py_library(
     name = "transformation_utils",
     srcs = ["transformation_utils.py"],
-    deps = [
-        ":building_blocks",
-        "//federated_language/common_libs:structure",
-    ],
+    deps = [":building_blocks"],
 )
 
 py_test(

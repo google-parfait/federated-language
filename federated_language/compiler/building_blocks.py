@@ -358,8 +358,8 @@ class Selection(ComputationBuildingBlock):
     if self._index is not None:
       return self._index
     else:
-      field_to_index = structure.name_to_index_map(self._source.type_signature)  # pytype: disable=wrong-arg-types
-      return field_to_index[self._name]
+      names = [n for n, _ in self._source.type_signature.items()]  # pytype: disable=attribute-error
+      return names.index(self._name)
 
   def __eq__(self, other: object) -> bool:
     if self is other:

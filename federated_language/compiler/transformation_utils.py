@@ -21,7 +21,6 @@ import operator
 import typing
 from typing import Optional
 
-from federated_language.common_libs import structure
 from federated_language.compiler import building_blocks
 
 
@@ -362,9 +361,8 @@ def transform_postorder_with_symbol_bindings(
       if comp.index is not None:
         index = comp.index
       else:
-        index = structure.name_to_index_map(comp.source.type_signature)[
-            comp.name
-        ]
+        names = [n for n, _ in comp.source.type_signature.items()]
+        index = names.index(comp.name)
       comp = building_blocks.Selection(source, index=index)
     comp, comp_modified = transform(comp, context_tree)
     return comp, comp_modified or source_modified
