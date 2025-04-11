@@ -85,7 +85,9 @@ async def _ingest(
       ingested.append(_ingest(executor, v, t))
     ingested = await asyncio.gather(*ingested)
     return await executor.create_struct(
-        [(name, val) for (name, _), val in zip(t_elem, ingested)]
+        structure.Struct(
+            (name, val) for (name, _), val in zip(t_elem, ingested)
+        )
     )
   else:
     return await executor.create_value(val, type_spec)
