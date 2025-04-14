@@ -34,8 +34,8 @@ concurrency:
 
 jobs:
 
-  test-dependencies:
-    name: Test Dependencies
+  test-tools:
+    name: Test Tools
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -50,15 +50,19 @@ jobs:
         disk-cache: ${{ github.workflow }}
         repository-cache: true
 
-    - name: Test Bazel Dependencies
+    - name: Test Bazel dependencies
       run: |
         bazelisk mod deps --lockfile_mode=error
 
-    - name: Test Python Dependencies
+    - name: Test examples
+      run: |
+        bazelisk test //examples/...
+
+    - name: Test tools
       run: |
         bazelisk test //tools/...
 
-  test-python:
+  test-project:
     name: Test PY ${{ matrix.python-version }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -84,7 +88,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
         cache: "pip"
 
-    - name: Test python
+    - name: Test project
       run: |
         bazelisk test //federated_language/... \
             --@rules_python//python/config_settings:python_version="${{ matrix.python-version }}"
