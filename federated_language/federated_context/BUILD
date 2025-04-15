@@ -57,8 +57,8 @@ py_test(
         "//federated_language/context_stack:context_stack_impl",
         "//federated_language/context_stack:runtime_error_context",
         "//federated_language/types:computation_types",
-        "@pypi//absl_py",
-        "@pypi//numpy",
+        "@federated_language_pypi//absl_py",
+        "@federated_language_pypi//numpy",
     ],
 )
 
@@ -89,8 +89,8 @@ py_test(
         "//federated_language/context_stack:context_stack_impl",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
-        "@pypi//absl_py",
-        "@pypi//numpy",
+        "@federated_language_pypi//absl_py",
+        "@federated_language_pypi//numpy",
     ],
 )
 
@@ -118,8 +118,8 @@ py_test(
         "//federated_language/computation:function_utils",
         "//federated_language/context_stack:context_stack_impl",
         "//federated_language/types:computation_types",
-        "@pypi//absl_py",
-        "@pypi//numpy",
+        "@federated_language_pypi//absl_py",
+        "@federated_language_pypi//numpy",
     ],
 )
 
@@ -141,7 +141,7 @@ py_library(
         "//federated_language/types:placements",
         "//federated_language/types:type_analysis",
         "//federated_language/types:type_factory",
-        "@pypi//numpy",
+        "@federated_language_pypi//numpy",
     ],
 )
 
@@ -158,8 +158,8 @@ py_test(
         "//federated_language/context_stack:context_stack_test_utils",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
-        "@pypi//absl_py",
-        "@pypi//numpy",
+        "@federated_language_pypi//absl_py",
+        "@federated_language_pypi//numpy",
     ],
 )
 
@@ -182,7 +182,7 @@ py_library(
         "//federated_language/types:placements",
         "//federated_language/types:type_conversions",
         "//federated_language/types:typed_object",
-        "@pypi//attrs",
+        "@federated_language_pypi//attrs",
     ],
 )
 
@@ -200,9 +200,9 @@ py_test(
         "//federated_language/context_stack:context_stack_impl",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
-        "@pypi//absl_py",
-        "@pypi//attrs",
-        "@pypi//numpy",
+        "@federated_language_pypi//absl_py",
+        "@federated_language_pypi//attrs",
+        "@federated_language_pypi//numpy",
     ],
 )
 
@@ -232,7 +232,7 @@ py_test(
         "//federated_language/context_stack:context_stack_impl",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
-        "@pypi//absl_py",
-        "@pypi//numpy",
+        "@federated_language_pypi//absl_py",
+        "@federated_language_pypi//numpy",
     ],
 )

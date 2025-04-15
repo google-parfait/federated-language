@@ -40,8 +40,8 @@ py_test(
         "//federated_language",
         "//federated_language/proto:computation_py_pb2",
         "//federated_language/proto:data_type_py_pb2",
-        "@pypi//absl_py",
-        "@pypi//numpy",
+        "@federated_language_pypi//absl_py",
+        "@federated_language_pypi//numpy",
     ],
 )
 
@@ -62,7 +62,7 @@ py_test(
     deps = [
         ":python_computation",
         "//federated_language",
-        "@pypi//absl_py",
-        "@pypi//numpy",
+        "@federated_language_pypi//absl_py",
+        "@federated_language_pypi//numpy",
     ],
 )

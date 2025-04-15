@@ -73,8 +73,8 @@ py_test(
         "//federated_language/context_stack:context_stack_impl",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
-        "@pypi//absl_py",
-        "@pypi//numpy",
+        "@federated_language_pypi//absl_py",
+        "@federated_language_pypi//numpy",
     ],
 )
 
@@ -84,7 +84,7 @@ py_library(
     deps = [
         ":release_manager",
         ":value_reference",
-        "@pypi//absl_py",
+        "@federated_language_pypi//absl_py",
     ],
 )
 
@@ -94,9 +94,9 @@ py_test(
     deps = [
         ":logging_release_manager",
         ":program_test_utils",
-        "@pypi//absl_py",
-        "@pypi//dm_tree",
-        "@pypi//numpy",
+        "@federated_language_pypi//absl_py",
+        "@federated_language_pypi//dm_tree",
+        "@federated_language_pypi//numpy",
     ],
 )
 
@@ -115,9 +115,9 @@ py_test(
     deps = [
         ":memory_release_manager",
         ":program_test_utils",
-        "@pypi//absl_py",
-        "@pypi//dm_tree",
-        "@pypi//numpy",
+        "@federated_language_pypi//absl_py",
+        "@federated_language_pypi//dm_tree",
+        "@federated_language_pypi//numpy",
     ],
 )
 
@@ -134,7 +134,7 @@ py_library(
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
         "//federated_language/types:type_conversions",
-        "@pypi//dm_tree",
+        "@federated_language_pypi//dm_tree",
     ],
 )
 
@@ -151,9 +151,9 @@ py_test(
         "//federated_language/federated_context:federated_computation",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
-        "@pypi//absl_py",
-        "@pypi//dm_tree",
-        "@pypi//numpy",
+        "@federated_language_pypi//absl_py",
+        "@federated_language_pypi//dm_tree",
+        "@federated_language_pypi//numpy",
     ],
 )
 
@@ -172,7 +172,7 @@ py_test(
     srcs = ["program_state_manager_test.py"],
     deps = [
         ":program_state_manager",
-        "@pypi//absl_py",
+        "@federated_language_pypi//absl_py",
     ],
 )
 
@@ -185,9 +185,9 @@ py_library(
         "//federated_language/common_libs:py_typecheck",
         "//federated_language/common_libs:serializable",
         "//federated_language/types:computation_types",
-        "@pypi//attrs",
-        "@pypi//dm_tree",
-        "@pypi//numpy",
+        "@federated_language_pypi//attrs",
+        "@federated_language_pypi//dm_tree",
+        "@federated_language_pypi//numpy",
     ],
 )
 
@@ -198,8 +198,8 @@ py_library(
         ":structure_utils",
         ":value_reference",
         "//federated_language/common_libs:py_typecheck",
-        "@pypi//attrs",
-        "@pypi//dm_tree",
+        "@federated_language_pypi//attrs",
+        "@federated_language_pypi//dm_tree",
     ],
 )
 
@@ -209,9 +209,9 @@ py_test(
     deps = [
         ":program_test_utils",
         ":release_manager",
-        "@pypi//absl_py",
-        "@pypi//dm_tree",
-        "@pypi//numpy",
+        "@federated_language_pypi//absl_py",
+        "@federated_language_pypi//dm_tree",
+        "@federated_language_pypi//numpy",
     ],
 )
 
@@ -232,8 +232,8 @@ py_test(
         ":program_test_utils",
         ":serialization_utils",
         "//federated_language/types:computation_types",
-        "@pypi//absl_py",
-        "@pypi//numpy",
+        "@federated_language_pypi//absl_py",
+        "@federated_language_pypi//numpy",
     ],
 )
 
@@ -242,8 +242,8 @@ py_library(
     srcs = ["structure_utils.py"],
     deps = [
         "//federated_language/common_libs:py_typecheck",
-        "@pypi//attrs",
-        "@pypi//dm_tree",
+        "@federated_language_pypi//attrs",
+        "@federated_language_pypi//dm_tree",
     ],
 )
 
@@ -253,9 +253,9 @@ py_test(
     deps = [
         ":program_test_utils",
         ":structure_utils",
-        "@pypi//absl_py",
-        "@pypi//dm_tree",
-        "@pypi//numpy",
+        "@federated_language_pypi//absl_py",
+        "@federated_language_pypi//dm_tree",
+        "@federated_language_pypi//numpy",
     ],
 )
 
@@ -266,7 +266,7 @@ py_library(
         ":structure_utils",
         "//federated_language/types:computation_types",
         "//federated_language/types:typed_object",
-        "@pypi//numpy",
+        "@federated_language_pypi//numpy",
     ],
 )
 
@@ -276,8 +276,8 @@ py_test(
     deps = [
         ":program_test_utils",
         ":value_reference",
-        "@pypi//absl_py",
-        "@pypi//dm_tree",
-        "@pypi//numpy",
+        "@federated_language_pypi//absl_py",
+        "@federated_language_pypi//dm_tree",
+        "@federated_language_pypi//numpy",
     ],
 )
