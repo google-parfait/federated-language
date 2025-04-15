@@ -48,7 +48,7 @@ py_library(
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
         "//federated_language/types:type_conversions",
-        "@pypi//dm_tree",
+        "@federated_language_pypi//dm_tree",
     ],
 )
 
@@ -59,7 +59,7 @@ py_test(
     deps = [
         ":async_execution_context",
         "//federated_language/executor:executor_base",
-        "@pypi//absl_py",
+        "@federated_language_pypi//absl_py",
     ],
 )
 
@@ -80,8 +80,8 @@ py_test(
         "//federated_language/common_libs:structure",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
-        "@pypi//absl_py",
-        "@pypi//numpy",
+        "@federated_language_pypi//absl_py",
+        "@federated_language_pypi//numpy",
     ],
 )
 

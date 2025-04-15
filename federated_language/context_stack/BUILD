@@ -55,7 +55,7 @@ py_test(
     deps = [
         ":context",
         ":context_stack_impl",
-        "@pypi//absl_py",
+        "@federated_language_pypi//absl_py",
     ],
 )
 
@@ -75,7 +75,7 @@ py_test(
         ":context",
         ":context_stack_impl",
         ":context_stack_test_utils",
-        "@pypi//absl_py",
+        "@federated_language_pypi//absl_py",
     ],
 )
 

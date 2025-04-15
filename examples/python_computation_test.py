@@ -17,8 +17,9 @@ import unittest
 
 from absl.testing import absltest
 import federated_language
-from federated_language.examples import python_computation
 import numpy as np
+
+import python_computation
 
 
 class ComputationTest(unittest.TestCase):

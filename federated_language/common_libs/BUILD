@@ -37,7 +37,7 @@ py_library(
     name = "golden",
     testonly = True,
     srcs = ["golden.py"],
-    deps = ["@pypi//absl_py"],
+    deps = ["@federated_language_pypi//absl_py"],
 )
 
 py_test(
@@ -59,14 +59,14 @@ py_test(
     ],
     deps = [
         ":golden",
-        "@pypi//absl_py",
+        "@federated_language_pypi//absl_py",
     ],
 )
 
 py_library(
     name = "py_typecheck",
     srcs = ["py_typecheck.py"],
-    deps = ["@pypi//typing_extensions"],
+    deps = ["@federated_language_pypi//typing_extensions"],
 )
 
 py_test(
@@ -75,7 +75,7 @@ py_test(
     srcs = ["py_typecheck_test.py"],
     deps = [
         ":py_typecheck",
-        "@pypi//absl_py",
+        "@federated_language_pypi//absl_py",
     ],
 )
 
@@ -90,7 +90,7 @@ py_test(
     srcs = ["retrying_test.py"],
     deps = [
         ":retrying",
-        "@pypi//absl_py",
+        "@federated_language_pypi//absl_py",
     ],
 )
 
@@ -104,8 +104,8 @@ py_library(
     srcs = ["structure.py"],
     deps = [
         ":py_typecheck",
-        "@pypi//attrs",
-        "@pypi//dm_tree",
+        "@federated_language_pypi//attrs",
+        "@federated_language_pypi//dm_tree",
     ],
 )
 
@@ -115,15 +115,15 @@ py_test(
     srcs = ["structure_test.py"],
     deps = [
         ":structure",
-        "@pypi//absl_py",
-        "@pypi//attrs",
+        "@federated_language_pypi//absl_py",
+        "@federated_language_pypi//attrs",
     ],
 )
 
 py_library(
     name = "tracing",
     srcs = ["tracing.py"],
-    deps = ["@pypi//absl_py"],
+    deps = ["@federated_language_pypi//absl_py"],
 )
 
 py_test(
@@ -132,6 +132,6 @@ py_test(
     srcs = ["tracing_test.py"],
     deps = [
         ":tracing",
-        "@pypi//absl_py",
+        "@federated_language_pypi//absl_py",
     ],
 )

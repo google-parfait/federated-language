@@ -41,8 +41,8 @@ py_library(
         "//federated_language/proto:array_py_pb2",
         "//federated_language/types:array_shape",
         "//federated_language/types:dtype_utils",
-        "@pypi//ml_dtypes",
-        "@pypi//numpy",
+        "@federated_language_pypi//ml_dtypes",
+        "@federated_language_pypi//numpy",
     ],
 )
 
@@ -53,9 +53,9 @@ py_test(
         ":array",
         "//federated_language/proto:array_py_pb2",
         "//federated_language/proto:data_type_py_pb2",
-        "@pypi//absl_py",
-        "@pypi//ml_dtypes",
-        "@pypi//numpy",
+        "@federated_language_pypi//absl_py",
+        "@federated_language_pypi//ml_dtypes",
+        "@federated_language_pypi//numpy",
     ],
 )
 
@@ -135,8 +135,8 @@ py_test(
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
         "//federated_language/types:type_analysis",
-        "@pypi//absl_py",
-        "@pypi//numpy",
+        "@federated_language_pypi//absl_py",
+        "@federated_language_pypi//numpy",
     ],
 )
 
@@ -153,8 +153,8 @@ py_library(
         "//federated_language/types:placements",
         "//federated_language/types:type_analysis",
         "//federated_language/types:typed_object",
+        "@federated_language_pypi//numpy",
         "@protobuf//:protobuf_python",
-        "@pypi//numpy",
     ],
 )
 
@@ -174,11 +174,11 @@ py_test(
         "//federated_language/proto:data_type_py_pb2",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
+        "@federated_language_pypi//absl_py",
+        "@federated_language_pypi//dm_tree",
+        "@federated_language_pypi//ml_dtypes",
+        "@federated_language_pypi//numpy",
         "@protobuf//:protobuf_python",
-        "@pypi//absl_py",
-        "@pypi//dm_tree",
-        "@pypi//ml_dtypes",
-        "@pypi//numpy",
     ],
 )
 
@@ -200,8 +200,8 @@ py_test(
         "//federated_language/proto:computation_py_pb2",
         "//federated_language/types:computation_types",
         "//federated_language/types:type_factory",
-        "@pypi//absl_py",
-        "@pypi//numpy",
+        "@federated_language_pypi//absl_py",
+        "@federated_language_pypi//numpy",
     ],
 )
 
@@ -212,7 +212,7 @@ py_library(
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
         "//federated_language/types:type_factory",
-        "@pypi//numpy",
+        "@federated_language_pypi//numpy",
     ],
 )
 
@@ -222,7 +222,7 @@ py_test(
     srcs = ["intrinsic_defs_test.py"],
     deps = [
         ":intrinsic_defs",
-        "@pypi//absl_py",
+        "@federated_language_pypi//absl_py",
     ],
 )
 
@@ -242,9 +242,9 @@ py_test(
         ":transformation_utils",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
+        "@federated_language_pypi//absl_py",
+        "@federated_language_pypi//numpy",
         "@protobuf//:protobuf_python",
-        "@pypi//absl_py",
-        "@pypi//numpy",
     ],
 )
 
@@ -272,7 +272,7 @@ py_test(
         ":tree_analysis",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
-        "@pypi//absl_py",
-        "@pypi//numpy",
+        "@federated_language_pypi//absl_py",
+        "@federated_language_pypi//numpy",
     ],
 )
