@@ -24,10 +24,7 @@ licenses(["notice"])
 py_library(
     name = "program",
     srcs = ["__init__.py"],
-    visibility = [
-        "//federated_language:__pkg__",
-        "//tools:__subpackages__",
-    ],
+    visibility = ["//federated_language:__pkg__"],
     deps = [
         ":data_source",
         ":federated_context",
