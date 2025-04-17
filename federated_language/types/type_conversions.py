@@ -318,7 +318,7 @@ def type_to_py_container(value, type_spec: computation_types.Type):
 
   # Ensure that names are only added, not mismatched or removed
   names_from_value = structure.name_list_with_nones(value)
-  names_from_type_spec = structure.name_list_with_nones(structure_type_spec)
+  names_from_type_spec = [n for n, _ in structure_type_spec.items()]
   for value_name, type_name in zip(names_from_value, names_from_type_spec):
     if value_name is not None:
       if value_name != type_name:
