@@ -13,9 +13,10 @@
 # limitations under the License.
 
 load("@rules_python//python:defs.bzl", "py_library", "py_test")
+load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 
 package(
-    default_applicable_licenses = ["//:package_license"],
+    default_applicable_licenses = ["@federated_language//:package_license"],
     default_visibility = ["//visibility:private"],
 )
 
@@ -25,9 +26,9 @@ py_library(
     name = "execution_context",
     srcs = ["execution_context.py"],
     deps = [
-        "//federated_language",
-        "//federated_language/proto:array_py_pb2",
-        "//third_party/py/cloudpickle",
+        "@examples_pypi//cloudpickle",
+        "@federated_language//federated_language",
+        "@federated_language//federated_language/proto:array_py_pb2",
     ],
 )
 
@@ -37,11 +38,11 @@ py_test(
     deps = [
         ":execution_context",
         ":python_computation",
-        "//federated_language",
-        "//federated_language/proto:computation_py_pb2",
-        "//federated_language/proto:data_type_py_pb2",
-        "@federated_language_pypi//absl_py",
-        "@federated_language_pypi//numpy",
+        "@examples_pypi//absl_py",
+        "@examples_pypi//numpy",
+        "@federated_language//federated_language",
+        "@federated_language//federated_language/proto:computation_py_pb2",
+        "@federated_language//federated_language/proto:data_type_py_pb2",
     ],
 )
 
@@ -49,9 +50,9 @@ py_library(
     name = "python_computation",
     srcs = ["python_computation.py"],
     deps = [
-        "//federated_language",
-        "//federated_language/proto:computation_py_pb2",
-        "//third_party/py/cloudpickle",
+        "@examples_pypi//cloudpickle",
+        "@federated_language//federated_language",
+        "@federated_language//federated_language/proto:computation_py_pb2",
         "@protobuf//:protobuf_python",
     ],
 )
@@ -61,8 +62,14 @@ py_test(
     srcs = ["python_computation_test.py"],
     deps = [
         ":python_computation",
-        "//federated_language",
-        "@federated_language_pypi//absl_py",
-        "@federated_language_pypi//numpy",
+        "@examples_pypi//absl_py",
+        "@examples_pypi//numpy",
+        "@federated_language//federated_language",
     ],
+)
+
+compile_pip_requirements(
+    name = "requirements",
+    src = "requirements.in",
+    requirements_txt = "requirements_lock.txt",
 )

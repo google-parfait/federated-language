@@ -18,11 +18,12 @@ from unittest import mock
 
 from absl.testing import absltest
 import federated_language
-from federated_language.examples import execution_context
-from federated_language.examples import python_computation
 from federated_language.proto import computation_pb2
 from federated_language.proto import data_type_pb2
 import numpy as np
+
+import execution_context
+import python_computation
 
 
 def _assert_computation_contains(

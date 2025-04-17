@@ -60,7 +60,8 @@ jobs:
 
     - name: Test examples
       run: |
-        bazelisk test //examples/...
+        cd "examples"
+        bazelisk --bazelrc="../.bazelrc" test //...
 
   test-project:
     name: Test PY ${{ matrix.python-version }}
