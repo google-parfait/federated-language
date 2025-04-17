@@ -483,24 +483,6 @@ class StructTest(parameterized.TestCase):
     with self.assertRaises(TypeError):
       structure.from_container(3)
 
-  def test_name_to_index_map_empty_unnamed_struct(self):
-    unnamed_struct = structure.Struct.unnamed(10, 20)
-    self.assertEmpty(structure.name_to_index_map(unnamed_struct))
-
-  def test_name_to_index_map_partially_named_struct(self):
-    partially_named_struct = structure.Struct([(None, 10), ('a', 20)])
-
-    name_to_index_dict = structure.name_to_index_map(partially_named_struct)
-    expected_name_to_index_map = {'a': 1}
-    self.assertEqual(name_to_index_dict, expected_name_to_index_map)
-
-  def test_name_to_index_map_fully_named_struct(self):
-    partially_named_struct = structure.Struct.named(b=10, a=20)
-
-    name_to_index_dict = structure.name_to_index_map(partially_named_struct)
-    expected_name_to_index_map = {'b': 0, 'a': 1}
-    self.assertEqual(name_to_index_dict, expected_name_to_index_map)
-
   def test_update_struct(self):
     with self.subTest('fully_named'):
       state = structure.Struct.named(a=1, b=2, c=3)

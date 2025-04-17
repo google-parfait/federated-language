@@ -635,18 +635,6 @@ def has_field(structure: Struct, field: str) -> bool:
   return field in structure._name_array  # pylint: disable=protected-access
 
 
-def name_to_index_map(structure: Struct) -> dict[str, int]:
-  """Returns map from names in `structure` to their indices.
-
-  Args:
-    structure: An instance of `Struct`.
-
-  Returns:
-    Mapping from names in `structure` to their indices.
-  """
-  return structure._name_to_index  # pylint: disable=protected-access
-
-
 def update_struct(structure, **kwargs):
   """Constructs a new `structure` with new values for fields in `kwargs`.
 
