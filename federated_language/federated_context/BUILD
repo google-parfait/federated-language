@@ -29,7 +29,7 @@ licenses(["notice"])
 py_library(
     name = "federated_context",
     srcs = ["__init__.py"],
-    visibility = ["//tools:__subpackages__"],
+    visibility = ["//visibility:private"],
 )
 
 py_library(name = "data")
