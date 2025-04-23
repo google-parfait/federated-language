@@ -228,7 +228,7 @@ class Struct(Generic[_T]):
     Args:
       recursive: Whether to convert nested `Struct`s recursively.
     """
-    return _to_odict(self, recursive=recursive)
+    return to_odict(self, recursive=recursive)
 
 
 def name_list(struct: Struct) -> list[str]:
@@ -290,7 +290,7 @@ def iter_elements(struct: Struct[_T]) -> Iterator[tuple[Optional[str], _T]]:
   return iter(struct._elements())  # pylint: disable=protected-access
 
 
-def _to_odict(
+def to_odict(
     struct: Struct[_T], recursive: bool = False
 ) -> collections.OrderedDict[str, _T]:
   """Returns `struct` as an `collections.OrderedDict`, if possible.
@@ -303,7 +303,7 @@ def _to_odict(
     ValueError: If the `Struct` contains unnamed elements.
   """
 
-  def _to_odict_helper(
+  def _to_odict(
       elements: list[tuple[Optional[str], _T]],
   ) -> collections.OrderedDict[str, _T]:
     for name, _ in elements:
@@ -316,9 +316,9 @@ def _to_odict(
     return collections.OrderedDict(elements)
 
   if recursive:
-    return _to_container_recursive(struct, _to_odict_helper)
+    return _to_container_recursive(struct, _to_odict)
   else:
-    return _to_odict_helper(to_elements(struct))
+    return _to_odict(to_elements(struct))
 
 
 def to_odict_or_tuple(
