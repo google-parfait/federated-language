@@ -67,7 +67,7 @@ class StructTest(parameterized.TestCase):
     self.assertEqual(x, structure.Struct([]))
     self.assertNotEqual(x, structure.Struct([('foo', 10)]))
     self.assertEqual(structure.to_elements(x), v)
-    self.assertEqual(structure.to_odict(x), collections.OrderedDict())
+    self.assertEqual(structure._to_odict(x), collections.OrderedDict())
     self.assertEqual(structure.to_odict_or_tuple(x), ())
     self.assertEqual(repr(x), 'Struct([])')
     self.assertEqual(str(x), '<>')
@@ -90,7 +90,7 @@ class StructTest(parameterized.TestCase):
     self.assertEqual(str(x), '<10>')
     self.assertEqual(structure.to_odict_or_tuple(x), tuple([10]))
     with self.assertRaisesRegex(ValueError, 'unnamed'):
-      structure.to_odict(x)
+      structure._to_odict(x)
 
   def test_single_named(self):
     v = [('foo', 20)]
@@ -110,7 +110,7 @@ class StructTest(parameterized.TestCase):
     self.assertEqual(structure.to_elements(x), v)
     self.assertEqual(repr(x), "Struct([('foo', 20)])")
     self.assertEqual(str(x), '<foo=20>')
-    self.assertEqual(structure.to_odict(x), collections.OrderedDict(v))
+    self.assertEqual(structure._to_odict(x), collections.OrderedDict(v))
     self.assertEqual(structure.to_odict_or_tuple(x), collections.OrderedDict(v))
 
   def test_multiple_named_and_unnamed(self):
@@ -137,7 +137,7 @@ class StructTest(parameterized.TestCase):
     self.assertEqual(repr(x), "Struct([(None, 10), ('foo', 20), ('bar', 30)])")
     self.assertEqual(str(x), '<10,foo=20,bar=30>')
     with self.assertRaisesRegex(ValueError, 'unnamed'):
-      structure.to_odict(x)
+      structure._to_odict(x)
     with self.assertRaisesRegex(ValueError, 'named and unnamed'):
       structure.to_odict_or_tuple(x)
 
