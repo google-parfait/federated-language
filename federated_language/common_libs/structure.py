@@ -625,16 +625,6 @@ def _to_container_recursive(
   return container_fn([(k, recurse(v)) for k, v in iter_elements(value)])
 
 
-def has_field(structure: Struct, field: str) -> bool:
-  """Returns `True` if the `structure` has the `field`.
-
-  Args:
-    structure: An instance of `Struct`.
-    field: A string, the field to test for.
-  """
-  return field in structure._name_array  # pylint: disable=protected-access
-
-
 def update_struct(structure, **kwargs):
   """Constructs a new `structure` with new values for fields in `kwargs`.
 
