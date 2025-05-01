@@ -3,7 +3,7 @@
 1.  Choose a version (using the [Semantic Versioning](https://semver.org/)
     scheme).
 
-    Given a version number `MAJOR.MINOR.PATCH`, increment the:
+    Given a version number `MAJOR.MINOR.PATCH`:
 
     *   Don't increment the **MAJOR** version, this project is in an
         [initial development phase](https://semver.org/#spec-item-4).
@@ -20,7 +20,8 @@
 1.  Submit a CL to update the version in
     [version.py](https://github.com/google-parfait/federated-language/blob/main/federated_language/version.py)
     and
-    [MODULE.bazel](https://github.com/google-parfait/federated-language/blob/main/federated_language/MODULE.bazel).
+    [MODULE.bazel](https://github.com/google-parfait/federated-language/blob/main/federated_language/MODULE.bazel);
+    then [update the Bazel lockfile](dependencies.md#update-bazel-dependencies).
 
 1.  Create and push a tag to the
     [federated-language](https://github.com/google-parfait/federated-language/)
@@ -41,7 +42,7 @@
 
 1.  Wait for the
     [release](https://github.com/google-parfait/federated-language/actions/workflows/release.yaml)
-    workflow.
+    workflow to automatically:
 
     *   Publish a package to
         [PyPI](https://pypi.org/project/federated-language/#history).
