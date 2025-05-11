@@ -27,7 +27,7 @@ licenses(["notice"])
 py_library(
     name = "proto",
     srcs = ["__init__.py"],
-    visibility = ["//tools:__subpackages__"],
+    visibility = ["//visibility:private"],
 )
 
 proto_library(
