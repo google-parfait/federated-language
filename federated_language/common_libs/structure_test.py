@@ -320,12 +320,12 @@ class StructTest(parameterized.TestCase):
 
   def test_is_same_structure_check_types(self):
     self.assertTrue(
-        structure.is_same_structure(
+        structure._is_same_structure(
             structure.Struct.named(a=10), structure.Struct.named(a=20)
         )
     )
     self.assertTrue(
-        structure.is_same_structure(
+        structure._is_same_structure(
             structure.Struct.named(
                 a=10,
                 b=structure.Struct.named(z=5),
@@ -334,13 +334,13 @@ class StructTest(parameterized.TestCase):
         )
     )
     self.assertFalse(
-        structure.is_same_structure(
+        structure._is_same_structure(
             structure.Struct.named(x=dict(y=4)),
             structure.Struct.named(x=dict(y=5, z=6)),
         )
     )
     self.assertTrue(
-        structure.is_same_structure(
+        structure._is_same_structure(
             structure.Struct.named(x=dict(y=5)),
             structure.Struct.named(x=dict(y=6)),
         )

@@ -433,7 +433,7 @@ def pack_sequence_as(
   return result
 
 
-def is_same_structure(a: Struct, b: Struct) -> bool:
+def _is_same_structure(a: Struct, b: Struct) -> bool:
   """Compares whether `a` and `b` have the same nested structure.
 
   This method is analogous to `tf.nest.assert_same_structure`,
@@ -459,7 +459,7 @@ def is_same_structure(a: Struct, b: Struct) -> bool:
     if elem_a[0] != elem_b[0]:
       return False
     if isinstance(val_a, Struct) and isinstance(val_b, Struct):
-      return is_same_structure(val_a, val_b)
+      return _is_same_structure(val_a, val_b)
     elif isinstance(val_a, Struct) or isinstance(val_b, Struct):
       return False
     else:
@@ -498,7 +498,7 @@ def map_structure(fn: Callable[..., object], *structures: Struct) -> object:
     return tree.map_structure(fn, *structures)
 
   for i, other in enumerate(structures[1:]):
-    if not is_same_structure(structures[0], other):
+    if not _is_same_structure(structures[0], other):
       raise TypeError(
           'Structure at position {} is not the same structure'.format(i)
       )
