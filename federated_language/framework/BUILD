@@ -24,10 +24,7 @@ licenses(["notice"])
 py_library(
     name = "framework",
     srcs = ["__init__.py"],
-    visibility = [
-        "//federated_language:__pkg__",
-        "//tools:__subpackages__",
-    ],
+    visibility = ["//federated_language:__pkg__"],
     deps = [
         "//federated_language/common_libs:tracing",
         "//federated_language/compiler:building_block_analysis",
