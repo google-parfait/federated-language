@@ -44,7 +44,7 @@ jobs:
       uses: actions/checkout@v4.2.2
 
     - name: Setup Bazel
-      uses: bazel-contrib/setup-bazel@0.9.1
+      uses: bazel-contrib/setup-bazel@0.15.0
       with:
         bazelisk-cache: true
         disk-cache: ${{ github.workflow }}
@@ -77,14 +77,14 @@ jobs:
       uses: actions/checkout@v4.2.2
 
     - name: Setup Bazel
-      uses: bazel-contrib/setup-bazel@0.9.1
+      uses: bazel-contrib/setup-bazel@0.15.0
       with:
         bazelisk-cache: true
         disk-cache: ${{ github.workflow }}
         repository-cache: true
 
     - name: Setup Python
-      uses: actions/setup-python@v5.3.0
+      uses: actions/setup-python@v5.6.0
       with:
         python-version: ${{ matrix.python-version }}
         cache: "pip"
