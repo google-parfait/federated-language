@@ -10,7 +10,7 @@
 absl-py~=1.0
 attrs~=23.1
 dm-tree~=0.1.8
-ml_dtypes~=0.4.0
+ml_dtypes>=0.4.0,<0.6
 numpy~=2.0
 protobuf~=5.29
 typing-extensions~=4.5
