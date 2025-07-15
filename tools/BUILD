@@ -50,8 +50,7 @@ compile_pip_requirements_3_9(
     name = "requirements_3_9",
     src = "//:requirements.in",
     extra_args = [
-        "--allow-unsafe",
-        "--resolver=backtracking",
+        "--strip-extras",
     ],
     requirements_txt = "//:requirements_lock_3_9.txt",
 )
@@ -60,8 +59,7 @@ compile_pip_requirements_3_10(
     name = "requirements_3_10",
     src = "//:requirements.in",
     extra_args = [
-        "--allow-unsafe",
-        "--resolver=backtracking",
+        "--strip-extras",
     ],
     requirements_txt = "//:requirements_lock_3_10.txt",
 )
@@ -70,8 +68,7 @@ compile_pip_requirements_3_11(
     name = "requirements_3_11",
     src = "//:requirements.in",
     extra_args = [
-        "--allow-unsafe",
-        "--resolver=backtracking",
+        "--strip-extras",
     ],
     requirements_txt = "//:requirements_lock_3_11.txt",
 )
@@ -80,8 +77,7 @@ compile_pip_requirements_3_12(
     name = "requirements_3_12",
     src = "//:requirements.in",
     extra_args = [
-        "--allow-unsafe",
-        "--resolver=backtracking",
+        "--strip-extras",
     ],
     requirements_txt = "//:requirements_lock_3_12.txt",
 )
@@ -90,8 +86,7 @@ compile_pip_requirements_3_13(
     name = "requirements_3_13",
     src = "//:requirements.in",
     extra_args = [
-        "--allow-unsafe",
-        "--resolver=backtracking",
+        "--strip-extras",
     ],
     requirements_txt = "//:requirements_lock_3_13.txt",
 )
