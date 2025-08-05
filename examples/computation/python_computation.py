@@ -16,10 +16,10 @@
 This example demonstrates how to express logic from other libraries (e.g.,
 TensorFlow, JAX, PyTorch) as a Federated Language `Computation`.
 
-IMPORTANT: To highlight the abstract concepts and simplify the implementation,
-this example uses Python to represent logic and `cloudpickle` to serialize
-Python. However, using Python in this way is an implementation detail and
-serializing Python functions may not be suitable for production systems.
+WARNING: This example uses `cloudpickle` to serialize Python. This purpose of
+this example is to highlight concepts of the Federated Language, serializing
+Python using `cloudpickle` is not recommended for all systems and should thought
+of as an implementation detail.
 """
 
 from collections.abc import Callable, Mapping, Sequence
@@ -34,7 +34,7 @@ from federated_language.proto import computation_pb2
 from google.protobuf import any_pb2
 
 
-T = TypeVar('T', bound=type[object])
+T = TypeVar('T')
 Structure = Union[
     Sequence[T],
     Mapping[str, T],
@@ -92,7 +92,7 @@ def _create_concrete_computation_from_fn(
 
 
 def _check_parameter_types(
-    parameter_types: Optional[Structure[type[object]]],
+    parameter_types: Optional[Structure[object]],
     parameters: Mapping[str, inspect.Parameter],
 ) -> None:
   """Checks that the `parameter_types` match the `parameters` of the function.
@@ -119,8 +119,8 @@ def _check_parameter_types(
 
 
 def python_computation(
-    parameter_types: Optional[Structure[type[object]]],
-    result_type: type[object],
+    parameter_types: Optional[Structure[object]],
+    result_type: object,
 ) -> Callable[[Callable[..., object]], federated_language.Computation]:
   """A decorator factory that creates a `Computation` from a Python function.
 

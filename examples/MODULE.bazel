@@ -16,6 +16,7 @@ module(
     name = "examples",
 )
 
+# Dependencies
 bazel_dep(name = "federated_language")
 local_path_override(
     module_name = "federated_language",
@@ -25,11 +26,13 @@ local_path_override(
 bazel_dep(name = "protobuf", version = "29.0")
 bazel_dep(name = "rules_python", version = "1.0.0")
 
+# Python Toolchain
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(
     python_version = "3.12",
 )
 
+# Python Dependencies
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 pip.parse(
     hub_name = "examples_pypi",

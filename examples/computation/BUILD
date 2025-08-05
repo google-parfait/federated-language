@@ -12,17 +12,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_python//python:pip.bzl", "compile_pip_requirements")
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
 
 package(
     default_applicable_licenses = ["@federated_language//:package_license"],
-    default_visibility = ["//visibility:private"],
+    default_visibility = ["//:__subpackages__"],
 )
 
 licenses(["notice"])
 
-compile_pip_requirements(
-    name = "requirements",
-    src = "requirements.in",
-    requirements_txt = "requirements_lock.txt",
+py_library(
+    name = "python_computation",
+    srcs = ["python_computation.py"],
+    deps = [
+        "@examples_pypi//cloudpickle",
+        "@federated_language//federated_language",
+        "@federated_language//federated_language/proto:computation_py_pb2",
+        "@protobuf//:protobuf_python",
+    ],
+)
+
+py_test(
+    name = "python_computation_test",
+    srcs = ["python_computation_test.py"],
+    deps = [
+        ":python_computation",
+        "@examples_pypi//absl_py",
+        "@examples_pypi//numpy",
+        "@federated_language//federated_language",
+    ],
 )

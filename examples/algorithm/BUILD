@@ -12,17 +12,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_python//python:pip.bzl", "compile_pip_requirements")
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
 
 package(
     default_applicable_licenses = ["@federated_language//:package_license"],
-    default_visibility = ["//visibility:private"],
+    default_visibility = ["//:__subpackages__"],
 )
 
 licenses(["notice"])
 
-compile_pip_requirements(
-    name = "requirements",
-    src = "requirements.in",
-    requirements_txt = "requirements_lock.txt",
+py_library(
+    name = "program_logic",
+    srcs = ["program_logic.py"],
+    deps = ["@federated_language//federated_language"],
+)
+
+py_test(
+    name = "program_logic_test",
+    srcs = ["program_logic_test.py"],
+    deps = [
+        ":program_logic",
+        "//executor:execution_context",
+        "@examples_pypi//absl_py",
+        "@examples_pypi//numpy",
+        "@federated_language//federated_language",
+    ],
 )
