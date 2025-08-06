@@ -14,7 +14,7 @@
 """Representation of values inside a federated computation."""
 
 import abc
-from collections.abc import Hashable, Mapping, Sequence
+from collections.abc import Hashable, Mapping
 import itertools
 import typing
 from typing import Optional, Union
@@ -304,10 +304,12 @@ def to_value(
           placements.PlacementLiteral,
           computation_impl.ConcreteComputation,
           polymorphic_computation.PolymorphicComputation,
+          computation_types.SequenceType,
           structure.Struct,
           py_typecheck.SupportsNamedTuple,
           Mapping[Hashable, object],
-          Sequence[object],
+          tuple[object, ...],
+          list[object],
           array.Array,
       ],
       arg,
@@ -351,7 +353,9 @@ def to_value(
     result = _dictlike_items_to_value(items, type_spec, type(arg))
   elif isinstance(arg, Mapping):
     result = _dictlike_items_to_value(arg.items(), type_spec, type(arg))
-  elif isinstance(arg, Sequence) and not isinstance(arg, str):
+  elif isinstance(arg, (tuple, list)) and not isinstance(
+      type_spec, computation_types.SequenceType
+  ):
     items = zip(itertools.repeat(None), arg)
     result = _dictlike_items_to_value(items, type_spec, type(arg))
   elif isinstance(arg, typing.get_args(array.Array)):

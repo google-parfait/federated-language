@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""An example execution context.
+"""An example execution context used to execute a `ConcreteComputation`.
 
 This example demonstrates how to implement an execution context that can execute
 a `ConcreteComputation`:

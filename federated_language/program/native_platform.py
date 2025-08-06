@@ -19,7 +19,7 @@ from typing import Optional, Union
 
 from federated_language.common_libs import structure
 from federated_language.computation import computation_base
-from federated_language.context_stack import context
+from federated_language.executor import async_execution_context
 from federated_language.program import federated_context
 from federated_language.program import structure_utils
 from federated_language.program import value_reference
@@ -137,15 +137,15 @@ def _create_structure_of_references(
 
 
 class NativeFederatedContext(federated_context.FederatedContext):
-  """A `federated_language.program.FederatedContext` backed by a context."""
+  """A `federated_language.program.FederatedContext` backed by an execution context."""
 
-  def __init__(self, ctx: context.AsyncContext):
+  def __init__(self, context: async_execution_context.AsyncExecutionContext):
     """Returns an initialized `federated_language.program.NativeFederatedContext`.
 
     Args:
-      ctx: An `federated_language.framework.AsyncContext`.
+      context: An `federated_language.framework.AsyncExecutionContext`.
     """
-    self._ctx = ctx
+    self._context = context
 
   def invoke(
       self,
@@ -180,7 +180,7 @@ class NativeFederatedContext(federated_context.FederatedContext):
       )
 
     async def _invoke(
-        ctx: context.AsyncContext,
+        context: async_execution_context.AsyncExecutionContext,
         comp: computation_base.Computation,
         arg: value_reference.MaterializableStructure,
     ) -> value_reference.MaterializedStructure:
@@ -195,8 +195,8 @@ class NativeFederatedContext(federated_context.FederatedContext):
         arg = tree.traverse(_to_python, arg)
         arg = await value_reference.materialize_value(arg)
 
-      return await ctx.invoke(comp, arg)
+      return await context.invoke(comp, arg)
 
-    coro = _invoke(self._ctx, comp, arg)
+    coro = _invoke(self._context, comp, arg)
     task = asyncio.create_task(coro)
     return _create_structure_of_references(task, result_type)

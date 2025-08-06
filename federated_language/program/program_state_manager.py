@@ -104,7 +104,7 @@ class ProgramStateManager(abc.ABC, Generic[ProgramStateStructure]):
       there is no latest saved program state.
     """
     versions = await self.get_versions()
-    if versions is None or not versions:
+    if versions is None:
       return None, 0
     latest_version = max(versions)
     try:
