@@ -70,9 +70,22 @@ class ProgramStateManagerTest(
     self.assertEqual(program_state, 'test3')
     self.assertEqual(version, 3)
 
-  async def test_load_latest_with_no_saved_program_state(self):
+  async def test_load_latest_with_no_program_state(self):
     program_state_mngr = _TestProgramStateManager()
     program_state_mngr.get_versions = mock.AsyncMock(return_value=None)
+    program_state_mngr.load = mock.AsyncMock()
+    structure = 'test'
+
+    (program_state, version) = await program_state_mngr.load_latest(structure)
+
+    program_state_mngr.get_versions.assert_called_once_with()
+    program_state_mngr.load.assert_not_called()
+    self.assertIsNone(program_state)
+    self.assertEqual(version, 0)
+
+  async def test_load_latest_with_empty_program_state(self):
+    program_state_mngr = _TestProgramStateManager()
+    program_state_mngr.get_versions = mock.AsyncMock(return_value=[])
     program_state_mngr.load = mock.AsyncMock()
     structure = 'test'
 
