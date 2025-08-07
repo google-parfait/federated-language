@@ -22,8 +22,8 @@ from federated_language.proto import computation_pb2
 from federated_language.proto import data_type_pb2
 import numpy as np
 
-import execution_context
-import python_computation
+from executor import execution_context  # pylint: disable=g-bad-import-order
+from computation import python_computation  # pylint: disable=g-bad-import-order
 
 
 def _assert_computation_contains(
