@@ -30,7 +30,7 @@ licenses(["notice"])
 py_library(
     name = "computation",
     srcs = ["__init__.py"],
-    visibility = ["//tools:__subpackages__"],
+    visibility = ["//visibility:private"],
 )
 
 py_library(
