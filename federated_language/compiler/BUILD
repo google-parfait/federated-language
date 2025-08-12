@@ -19,10 +19,8 @@ package(
     default_visibility = [
         "//federated_language:__pkg__",
         "//federated_language/computation:__subpackages__",
-        "//federated_language/executor:__subpackages__",
         "//federated_language/federated_context:__subpackages__",
         "//federated_language/framework:__subpackages__",
-        "//federated_language/program:__subpackages__",
     ],
 )
 
@@ -31,7 +29,7 @@ licenses(["notice"])
 py_library(
     name = "compiler",
     srcs = ["__init__.py"],
-    visibility = ["//tools:__subpackages__"],
+    visibility = ["//visibility:private"],
 )
 
 py_library(
