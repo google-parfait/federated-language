@@ -473,7 +473,7 @@ def _unpack_arg(
     args.append(element_value)
   kwargs = {}
   for name, expected_type in kwarg_types.items():
-    element_value = getattr(arg, name)
+    element_value = arg[name]
     if _is_struct_with_py_container(element_value, expected_type):
       element_value = type_conversions.type_to_py_container(
           element_value, expected_type
