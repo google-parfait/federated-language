@@ -12,6 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@python//3.10:defs.bzl", compile_pip_requirements_3_10 = "compile_pip_requirements")
+load("@python//3.11:defs.bzl", compile_pip_requirements_3_11 = "compile_pip_requirements")
+load("@python//3.12:defs.bzl", compile_pip_requirements_3_12 = "compile_pip_requirements")
+load("@python//3.13:defs.bzl", compile_pip_requirements_3_13 = "compile_pip_requirements")
+load("@python//3.9:defs.bzl", compile_pip_requirements_3_9 = "compile_pip_requirements")
 load("@rules_license//rules:license.bzl", "license")
 
 package(
@@ -31,10 +36,49 @@ exports_files([
     "LICENSE",
     "pyproject.toml",
     "README.md",
-    "requirements_lock_3_10.txt",
-    "requirements_lock_3_11.txt",
-    "requirements_lock_3_12.txt",
-    "requirements_lock_3_13.txt",
-    "requirements_lock_3_9.txt",
-    "requirements.in",
 ])
+
+compile_pip_requirements_3_9(
+    name = "requirements_3_9",
+    src = "//:requirements.in",
+    extra_args = [
+        "--strip-extras",
+    ],
+    requirements_txt = "//:requirements_lock_3_9.txt",
+)
+
+compile_pip_requirements_3_10(
+    name = "requirements_3_10",
+    src = "//:requirements.in",
+    extra_args = [
+        "--strip-extras",
+    ],
+    requirements_txt = "//:requirements_lock_3_10.txt",
+)
+
+compile_pip_requirements_3_11(
+    name = "requirements_3_11",
+    src = "//:requirements.in",
+    extra_args = [
+        "--strip-extras",
+    ],
+    requirements_txt = "//:requirements_lock_3_11.txt",
+)
+
+compile_pip_requirements_3_12(
+    name = "requirements_3_12",
+    src = "//:requirements.in",
+    extra_args = [
+        "--strip-extras",
+    ],
+    requirements_txt = "//:requirements_lock_3_12.txt",
+)
+
+compile_pip_requirements_3_13(
+    name = "requirements_3_13",
+    src = "//:requirements.in",
+    extra_args = [
+        "--strip-extras",
+    ],
+    requirements_txt = "//:requirements_lock_3_13.txt",
+)

@@ -23,6 +23,8 @@ bazel_dep(name = "protobuf", version = "29.0")
 bazel_dep(name = "rules_license", version = "1.0.0")
 bazel_dep(name = "rules_python", version = "1.0.0")
 
+bazel_dep(name = "rules_shell", version = "0.5.1", dev_dependency = True)
+
 # Python Toolchain
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(

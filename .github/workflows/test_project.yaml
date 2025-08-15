@@ -54,14 +54,14 @@ jobs:
       run: |
         bazelisk mod deps --lockfile_mode=error
 
-    - name: Test tools
+    - name: Test Python dependencies
       run: |
-        bazelisk test //tools/...
+        bazelisk test //:*
 
     - name: Test examples
       run: |
         cd "examples"
-        bazelisk --bazelrc="../.bazelrc" test //...
+        bazelisk test //...
 
   test-project:
     name: Test PY ${{ matrix.python-version }}
