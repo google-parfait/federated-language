@@ -29,9 +29,9 @@ class ConcreteComputationTest(absltest.TestCase):
     # type are well-formed.
     computation_impl.ConcreteComputation(
         computation_proto=computation_pb2.Computation(**{
-            'type': computation_types.FunctionType(
-                np.int32, np.int32
-            ).to_proto(),
+            'type': (
+                computation_types.FunctionType(np.int32, np.int32).to_proto()
+            ),
             'intrinsic': computation_pb2.Intrinsic(uri='whatever'),
         }),
         context_stack=context_stack_impl.context_stack,

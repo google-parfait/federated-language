@@ -13,7 +13,6 @@
 # limitations under the License.
 """The Federated Language library."""
 
-
 # pylint: disable=g-importing-member
 from federated_language import framework
 from federated_language import program
