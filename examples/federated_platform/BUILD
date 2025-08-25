@@ -12,17 +12,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_python//python:pip.bzl", "compile_pip_requirements")
+load("@rules_python//python:defs.bzl", "py_library")
 
 package(
     default_applicable_licenses = ["@federated_language//:package_license"],
-    default_visibility = ["//visibility:private"],
+    default_visibility = ["//:__subpackages__"],
 )
 
 licenses(["notice"])
 
-compile_pip_requirements(
-    name = "requirements",
-    src = "requirements.in",
-    requirements_txt = "requirements_lock.txt",
+py_library(
+    name = "data_source",
+    srcs = ["data_source.py"],
+    deps = [
+        "@examples_pypi//numpy",
+        "@federated_language//federated_language",
+    ],
+)
+
+py_library(
+    name = "program_state_manager",
+    srcs = ["program_state_manager.py"],
+    deps = [
+        "@federated_language//federated_language",
+        "@federated_language//federated_language/program:structure_utils",
+    ],
 )

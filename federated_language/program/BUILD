@@ -130,7 +130,7 @@ py_library(
         ":value_reference",
         "//federated_language/common_libs:structure",
         "//federated_language/computation:computation_base",
-        "//federated_language/executor:async_execution_context",
+        "//federated_language/context_stack:context",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
         "//federated_language/types:type_conversions",
@@ -240,6 +240,10 @@ py_test(
 py_library(
     name = "structure_utils",
     srcs = ["structure_utils.py"],
+    visibility = [
+        # TODO: b/433268399 - Remove dependency on private Federated Language APIs.
+        "//federated_language/examples:__subpackages__",
+    ],
     deps = [
         "//federated_language/common_libs:py_typecheck",
         "@federated_language_pypi//attrs",

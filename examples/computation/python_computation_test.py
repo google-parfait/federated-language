@@ -19,7 +19,7 @@ from absl.testing import absltest
 import federated_language
 import numpy as np
 
-import python_computation
+from computation import python_computation  # pylint: disable=g-bad-import-order
 
 
 class ComputationTest(unittest.TestCase):
