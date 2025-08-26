@@ -63,6 +63,13 @@ jobs:
         cd "examples"
         bazelisk test //...
 
+        set +e
+        bazelisk run //program -- --helpshort
+        if [[ $? == 1 ]]; then
+          exit 0
+        fi
+        set -e
+
   test-project:
     name: Test PY ${{ matrix.python-version }}
     runs-on: ubuntu-latest
