@@ -36,6 +36,7 @@ exports_files([
     "LICENSE",
     "pyproject.toml",
     "README.md",
+    "requirements.in",
 ])
 
 compile_pip_requirements_3_9(
