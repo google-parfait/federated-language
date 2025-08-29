@@ -34,36 +34,6 @@ py_library(
 )
 
 py_library(
-    name = "golden",
-    testonly = True,
-    srcs = ["golden.py"],
-    deps = ["@federated_language_pypi//absl_py"],
-)
-
-py_test(
-    name = "golden_test",
-    size = "small",
-    srcs = ["golden_test.py"],
-    args = [
-        "--golden",
-        "$(location golden_test_goldens/test_check_string_fails.expected)",
-        "--golden",
-        "$(location golden_test_goldens/test_check_string_succeeds.expected)",
-        "--golden",
-        "$(location golden_test_goldens/test_check_string_updates.expected)",
-    ],
-    data = [
-        "golden_test_goldens/test_check_string_fails.expected",
-        "golden_test_goldens/test_check_string_succeeds.expected",
-        "golden_test_goldens/test_check_string_updates.expected",
-    ],
-    deps = [
-        ":golden",
-        "@federated_language_pypi//absl_py",
-    ],
-)
-
-py_library(
     name = "py_typecheck",
     srcs = ["py_typecheck.py"],
     deps = ["@federated_language_pypi//typing_extensions"],

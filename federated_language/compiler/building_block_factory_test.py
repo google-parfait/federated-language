@@ -16,7 +16,6 @@ import collections
 
 from absl.testing import absltest
 from absl.testing import parameterized
-from federated_language.common_libs import golden
 from federated_language.compiler import building_block_factory
 from federated_language.compiler import building_blocks
 from federated_language.types import computation_types
@@ -677,12 +676,26 @@ class CreateFederatedUnzipTest(absltest.TestCase):
     )
     value = building_blocks.Reference('v', value_type)
     comp = building_block_factory.create_federated_unzip(value)
-    golden.check_string(
-        'tuple_federated_map_with_two_values_unnamed.expected',
+    self.assertEqual(
         comp.formatted_representation(),
+        # pyformat: disable
+        '(let\n'
+        '  value=v\n'
+        ' in <\n'
+        '  federated_map(<\n'
+        '    (arg -> arg[0]),\n'
+        '    value\n'
+        '  >),\n'
+        '  federated_map(<\n'
+        '    (arg -> arg[1]),\n'
+        '    value\n'
+        '  >)\n'
+        '>)'
+        # pyformat: enable
     )
     self.assertEqual(
-        str(comp.type_signature), '<{int32}@CLIENTS,{int32}@CLIENTS>'
+        comp.type_signature.compact_representation(),
+        '<{int32}@CLIENTS,{int32}@CLIENTS>',
     )
 
   def test_returns_tuple_federated_map_with_two_values_named(self):
@@ -694,12 +707,26 @@ class CreateFederatedUnzipTest(absltest.TestCase):
     )
     value = building_blocks.Reference('v', value_type)
     comp = building_block_factory.create_federated_unzip(value)
-    golden.check_string(
-        'tuple_federated_map_with_two_values_named.expected',
+    self.assertEqual(
         comp.formatted_representation(),
+        # pyformat: disable
+        '(let\n'
+        '  value=v\n'
+        ' in <\n'
+        '  a=federated_map(<\n'
+        '    (arg -> arg[0]),\n'
+        '    value\n'
+        '  >),\n'
+        '  b=federated_map(<\n'
+        '    (arg -> arg[1]),\n'
+        '    value\n'
+        '  >)\n'
+        '>)'
+        # pyformat: enable
     )
     self.assertEqual(
-        str(comp.type_signature), '<a={int32}@CLIENTS,b={int32}@CLIENTS>'
+        comp.type_signature.compact_representation(),
+        '<a={int32}@CLIENTS,b={int32}@CLIENTS>',
     )
 
   def test_returns_tuple_federated_map_with_two_values_different_typed(self):
@@ -708,12 +735,26 @@ class CreateFederatedUnzipTest(absltest.TestCase):
     )
     value = building_blocks.Reference('v', value_type)
     comp = building_block_factory.create_federated_unzip(value)
-    golden.check_string(
-        'tuple_federated_map_with_two_values_different_typed.expected',
+    self.assertEqual(
         comp.formatted_representation(),
+        # pyformat: disable
+        '(let\n'
+        '  value=v\n'
+        ' in <\n'
+        '  federated_map(<\n'
+        '    (arg -> arg[0]),\n'
+        '    value\n'
+        '  >),\n'
+        '  federated_map(<\n'
+        '    (arg -> arg[1]),\n'
+        '    value\n'
+        '  >)\n'
+        '>)'
+        # pyformat: enable
     )
     self.assertEqual(
-        str(comp.type_signature), '<{int32}@CLIENTS,{bool}@CLIENTS>'
+        comp.type_signature.compact_representation(),
+        '<{int32}@CLIENTS,{bool}@CLIENTS>',
     )
 
   def test_returns_tuple_federated_apply_with_one_value_unnamed(self):
@@ -745,11 +786,27 @@ class CreateFederatedUnzipTest(absltest.TestCase):
     )
     value = building_blocks.Reference('v', value_type)
     comp = building_block_factory.create_federated_unzip(value)
-    golden.check_string(
-        'tuple_federated_apply_with_two_values_unnamed.expected',
+    self.assertEqual(
         comp.formatted_representation(),
+        # pyformat: disable
+        '(let\n'
+        '  value=v\n'
+        ' in <\n'
+        '  federated_apply(<\n'
+        '    (arg -> arg[0]),\n'
+        '    value\n'
+        '  >),\n'
+        '  federated_apply(<\n'
+        '    (arg -> arg[1]),\n'
+        '    value\n'
+        '  >)\n'
+        '>)'
+        # pyformat: enable
     )
-    self.assertEqual(str(comp.type_signature), '<int32@SERVER,int32@SERVER>')
+    self.assertEqual(
+        comp.type_signature.compact_representation(),
+        '<int32@SERVER,int32@SERVER>',
+    )
 
   def test_returns_tuple_federated_apply_with_two_values_named(self):
     type_signature = computation_types.StructType(
@@ -760,12 +817,26 @@ class CreateFederatedUnzipTest(absltest.TestCase):
     )
     value = building_blocks.Reference('v', value_type)
     comp = building_block_factory.create_federated_unzip(value)
-    golden.check_string(
-        'tuple_federated_apply_with_two_values_named.expected',
+    self.assertEqual(
         comp.formatted_representation(),
+        # pyformat: disable
+        '(let\n'
+        '  value=v\n'
+        ' in <\n'
+        '  a=federated_apply(<\n'
+        '    (arg -> arg[0]),\n'
+        '    value\n'
+        '  >),\n'
+        '  b=federated_apply(<\n'
+        '    (arg -> arg[1]),\n'
+        '    value\n'
+        '  >)\n'
+        '>)'
+        # pyformat: enable
     )
     self.assertEqual(
-        str(comp.type_signature), '<a=int32@SERVER,b=int32@SERVER>'
+        comp.type_signature.compact_representation(),
+        '<a=int32@SERVER,b=int32@SERVER>',
     )
 
   def test_returns_tuple_federated_apply_with_two_values_different_typed(self):
@@ -774,11 +845,27 @@ class CreateFederatedUnzipTest(absltest.TestCase):
     )
     value = building_blocks.Reference('v', value_type)
     comp = building_block_factory.create_federated_unzip(value)
-    golden.check_string(
-        'tuple_federated_apply_with_two_values_different_typed.expected',
+    self.assertEqual(
         comp.formatted_representation(),
+        # pyformat: disable
+        '(let\n'
+        '  value=v\n'
+        ' in <\n'
+        '  federated_apply(<\n'
+        '    (arg -> arg[0]),\n'
+        '    value\n'
+        '  >),\n'
+        '  federated_apply(<\n'
+        '    (arg -> arg[1]),\n'
+        '    value\n'
+        '  >)\n'
+        '>)'
+        # pyformat: enable
     )
-    self.assertEqual(str(comp.type_signature), '<int32@SERVER,bool@SERVER>')
+    self.assertEqual(
+        comp.type_signature.compact_representation(),
+        '<int32@SERVER,bool@SERVER>',
+    )
 
 
 class CreateFederatedValueTest(absltest.TestCase):
