@@ -17,7 +17,7 @@ import abc
 import atexit
 import collections
 from collections.abc import Hashable, Iterable, Iterator, Mapping, MutableMapping, Sequence
-from typing import Optional, TypeVar, Union
+from typing import NamedTuple, Optional, TypeVar, Union
 import weakref
 
 import attrs
@@ -1166,8 +1166,7 @@ def to_type(obj: object) -> Type:
     )
 
 
-@attrs.define(frozen=True)
-class _ContainedChildrenTypes:
+class _ContainedChildrenTypes(NamedTuple):
   """The types of children `federated_language.Types` contained by a `federated_language.Type`.
 
   This data structure is used by `_get_contained_children_types` to package
