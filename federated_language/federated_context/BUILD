@@ -18,7 +18,6 @@ package(
     default_applicable_licenses = ["//:package_license"],
     default_visibility = [
         "//federated_language:__pkg__",
-        "//federated_language/executor:__subpackages__",
         "//federated_language/framework:__subpackages__",
         "//federated_language/program:__subpackages__",
     ],
