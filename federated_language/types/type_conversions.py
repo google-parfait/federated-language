@@ -186,7 +186,8 @@ def to_structure_with_type(
         return list, None
       else:
         type_spec = type_spec.member
-    elif isinstance(type_spec, computation_types.SequenceType):
+
+    if isinstance(type_spec, computation_types.SequenceType):
       return list, None
 
     if isinstance(type_spec, computation_types.StructType):

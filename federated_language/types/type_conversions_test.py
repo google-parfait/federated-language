@@ -272,6 +272,12 @@ class ToStructureWithTypeTest(parameterized.TestCase):
           _TestNamedTuple(1, 2, 3),
       ),
       (
+          'sequence',
+          [1, 2, 3],
+          computation_types.SequenceType(np.int32),
+          [1, 2, 3],
+      ),
+      (
           'federated_value',
           1,
           computation_types.FederatedType(np.int32, placements.CLIENTS),
@@ -316,9 +322,23 @@ class ToStructureWithTypeTest(parameterized.TestCase):
           [[1, 2], [3]],
       ),
       (
-          'sequence',
+          'federated_sequence_not_all_equal',
           [1, 2, 3],
-          computation_types.SequenceType(np.int32),
+          computation_types.FederatedType(
+              computation_types.SequenceType(np.int32),
+              placements.CLIENTS,
+              all_equal=False,
+          ),
+          [1, 2, 3],
+      ),
+      (
+          'federated_sequence_all_equal',
+          [1, 2, 3],
+          computation_types.FederatedType(
+              computation_types.SequenceType(np.int32),
+              placements.CLIENTS,
+              all_equal=True,
+          ),
           [1, 2, 3],
       ),
   )
