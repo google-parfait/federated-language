@@ -117,7 +117,7 @@ async def _invoke(
   )
   result = await executor.create_call(comp, arg)
   result_value = await result.compute()
-  return type_conversions.type_to_py_container(result_value, result_type)
+  return type_conversions.to_structure_with_type(result_value, result_type)
 
 
 class AsyncExecutionContext(context.AsyncContext):
