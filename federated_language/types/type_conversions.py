@@ -196,7 +196,7 @@ def to_structure_with_type(
     else:
       raise ValueError(
           'Expected `type_spec` to be a `federated_language.StructType`,'
-          ' found {type(type_spec)}.'
+          f' found {type(type_spec)}.'
       )
 
   def _to_structure(path: tuple[Union[str, int], ...], obj: object) -> object:
