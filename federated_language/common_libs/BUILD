@@ -72,6 +72,7 @@ py_library(
 py_library(
     name = "structure",
     srcs = ["structure.py"],
+    visibility = ["//federated_language_jax/third_party/federated_language_executor:__pkg__"],
     deps = [
         ":py_typecheck",
         "@federated_language_pypi//attrs",
