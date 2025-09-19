@@ -180,6 +180,38 @@ class InferTypeTest(parameterized.TestCase):
     self.assertEqual(t, computation_types.StructWithPythonType([], tuple))
 
 
+class StructureWithTypeTest(parameterized.TestCase):
+
+  @parameterized.named_parameters(
+      ('value', lambda x: 1, computation_types.TensorType(np.int32), 1),
+      (
+          'structure_unnamed',
+          lambda x: 1,
+          computation_types.StructType([np.int32, np.int32, np.int32]),
+          [1, 1, 1],
+      ),
+      (
+          'structure_named',
+          lambda x: 1,
+          computation_types.StructType([
+              ('a', np.int32),
+              ('b', np.int32),
+              ('c', np.int32),
+          ]),
+          {'a': 1, 'b': 1, 'c': 1},
+      ),
+      (
+          'structure_nested',
+          lambda x: 1,
+          computation_types.StructType([[np.int32, np.int32], [np.int32]]),
+          [[1, 1], [1]],
+      ),
+  )
+  def test_returns_result(self, factory, type_spec, expected):
+    actual = type_conversions.structure_with_type(factory, type_spec)
+    self.assertEqual(actual, expected)
+
+
 class ToStructureWithTypeTest(parameterized.TestCase):
 
   @parameterized.named_parameters(

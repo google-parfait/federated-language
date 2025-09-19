@@ -13,10 +13,10 @@
 """Utilities for type conversion, type checking, type inference, etc."""
 
 import collections
-from collections.abc import Hashable, Mapping, Sequence
+from collections.abc import Callable, Hashable, Mapping, Sequence
 import functools
 import typing
-from typing import Optional, Union
+from typing import Optional, TypeVar, Union
 
 import attrs
 from federated_language.common_libs import py_typecheck
@@ -102,6 +102,94 @@ def infer_type(arg: object) -> Optional[computation_types.Type]:
     raise NotImplementedError(f'Unexpected arg found: {type(arg)}.')
 
 
+def is_named(obj: Union[object, type[object]]) -> bool:
+  if isinstance(obj, type):
+    return isinstance(obj, py_typecheck.SupportsNamedTuple) or issubclass(
+        obj, Mapping
+    )
+  else:
+    return isinstance(obj, py_typecheck.SupportsNamedTuple) or isinstance(
+        obj, Mapping
+    )
+
+
+def _get_container_cls(type_spec: computation_types.StructType) -> type[object]:
+  """Returns the Python container type a `computation_types.StructType`."""
+  container_cls = type_spec.python_container
+  if container_cls is None:
+    has_names = [name is not None for name, _ in type_spec.items()]
+    if any(has_names):
+      if not all(has_names):
+        raise ValueError(
+            'Expected `type_spec` to have either all named or unnamed'
+            f' elements, found {type_spec}.'
+        )
+      container_cls = dict
+    else:
+      container_cls = list
+  return container_cls
+
+
+_T = TypeVar('_T', bound=Union[Sequence[object], Mapping[str, object]])
+
+
+def _create_structure(
+    cls: type[_T],
+    elements: Union[Sequence[object], Sequence[tuple[str, object]]],
+) -> _T:
+  """Creates an object of type `cls` from the `elements`."""
+  if isinstance(cls, py_typecheck.SupportsNamedTuple):
+    return cls(**dict(elements))
+  elif issubclass(cls, (Mapping, Sequence)):
+    return cls(elements)  # pylint: disable=too-many-function-args
+  else:
+    raise ValueError(
+        'Expected `cls` to be a `NamedTuple`, `Mapping`, or `Sequence`, found'
+        f' {cls}.'
+    )
+
+
+def structure_with_type(
+    factory: Callable[[computation_types.Type], object],
+    type_spec: computation_types.Type,
+) -> object:
+  """Creates a structure matching `type_spec` using `factory` to create each leaf.
+
+  For example:
+
+  >>> factory = lambda x: 1
+  >>> type_spec = federated_language.TensorType(np.int32)
+  >>> federated_language.types.structure_with_type(factory, type_spec)
+  1
+
+  >>> factory = lambda x: 1
+  >>> type_spec = federated_language.StructType([np.int32] * 3)
+  >>> federated_language.types.structure_with_type(factory, type_spec)
+  [1, 1, 1]
+
+  Args:
+    factory: A function used to create each leaf in the structure.
+    type_spec: The `federated_language.Type` to use.
+
+  Returns:
+    A Python value with a structure matching `type_spec`.
+  """
+
+  if isinstance(type_spec, computation_types.StructType):
+    cls = _get_container_cls((type_spec))
+    elements = []
+
+    for name, value in type_spec.items():
+      if is_named(cls):
+        elements.append((name, structure_with_type(factory, value)))
+      else:
+        elements.append(structure_with_type(factory, value))
+
+    return _create_structure(cls, elements)
+  else:
+    return factory(type_spec)
+
+
 def to_structure_with_type(
     obj: object, type_spec: computation_types.Type
 ) -> object:
@@ -132,7 +220,7 @@ def to_structure_with_type(
 
   Args:
     obj: A Python value.
-    type_spec: The `federated_language.Type` to use convert `obj`.
+    type_spec: The `federated_language.Type` to use.
 
   Returns:
     A Python value equivalent to `obj` with a structure matching `type_spec`.
@@ -150,7 +238,8 @@ def to_structure_with_type(
         return type_spec.member
       else:
         type_spec = type_spec.member
-    elif isinstance(type_spec, computation_types.SequenceType):
+
+    if isinstance(type_spec, computation_types.SequenceType):
       return type_spec.element
 
     if isinstance(type_spec, computation_types.StructType):
@@ -160,23 +249,6 @@ def to_structure_with_type(
           'Expected `type_spec` to be a `federated_language.StructType`, found'
           f' {type(type_spec)}.'
       )
-
-  def _get_container_cls(
-      type_spec: computation_types.StructType,
-  ) -> type[object]:
-    container_cls = type_spec.python_container
-    if container_cls is None:
-      has_names = [name is not None for name, _ in type_spec.items()]
-      if any(has_names):
-        if not all(has_names):
-          raise ValueError(
-              'Expected `type_spec` to have either all named or unnamed'
-              f' elements, found {type_spec}.'
-          )
-        container_cls = dict
-      else:
-        container_cls = list
-    return container_cls
 
   def _get_container_spec(
       type_spec: computation_types.Type,
@@ -192,8 +264,8 @@ def to_structure_with_type(
 
     if isinstance(type_spec, computation_types.StructType):
       names = [name for name, _ in type_spec.items()]
-      container_cls = _get_container_cls(type_spec)
-      return container_cls, names
+      cls = _get_container_cls(type_spec)
+      return cls, names
     else:
       raise ValueError(
           'Expected `type_spec` to be a `federated_language.StructType`,'
@@ -207,11 +279,11 @@ def to_structure_with_type(
       container_cls, names = _get_container_spec(container_type)
 
       if isinstance(obj, py_typecheck.SupportsNamedTuple):
-        elements = obj._asdict().values()
+        values = obj._asdict().values()
       elif isinstance(obj, Mapping):
-        elements = obj.values()
+        values = obj.values()
       elif isinstance(obj, Sequence):
-        elements = obj
+        values = obj
       else:
         raise ValueError(
             'Expected `obj` to be a `NamedTuple`, `Mapping`, or `Sequence`,'
@@ -219,16 +291,18 @@ def to_structure_with_type(
         )
 
       if isinstance(container_cls, py_typecheck.SupportsNamedTuple):
-        return container_cls(**dict(zip(names, elements)))
+        elements = zip(names, values)
       elif issubclass(container_cls, Mapping):
-        return container_cls(zip(names, elements))  # pylint: disable=too-many-function-args
+        elements = zip(names, values)
       elif issubclass(container_cls, Sequence):
-        return container_cls(elements)  # pylint: disable=too-many-function-args
+        elements = values
       else:
         raise ValueError(
             'Expected `container_cls` to be a `NamedTuple`, `Mapping`, or'
             f' `Sequence`, found {container_cls}.'
         )
+
+      return _create_structure(container_cls, elements)
     else:
       return None
 

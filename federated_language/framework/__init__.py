@@ -157,6 +157,7 @@ from federated_language.types.type_analysis import is_structure_of_integers
 from federated_language.types.type_analysis import is_structure_of_tensors
 from federated_language.types.type_analysis import preorder_types
 from federated_language.types.type_conversions import infer_type
+from federated_language.types.type_conversions import structure_with_type
 from federated_language.types.type_conversions import to_structure_with_type
 from federated_language.types.type_conversions import type_to_py_container
 from federated_language.types.type_transformations import transform_type_postorder
