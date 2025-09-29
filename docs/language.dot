@@ -1,0 +1,50 @@
+// Copyright 2025 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+digraph {
+  graph [style="dotted,rounded"]
+  node [color="#bdc1c6", fillcolor="#f8f9fa", shape="box", style="rounded,filled", width="1.6"]
+  edge [color="#5f6368"]
+  newrank=true
+
+  subgraph cluster_language {
+    graph [label="Language"]
+    node [color="#7baaf7", fillcolor="#e8f0fe"]
+    program_api [label="Program API"]
+    tracing [label="Tracing"]
+    analysis [label="Analysis"]
+    compiler_api [label="Compiler API"]
+    executor_api [label="Executor API"]
+    intrinsics [label="Intrinsics"]
+    computation [label="Computation"]
+    types [label="Types"]
+  }
+
+  program_api -> tracing
+  program_api -> analysis
+  program_api -> compiler_api
+  program_api -> executor_api
+  tracing -> intrinsics
+  tracing -> computation
+  analysis -> computation
+  intrinsics -> computation
+  computation -> types
+
+  // Layout
+  {rank=same; program_api}
+  {rank=same; tracing, analysis, compiler_api, executor_api}
+  {rank=same; intrinsics, computation}
+  {rank=same; types}
+}
+

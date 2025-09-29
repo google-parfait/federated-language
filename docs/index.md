@@ -1,5 +1,8 @@
 # Federated Language
 
+Federated Language is a framework for implementing federated algorithms and
+computations on privacy-sensitive data.
+
 [TOC]
 
 ## Federated Computation
@@ -183,4 +186,4 @@ A platform is a [context](#context) that is used to execute
 technologies or systems.
 
 Often a platform is implemented as an [ExecutionContext](#executioncontext)
-using a [compiler](#compiler) and an [executor](#executor).
+using a [compiler](#compilation) and an [executor](#executor).

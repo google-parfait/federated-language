@@ -14,20 +14,20 @@
 
 digraph {
   graph [style="dotted,rounded"]
-  node [color="#bdbdbd", fillcolor="#efefef", shape="box", style="rounded,filled", width="1.6"]
-  edge [color="#616161"]
+  node [color="#bdc1c6", fillcolor="#f8f9fa", shape="box", style="rounded,filled", width="1.6"]
+  edge [color="#5f6368"]
   newrank=true
 
   subgraph cluster_core_customer {
     graph [label="Customer"]
-    customer_storage [label="Customer Storage", href="#customer-storage" target="_parent", color="#57bb8a", fillcolor="#e2f3eb", shape="cylinder", style="filled"]
+    customer_storage [label="Customer Storage", href="#customer-storage" target="_parent", shape="cylinder", style="filled"]
   }
 
   subgraph cluster_core_platform {
     graph [label="Platform"]
     program [label="Program", href="#program" target="_parent"]
-    platform_storage [label="Platform Storage", href="#platform-storage" target="_parent", color="#57bb8a", fillcolor="#e2f3eb", shape="cylinder", style="filled"]
-    python [label="Python", color="#57bb8a", fillcolor="#e2f3eb"]
+    platform_storage [label="Platform Storage", href="#platform-storage" target="_parent", shape="cylinder", style="filled"]
+    python [label="Python"]
   }
 
   program -> platform_storage [label="save"]

@@ -21,10 +21,10 @@ More, specifically a **federated program**:
 *   and [parameters](#parameters) set by the [customer](#customer)
 *   when the [customer](#customer) runs the [program](#program)
 *   and may [materialize](#materialize) data in
-    [platform storage](#platform storage) to:
+    [platform storage](#platform-storage) to:
     *   use in Python logic
-    *   implement [fault tolerance](#fault tolerance)
-*   and may [release](#release) data to [customer storage](#customer storage)
+    *   implement [fault tolerance](#fault-tolerance)
+*   and may [release](#release) data to [customer storage](#customer-storage)
 
 Defining these [concepts](#concepts) and abstractions make it possible to
 describe the relationships between the [components](#components) of a federated
@@ -146,15 +146,15 @@ and performs some operations, which typically includes:
 
 *   executing [computations](#computations)
 *   executing Python logic
-*   [materializing](#materialize) data in [platform storage](#platform storage)
+*   [materializing](#materialize) data in [platform storage](#platform-storage)
     to:
     *   use in Python logic
-    *   implement [fault tolerance](#fault tolerance)
+    *   implement [fault tolerance](#fault-tolerance)
 
 and may yields some output, which typically includes:
 
-*   [releasing](#release) data to [customer storage](#customer storage) as
-    [metrics](#metrics)
+*   [releasing](#release) data to [customer storage](#customer-storage) as
+    metrics
 
 For example:
 

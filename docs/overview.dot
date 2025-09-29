@@ -1,0 +1,82 @@
+// Copyright 2025 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+digraph {
+  graph [style="dotted,rounded"]
+  node [color="#bdc1c6", fillcolor="#f8f9fa", shape="box", style="rounded,filled", width="1.6"]
+  edge [color="#5f6368"]
+  newrank=true
+
+  subgraph cluster_algorithms {
+    graph [label="Algorithms"]
+    learning [label="Learning"]
+    analytics [label="Analytics"]
+    algorithms_more [label="..."]
+  }
+
+  subgraph cluster_platforms {
+    graph [label="Platforms"]
+    platform_a [label="Platform A"]
+    platform_b [label="Platform B"]
+    platforms_more [label="..."]
+    native [label="Native", color="#7baaf7", fillcolor="#e8f0fe"]
+  }
+
+  learning -> platform_a [arrowhead="none", style="invisible"]
+  analytics -> platform_b [arrowhead="none", style="invisible"]
+  algorithms_more -> platforms_more [arrowhead="none", style="invisible"]
+
+  platform_a -> native
+  platform_b -> native
+
+  subgraph cluster_environments {
+    graph [label="Environments"]
+    tensorflow [label="TensorFlow", color="#7baaf7", fillcolor="#e8f0fe"]
+    jax [label="JAX", color="#7baaf7", fillcolor="#e8f0fe", href="#jax" target="_parent"]
+    environments_more [label="..."]
+    compiler [label="Compiler", color="#7baaf7", fillcolor="#e8f0fe"]
+    executor [label="Executor", color="#7baaf7", fillcolor="#e8f0fe"]
+    backend_s1 [label=" ", style="invisible"]
+  }
+
+  native -> tensorflow [arrowhead="none", style="invisible"]
+  native -> jax [arrowhead="none", style="invisible"]
+  platforms_more -> environments_more [arrowhead="none", style="invisible"]
+
+  tensorflow -> compiler
+  tensorflow -> executor [weight=0]
+  jax -> compiler [weight=0]
+  jax -> executor
+  environments_more -> backend_s1 [arrowhead="none", style="invisible"]
+
+  subgraph cluster_language {
+    graph [label="Language"]
+    node [color="#7baaf7", fillcolor="#e8f0fe"]
+    language_s1 [label=" ", style="invisible"]
+    language [label="Language", href="#language" target="_parent"]
+    language_s2 [label=" ", style="invisible"]
+  }
+
+  compiler -> language_s1 [arrowhead="none", style="invisible"]
+  executor -> language [arrowhead="none", style="invisible"]
+  backend_s1 -> language_s2 [arrowhead="none", style="invisible"]
+
+  // Layout
+  {rank=same; learning, analytics, algorithms_more}
+  {rank=same; platform_a, platform_b, platforms_more}
+  {rank=same; native}
+  {rank=same; tensorflow, jax, environments_more}
+  {rank=same; compiler, executor, backend_s1}
+  {rank=same; language}
+}

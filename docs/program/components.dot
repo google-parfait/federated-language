@@ -14,8 +14,8 @@
 
 digraph {
   graph [style="dotted,rounded"]
-  node [color="#bdbdbd", fillcolor="#efefef", shape="box", style="rounded,filled", width="1.6"]
-  edge [color="#616161"]
+  node [color="#bdc1c6", fillcolor="#f8f9fa", shape="box", style="rounded,filled", width="1.6"]
+  edge [color="#5f6368"]
   newrank=true
 
   subgraph cluster_core_customer {

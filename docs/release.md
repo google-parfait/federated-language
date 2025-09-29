@@ -17,7 +17,7 @@
     latest release and the `main` branch to see the commits since the latest
     release.
 
-1.  Submit a CL to update the version in
+1.  Submit a change to update the version in
     [version.py](https://github.com/google-parfait/federated-language/blob/main/federated_language/version.py)
     and
     [MODULE.bazel](https://github.com/google-parfait/federated-language/blob/main/federated_language/MODULE.bazel);
@@ -33,8 +33,8 @@
     ```shell
     $ git clone \
         https://<USERNAME>:<TOKEN>@github.com/google-parfait/federated-language/ \
-        "/tmp/federated-language"
-    $ cd "/tmp/federated-language"
+        "/tmp/lang"
+    $ cd "/tmp/lang"
     $ git checkout <COMMIT>
     $ git tag v<VERSION>
     $ git push origin tag v<VERSION>

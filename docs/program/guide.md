@@ -1,6 +1,6 @@
 # Federated Program Guide
 
-This documentation is for anyone who is interested in authoring
+This guide is for anyone who is interested in authoring
 [federated program logic](https://github.com/google-parfait/federated-language/blob/main/docs/program/overview.md#program-logic)
 or a
 [federated program](https://github.com/google-parfait/federated-language/blob/main/docs/program/overview.md#program).
