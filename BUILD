@@ -12,12 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@python//3.10:defs.bzl", compile_pip_requirements_3_10 = "compile_pip_requirements")
-load("@python//3.11:defs.bzl", compile_pip_requirements_3_11 = "compile_pip_requirements")
-load("@python//3.12:defs.bzl", compile_pip_requirements_3_12 = "compile_pip_requirements")
-load("@python//3.13:defs.bzl", compile_pip_requirements_3_13 = "compile_pip_requirements")
-load("@python//3.9:defs.bzl", compile_pip_requirements_3_9 = "compile_pip_requirements")
 load("@rules_license//rules:license.bzl", "license")
+load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 
 package(
     default_applicable_licenses = [":package_license"],
@@ -39,7 +35,7 @@ exports_files([
     "requirements.in",
 ])
 
-compile_pip_requirements_3_9(
+compile_pip_requirements(
     name = "requirements_3_9",
     src = "//:requirements.in",
     extra_args = [
@@ -48,7 +44,7 @@ compile_pip_requirements_3_9(
     requirements_txt = "//:requirements_lock_3_9.txt",
 )
 
-compile_pip_requirements_3_10(
+compile_pip_requirements(
     name = "requirements_3_10",
     src = "//:requirements.in",
     extra_args = [
@@ -57,7 +53,7 @@ compile_pip_requirements_3_10(
     requirements_txt = "//:requirements_lock_3_10.txt",
 )
 
-compile_pip_requirements_3_11(
+compile_pip_requirements(
     name = "requirements_3_11",
     src = "//:requirements.in",
     extra_args = [
@@ -66,7 +62,7 @@ compile_pip_requirements_3_11(
     requirements_txt = "//:requirements_lock_3_11.txt",
 )
 
-compile_pip_requirements_3_12(
+compile_pip_requirements(
     name = "requirements_3_12",
     src = "//:requirements.in",
     extra_args = [
@@ -75,7 +71,7 @@ compile_pip_requirements_3_12(
     requirements_txt = "//:requirements_lock_3_12.txt",
 )
 
-compile_pip_requirements_3_13(
+compile_pip_requirements(
     name = "requirements_3_13",
     src = "//:requirements.in",
     extra_args = [
