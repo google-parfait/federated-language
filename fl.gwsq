@@ -1,0 +1,17 @@
+// When editing this file, run the test in this directory before checkin.
+//
+//   To test manually:
+//     /google/data/ro/teams/gwsq/analyze \
+//       --input_file=third_party/py/federated_language/fl.gwsq \
+//       --trace --cl=NNNNN
+
+send_cls_to('federated-language-reviews');
+
+define Main {
+  // All reviewers must LGTM or approve before Critique considers a change
+  // “green”. Details: go/want_lgtm
+  set_tag('WANT_LGTM', 'all');
+
+  reassign_to_list(
+        from_owners_file("third_party/py/federated_language/OWNERS"));
+}
