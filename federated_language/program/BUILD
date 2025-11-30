@@ -240,10 +240,6 @@ py_test(
 py_library(
     name = "structure_utils",
     srcs = ["structure_utils.py"],
-    visibility = [
-        # TODO: b/433268399 - Remove dependency on private Federated Language APIs.
-        "//federated_language/examples:__subpackages__",
-    ],
     deps = [
         "//federated_language/common_libs:py_typecheck",
         "@federated_language_pypi//attrs",
