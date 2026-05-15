@@ -13,7 +13,6 @@
 # limitations under the License.
 
 load("@rules_python//python:defs.bzl", "py_binary", "py_library", "py_test")
-load("//third_party/bazel_rules/rules_python/python:py_test.bzl", "py_test")
 
 package(
     default_applicable_licenses = ["@federated_language//:package_license"],
