@@ -402,7 +402,7 @@
     "@@rules_python~//python/extensions:pip.bzl%pip": {
       "general": {
         "bzlTransitiveDigest": "CFNV4B4mtTXrIRSKnuSPYAG0+CMYIO/4aVQ2SBz6n3c=",
-        "usagesDigest": "ivvjZv7EuD/Ek76VPkEi15E/Ff3fNP8tan2NLMxdocI=",
+        "usagesDigest": "IohGfTpZku6QFnUYTkKL2wk5vMCFKoDqjlvmVJ37BcA=",
         "recordedFileInputs": {
           "@@//requirements_lock_3_10.txt": "8b32f74f5b9b25567e575bb2809b37a49ec306fb7d709abf237969ee897842ac",
           "@@rules_python~//tools/publish/requirements_linux.txt": "8175b4c8df50ae2f22d1706961884beeb54e7da27bd2447018314a175981997d",
