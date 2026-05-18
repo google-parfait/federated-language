@@ -67,7 +67,6 @@ py_library(
         "//federated_language/proto:computation_py_pb2",
         "@federated_language_pypi//attrs",
         "@federated_language_pypi//numpy",
-        "@federated_language_pypi//typing_extensions",
     ],
 )
 

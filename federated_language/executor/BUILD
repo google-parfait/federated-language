@@ -35,16 +35,16 @@ py_library(
     name = "async_execution_context",
     srcs = ["async_execution_context.py"],
     deps = [
+        ":cardinalities_utils",
+        ":executor_base",
+        ":executor_factory",
+        ":executor_value_base",
         "//federated_language/common_libs:retrying",
         "//federated_language/common_libs:structure",
         "//federated_language/common_libs:tracing",
         "//federated_language/computation:computation_base",
         "//federated_language/computation:function_utils",
         "//federated_language/context_stack:context",
-        "//federated_language/executor:cardinalities_utils",
-        "//federated_language/executor:executor_base",
-        "//federated_language/executor:executor_factory",
-        "//federated_language/executor:executor_value_base",
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
         "//federated_language/types:type_conversions",
@@ -58,7 +58,7 @@ py_test(
     srcs = ["async_execution_context_test.py"],
     deps = [
         ":async_execution_context",
-        "//federated_language/executor:executor_base",
+        ":executor_base",
         "@federated_language_pypi//absl_py",
     ],
 )
@@ -111,10 +111,10 @@ py_library(
     srcs = ["sync_execution_context.py"],
     deps = [
         ":async_execution_context",
+        ":cardinalities_utils",
+        ":executor_factory",
         "//federated_language/common_libs:async_utils",
         "//federated_language/computation:computation_base",
         "//federated_language/context_stack:context",
-        "//federated_language/executor:cardinalities_utils",
-        "//federated_language/executor:executor_factory",
     ],
 )

@@ -36,7 +36,6 @@ py_library(
 py_library(
     name = "py_typecheck",
     srcs = ["py_typecheck.py"],
-    deps = ["@federated_language_pypi//typing_extensions"],
 )
 
 py_test(

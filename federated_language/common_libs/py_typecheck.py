@@ -14,11 +14,8 @@
 """Utility functions for checking Python types."""
 
 from collections.abc import Sequence
-import sys
 import typing
-from typing import Optional, Protocol, TypeVar, Union
-
-from typing_extensions import TypeGuard
+from typing import Protocol, TypeGuard, TypeVar
 
 
 @typing.runtime_checkable
@@ -33,13 +30,13 @@ class SupportsNamedTuple(Protocol):
     ...
 
 
-_NT = TypeVar('_NT', bound=Optional[str])
+_NT = TypeVar('_NT', bound=str | None)
 _VT = TypeVar('_VT', bound=object)
 
 
 def is_name_value_pair(
     obj: object,
-    name_type: type[_NT] = Optional[str],
+    name_type: type[_NT] = str | None,
     value_type: type[_VT] = object,
 ) -> TypeGuard[tuple[_NT, _VT]]:
   """Returns `True` if `obj` is a name value pair, otherwise `False`.
@@ -56,21 +53,5 @@ def is_name_value_pair(
   if not isinstance(obj, Sequence) or len(obj) != 2:
     return False
   name, value = obj
-
-  # Before Python 3.10, you could not pass a `Union Type` to isinstance, see
-  # https://docs.python.org/3/library/functions.html#isinstance.
-  if sys.version_info < (3, 10):
-
-    def _unpack_type(x):
-      origin = typing.get_origin(x)
-      if origin is Union:
-        return typing.get_args(name_type)
-      elif origin is not None:
-        return origin
-      else:
-        return x
-
-    name_type = _unpack_type(name_type)
-    value_type = _unpack_type(value_type)
 
   return isinstance(name, name_type) and isinstance(value, value_type)

@@ -17,7 +17,7 @@ import abc
 import atexit
 import collections
 from collections.abc import Hashable, Iterable, Iterator, Mapping, MutableMapping, Sequence
-from typing import Optional, TypeVar, Union
+from typing import Optional, TypeGuard, TypeVar, Union
 import weakref
 
 import attrs
@@ -29,7 +29,6 @@ from federated_language.types import array_shape
 from federated_language.types import dtype_utils
 from federated_language.types import placements
 import numpy as np
-from typing_extensions import TypeGuard
 
 
 T = TypeVar('T')
