@@ -22,9 +22,15 @@ local_path_override(
     module_name = "federated_language",
     path = "..",
 )
+local_path_override(
+    module_name = "grpc-java",
+    path = "../third_party/grpc-java-mock",
+)
 
-bazel_dep(name = "protobuf", version = "29.0")
-bazel_dep(name = "rules_python", version = "1.0.0")
+
+
+bazel_dep(name = "protobuf", version = "32.1")
+bazel_dep(name = "rules_python", version = "2.0.1")
 
 # Python Toolchain
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
@@ -40,3 +46,12 @@ pip.parse(
     requirements_lock = "//:requirements_lock.txt",
 )
 use_repo(pip, "examples_pypi")
+
+single_version_override(
+    module_name = "grpc",
+    patch_strip = 1,
+    version = "1.78.0",
+    patches = [
+        "//:grpc.patch",
+    ],
+)
