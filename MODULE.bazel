@@ -19,11 +19,13 @@ module(
 )
 
 # Dependencies
-bazel_dep(name = "protobuf", version = "29.0")
+bazel_dep(name = "protobuf", version = "32.1")
 bazel_dep(name = "rules_license", version = "1.0.0")
-bazel_dep(name = "rules_python", version = "1.0.0")
+bazel_dep(name = "rules_python", version = "2.0.1")
+bazel_dep(name = "rules_cc", version = "0.2.17")
+bazel_dep(name = "grpc", version = "1.78.0", repo_name = "com_github_grpc_grpc")
 
-bazel_dep(name = "rules_shell", version = "0.5.1", dev_dependency = True)
+bazel_dep(name = "rules_shell", version = "0.6.1", dev_dependency = True)
 
 # Python Toolchain
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
@@ -67,3 +69,12 @@ pip.parse(
     requirements_lock = "//:requirements_lock_3_13.txt",
 )
 use_repo(pip, "federated_language_pypi")
+
+single_version_override(
+    module_name = "grpc",
+    patch_strip = 1,
+    version = "1.78.0",
+    patches = [
+        "//:grpc.patch",
+    ],
+)

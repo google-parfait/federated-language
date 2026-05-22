@@ -20,7 +20,6 @@ from federated_language.proto import data_type_pb2
 import ml_dtypes
 import numpy as np
 
-
 # Mapping from `DataType` to `type[np.generic]`.
 _PROTO_TO_DTYPE: Mapping[data_type_pb2.DataType, type[np.generic]] = {
     data_type_pb2.DataType.DT_BOOL: np.bool_,
@@ -95,21 +94,22 @@ def can_cast(
   This function is intended to be used to determine if the size of the `dtype`
   is capable of holding the `value`. This is useful, for example, when trying to
   infer the dtype of the `value`. This function is not intended to be used to
-  determine if you **should** cast a the `value` to `dtype`.
+  determine if you **should** cast the `value` to `dtype`.
 
   Args:
     value: The value to check.
     dtype: The dtype to check against.
   """
 
-  # When encountering an overflow, numpy issues a `RuntimeWarning` for floating
-  # dtypes and raises an `OverflowError` for integer dtypes.
+  # `np.can_cast` does not support Python scalars (since version 2.0). Casting
+  # the value to a numpy value and testing for an overflow is equivalent to
+  # testing the Python value.
   with warnings.catch_warnings():
     warnings.simplefilter(action='error', category=RuntimeWarning)
     try:
       np.asarray(value, dtype=dtype)
       return True
-    except (OverflowError, RuntimeWarning):
+    except (ValueError, TypeError, OverflowError, RuntimeWarning):
       return False
 
 
