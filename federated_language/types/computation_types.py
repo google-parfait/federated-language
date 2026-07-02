@@ -204,7 +204,7 @@ class _Intern(abc.ABCMeta):
     # Salt the key with `cls` to account for two different classes that return
     # the same result from `_hashable_from_init_args`.
     key = (cls, cls._hashable_from_init_args(*args, **kwargs))
-    intern_pool = _intern_pool[cls]
+    intern_pool = _intern_pool[cls]  # pyrefly: ignore[bad-index]
     instance = intern_pool.get(key, None)
     if instance is None:
       instance = super().__call__(*args, **kwargs)
@@ -236,7 +236,7 @@ def _clear_intern_pool() -> None:
   # `abc.ABCMeta` has already been deleted from the world, resulting in
   # exceptions after main.
   global _intern_pool
-  _intern_pool = None
+  _intern_pool = None  # pyrefly: ignore[bad-assignment]
 
 
 atexit.register(_clear_intern_pool)
@@ -492,7 +492,7 @@ class StructType(structure.Struct, Type, metaclass=_Intern):
   ) -> Hashable:
     if convert:
       elements = _to_named_types(elements)
-    invalid_names = _reserved_names_in_elements(elements, dir(cls))
+    invalid_names = _reserved_names_in_elements(elements, dir(cls))  # pyrefly: ignore[bad-argument-type]
     if invalid_names:
       raise ValueError(
           'Expected named elements to not match any reserved names, found'
@@ -521,7 +521,7 @@ class StructType(structure.Struct, Type, metaclass=_Intern):
     """
     if convert:
       elements = _to_named_types(elements)
-    structure.Struct.__init__(self, elements)
+    structure.Struct.__init__(self, elements)  # pyrefly: ignore[bad-argument-type]
 
     self._proto = None
 
@@ -605,7 +605,7 @@ class StructWithPythonType(StructType, metaclass=_Intern):
   """
 
   @classmethod
-  def _hashable_from_init_args(
+  def _hashable_from_init_args(  # pyrefly: ignore[bad-override]
       cls, elements: Iterable[object], container_type: type[object]
   ) -> Hashable:
     elements = _to_named_types(elements)
@@ -622,7 +622,7 @@ class StructWithPythonType(StructType, metaclass=_Intern):
     self._container_type = container_type
 
   @classmethod
-  def from_proto(
+  def from_proto(  # pyrefly: ignore[bad-override]
       cls, type_pb: computation_pb2.Type, *, container_type: type[object]
   ) -> 'StructWithPythonType':
     """Returns a `StructWithPythonType` for the `type_pb`."""
@@ -685,9 +685,9 @@ class SequenceType(Type, metaclass=_Intern):
           for name, value in type_spec.items()
       ]
       if not isinstance(type_spec, StructWithPythonType):
-        return StructType(elements=elements)
+        return StructType(elements=elements)  # pyrefly: ignore[bad-return]
       container_cls = type_spec.python_container
-      return StructWithPythonType(
+      return StructWithPythonType(  # pyrefly: ignore[bad-return]
           elements=elements,
           container_type=tuple if container_cls is list else container_cls,
       )
@@ -1154,7 +1154,7 @@ def to_type(obj: object) -> Type:
     return StructWithPythonType(attrs.asdict(obj, recurse=False), type(obj))
   elif isinstance(obj, py_typecheck.SupportsNamedTuple):
     elements = [(k, np.dtype(v)) for k, v in obj.__annotations__.items()]
-    return StructWithPythonType(elements, obj)
+    return StructWithPythonType(elements, obj)  # pyrefly: ignore[bad-argument-type]
   elif isinstance(obj, Mapping):
     return StructWithPythonType(obj, type(obj))
   elif isinstance(obj, structure.Struct):
@@ -1202,7 +1202,7 @@ def _clear_contained_children_types_cache():
   # `abc.ABCMeta` has already been deleted from the world, resulting in
   # exceptions after main.
   global _contained_children_types_cache
-  _contained_children_types_cache = None
+  _contained_children_types_cache = None  # pyrefly: ignore[bad-assignment]
 
 
 atexit.register(_clear_contained_children_types_cache)

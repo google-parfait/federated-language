@@ -652,8 +652,8 @@ def _check_select_keys_type(
   if not (
       isinstance(keys_type.member, computation_types.TensorType)
       and keys_type.member.dtype == np.int32
-      and len(keys_type.member.shape) == 1
-      and keys_type.member.shape[0] is not None
+      and len(keys_type.member.shape) == 1  # pyrefly: ignore[bad-argument-type]
+      and keys_type.member.shape[0] is not None  # pyrefly: ignore[unsupported-operation]
   ):
     _select_parameter_mismatch(
         keys_type.member,  # pytype: disable=attribute-error
@@ -1140,7 +1140,7 @@ def sequence_sum(value):
     return value_impl.Value(comp)
   elif isinstance(value.type_signature, computation_types.FederatedType):
     intrinsic_type = computation_types.FunctionType(
-        value.type_signature.member, value.type_signature.member.element
+        value.type_signature.member, value.type_signature.member.element  # pyrefly: ignore[missing-attribute]
     )
     intrinsic = building_blocks.Intrinsic(
         intrinsic_defs.SEQUENCE_SUM.uri, intrinsic_type

@@ -314,7 +314,7 @@ def _current_span_yields() -> SpanYields:
   if spans is None:
     spans = [None for _ in range(len(_global_tracing_providers))]
   assert len(_global_tracing_providers) == len(spans)
-  return spans
+  return spans  # pyrefly: ignore[bad-return]
 
 
 def _set_span_yields(span_yields: Optional[SpanYields]):
@@ -366,7 +366,7 @@ def _span_generator(
         scope,
         sub_scope,
         nonce,
-        parent_span_yield,
+        parent_span_yield,  # pyrefly: ignore[bad-argument-type]
         fn_args,
         fn_kwargs,
         trace_opts,
@@ -413,7 +413,7 @@ def wrap_rpc_in_trace_context():
     for tp, parent_span_yield in zip(
         _global_tracing_providers, _current_span_yields()
     ):
-      stack.enter_context(tp.wrap_rpc(parent_span_yield))
+      stack.enter_context(tp.wrap_rpc(parent_span_yield))  # pyrefly: ignore[bad-argument-type]
     yield None
 
 

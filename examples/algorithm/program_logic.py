@@ -484,7 +484,7 @@ async def train_federated_model(
   # *   Have static typing within the program logic.
   # *   Require callers to provide a `program_state_manager` capable of handling
   #     any `federated_language.program.ProgramStateStructure`.
-  program_state_manager = typing.cast(
+  program_state_manager = typing.cast(  # pyrefly: ignore[bad-assignment]
       Optional[federated_language.program.ProgramStateManager[_ProgramState]],
       program_state_manager,
   )
@@ -504,7 +504,7 @@ async def train_federated_model(
         round_num=0,
         iterator=train_data_iterator,
     )
-    program_state, version = await program_state_manager.load_latest(structure)
+    program_state, version = await program_state_manager.load_latest(structure)  # pyrefly: ignore[bad-argument-type]
 
     # TODO: b/271445312 - Cast `program_state` to `_ProgramState`. `TypeVar`s
     # are lost from async function signatures.
@@ -552,7 +552,7 @@ async def train_federated_model(
         )
         version = version + 1
         task_group.create_task(
-            program_state_manager.save(program_state, version)
+            program_state_manager.save(program_state, version)  # pyrefly: ignore[bad-argument-type]
         )
 
     # Run one round of evaluation. This is similar to running one round of

@@ -763,7 +763,7 @@ class SymbolTree:
     if (name is None or not name) and value is None:
       return
 
-    node = SequentialBindingNode(self.payload_type(name=name, value=value))
+    node = SequentialBindingNode(self.payload_type(name=name, value=value))  # pyrefly: ignore[bad-argument-type]
     self.active_node = typing.cast(SequentialBindingNode, self.active_node)
     if self.active_node.younger_sibling is None:
       self._add_younger_sibling(node)

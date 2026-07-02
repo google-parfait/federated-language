@@ -156,7 +156,7 @@ def _parameter_type(
     else:
       # The provided parameter type has no named fields. Apply the names from
       # the function parameters.
-      parameter_types = (v for (_, v) in parameter_type.items())
+      parameter_types = (v for (_, v) in parameter_type.items())  # pyrefly: ignore[bad-assignment]
       return computation_types.StructWithPythonType(
           list(zip(parameter_names, parameter_types)), collections.OrderedDict
       )
@@ -432,7 +432,7 @@ class ComputationWrapper:
       ] = computation_types.to_type,
       infer_type_fn: Callable[
           [object], computation_types.Type
-      ] = type_conversions.infer_type,
+      ] = type_conversions.infer_type,  # pyrefly: ignore[bad-function-definition]
   ):
     """Construct a new wrapper/decorator for the given wrapper callable.
 
@@ -493,7 +493,7 @@ class ComputationWrapper:
       # "success" case below.
       provided_types = []
       return lambda fn: _wrap(
-          fn, self._wrapper_fn, provided_types, self._infer_type_fn
+          fn, self._wrapper_fn, provided_types, self._infer_type_fn  # pyrefly: ignore[bad-argument-type]
       )
     elif _is_function(args[0]):
       # If the first argument on the list is a Python function, instance method,
@@ -505,9 +505,9 @@ class ComputationWrapper:
       # wrapper that are to be interpreted as the type specification.
       fn = args[0]
       provided_types = _to_types(args[1:])
-      return _wrap(fn, self._wrapper_fn, provided_types, self._infer_type_fn)
+      return _wrap(fn, self._wrapper_fn, provided_types, self._infer_type_fn)  # pyrefly: ignore[bad-argument-type]
     else:
       provided_types = _to_types(args)
       return lambda fn: _wrap(
-          fn, self._wrapper_fn, provided_types, self._infer_type_fn
+          fn, self._wrapper_fn, provided_types, self._infer_type_fn  # pyrefly: ignore[bad-argument-type]
       )

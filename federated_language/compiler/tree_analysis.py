@@ -580,7 +580,7 @@ def find_aggregations_in_tree(
     ):
       return
 
-    if kind_predicate(comp.function.intrinsic_def().aggregation_kind):
+    if kind_predicate(comp.function.intrinsic_def().aggregation_kind):  # pyrefly: ignore[bad-argument-type]
       aggregation_calls.append(comp)
 
   visit_postorder(comp, record_intrinsic_calls)

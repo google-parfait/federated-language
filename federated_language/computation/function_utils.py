@@ -69,7 +69,7 @@ def _is_signature_compatible_with_types(
       continue
     arg_type = computation_types.to_type(arg_value)
     default_type = type_conversions.infer_type(p.default)
-    if not arg_type.is_assignable_from(default_type):
+    if not arg_type.is_assignable_from(default_type):  # pyrefly: ignore[bad-argument-type]
       return False
   return True
 
@@ -136,7 +136,7 @@ def unpack_args_from_struct(
       if name is not None:
         elements.append((name, getattr(struct_with_args, name)))
       else:
-        elements.append((None, struct_with_args[index]))
+        elements.append((None, struct_with_args[index]))  # pyrefly: ignore[bad-index]
   else:
     struct_with_args = computation_types.to_type(struct_with_args)
     if not isinstance(struct_with_args, computation_types.StructType):

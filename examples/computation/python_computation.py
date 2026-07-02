@@ -81,7 +81,7 @@ def _create_concrete_computation_from_fn(
     parameter_type: The parameter type of the Python function.
     result_type: The result type of the  Python function.
   """
-  comp_pb = _create_computation_from_fn(fn, parameter_type, result_type)
+  comp_pb = _create_computation_from_fn(fn, parameter_type, result_type)  # pyrefly: ignore[bad-argument-type]
   context_stack = federated_language.framework.get_context_stack()
   annotated_type = federated_language.FunctionType(parameter_type, result_type)
   return federated_language.framework.ConcreteComputation(
@@ -171,7 +171,7 @@ def python_computation(
       parameter_type = None
     else:
       if len(parameter_types) == 1:
-        parameter_types, *_ = parameter_types
+        parameter_types, *_ = parameter_types  # pyrefly: ignore[bad-assignment]
       parameter_type = federated_language.to_type(parameter_types)
     result_type = federated_language.to_type(result_type)
 

@@ -141,9 +141,9 @@ def main(argv: Sequence[str]) -> None:
           evaluation_data_source=evaluation_data_source,
           total_rounds=_TOTAL_ROUNDS,
           num_clients=_NUM_CLIENTS,
-          train_metrics_manager=train_metrics_manager,
-          evaluation_metrics_manager=evaluation_metrics_manager,
-          model_output_manager=model_output_manager,
+          train_metrics_manager=train_metrics_manager,  # pyrefly: ignore[bad-argument-type]
+          evaluation_metrics_manager=evaluation_metrics_manager,  # pyrefly: ignore[bad-argument-type]
+          model_output_manager=model_output_manager,  # pyrefly: ignore[bad-argument-type]
           program_state_manager=program_state_mngr,
       )
   )

@@ -71,7 +71,7 @@ def zero_or_one_arg_fn_to_building_block(
     if parameter_type is not None:
       result = fn(
           value_impl.Value(
-              building_blocks.Reference(parameter_name, parameter_type),
+              building_blocks.Reference(parameter_name, parameter_type),  # pyrefly: ignore[bad-argument-type]
           )
       )
     else:

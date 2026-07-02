@@ -118,11 +118,11 @@ def _create_structure_of_references(
         key = name
       else:
         key = index
-      element = _get_item(task, key)
+      element = _get_item(task, key)  # pyrefly: ignore[bad-argument-type]
       element_task = asyncio.create_task(element)
       element = _create_structure_of_references(element_task, element_type)
       elements.append(element)
-    return type_conversions.to_structure_with_type(elements, type_signature)
+    return type_conversions.to_structure_with_type(elements, type_signature)  # pyrefly: ignore[bad-return]
   elif (
       isinstance(type_signature, computation_types.FederatedType)
       and type_signature.placement == placements.SERVER
@@ -197,6 +197,6 @@ class NativeFederatedContext(federated_context.FederatedContext):
 
       return await ctx.invoke(comp, arg)
 
-    coro = _invoke(self._ctx, comp, arg)
+    coro = _invoke(self._ctx, comp, arg)  # pyrefly: ignore[bad-argument-type]
     task = asyncio.create_task(coro)
     return _create_structure_of_references(task, result_type)

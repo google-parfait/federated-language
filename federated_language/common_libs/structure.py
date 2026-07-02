@@ -156,7 +156,7 @@ class Struct(Generic[_T]):
             'Element index {} is out of range, `Struct` has {} elements.'
             .format(key, len(self._element_array))
         )
-    return self._element_array[key]
+    return self._element_array[key]  # pyrefly: ignore[bad-return]
 
   def __getattr__(self, name: str) -> _T:
     if name not in self._name_to_index:
@@ -312,8 +312,8 @@ def to_odict(
             'Cannot convert an `Struct` with unnamed entries to a '
             '`collections.OrderedDict`: {}'.format(struct)
         )
-    elements = typing.cast(list[tuple[str, _T]], elements)
-    return collections.OrderedDict(elements)
+    elements = typing.cast(list[tuple[str, _T]], elements)  # pyrefly: ignore[bad-assignment]
+    return collections.OrderedDict(elements)  # pyrefly: ignore[bad-return]
 
   if recursive:
     return _to_container_recursive(struct, _to_odict)
@@ -352,8 +352,8 @@ def to_odict_or_tuple(
                 struct
             )
         )
-      elements = typing.cast(list[tuple[str, _T]], elements)
-      return collections.OrderedDict(elements)
+      elements = typing.cast(list[tuple[str, _T]], elements)  # pyrefly: ignore[bad-assignment]
+      return collections.OrderedDict(elements)  # pyrefly: ignore[bad-return]
     else:
       return tuple(value for _, value in elements)
 
@@ -420,7 +420,7 @@ def pack_sequence_as(
             '{!s}).'.format(type(structure), structure)
         )
 
-      return flat_sequence[position], position + 1
+      return flat_sequence[position], position + 1  # pyrefly: ignore[bad-return]
     else:
       elements = []
       for k, v in iter_elements(structure):
@@ -689,8 +689,8 @@ def update_struct(structure, **kwargs):
             'structure does not contain a field named "{!s}"'.format(key)
         )
     # Create a copy to prevent mutation of the original `structure`
-    dictionary = type(structure)(**structure)
-  dictionary.update(kwargs)
+    dictionary = type(structure)(**structure)  # pyrefly: ignore[bad-instantiation]
+  dictionary.update(kwargs)  # pyrefly: ignore[missing-attribute]
   if isinstance(structure, Mapping):
     return dictionary
-  return type(structure)(**dictionary)
+  return type(structure)(**dictionary)  # pyrefly: ignore[bad-argument-type, bad-instantiation]

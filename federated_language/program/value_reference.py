@@ -107,4 +107,4 @@ async def materialize_value(
   materialized_value = await asyncio.gather(
       *[_materialize(v) for v in flattened_value]
   )
-  return structure_utils.unflatten_as(value, materialized_value)
+  return structure_utils.unflatten_as(value, materialized_value)  # pyrefly: ignore[bad-return]

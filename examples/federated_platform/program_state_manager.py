@@ -64,7 +64,7 @@ class ProgramStateManager(
         versions.append(version)
     return sorted(versions)
 
-  async def load(
+  async def load(  # pyrefly: ignore[bad-override]
       self,
       version: int,
       structure: federated_language.program.ProgramStateStructure,
@@ -90,7 +90,7 @@ class ProgramStateManager(
     )
     return deserialized_state
 
-  async def save(
+  async def save(  # pyrefly: ignore[bad-override]
       self,
       program_state: federated_language.program.ProgramStateStructure,
       version: int,
@@ -100,7 +100,7 @@ class ProgramStateManager(
       os.remove(path)
 
     materialized_state = await federated_language.program.materialize_value(
-        program_state
+        program_state  # pyrefly: ignore[bad-argument-type]
     )
 
     def _serialize(value):

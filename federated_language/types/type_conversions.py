@@ -139,9 +139,9 @@ def _create_structure(
 ) -> _T:
   """Creates an object of type `cls` from the `elements`."""
   if isinstance(cls, py_typecheck.SupportsNamedTuple):
-    return cls(**dict(elements))
+    return cls(**dict(elements))  # pyrefly: ignore[no-matching-overload, not-callable]
   elif issubclass(cls, (Mapping, Sequence)):
-    return cls(elements)  # pylint: disable=too-many-function-args
+    return cls(elements)  # pylint: disable=too-many-function-args  # pyrefly: ignore[bad-argument-count, bad-return]
   else:
     raise ValueError(
         'Expected `cls` to be a `NamedTuple`, `Mapping`, or `Sequence`, found'
@@ -185,7 +185,7 @@ def structure_with_type(
       else:
         elements.append(structure_with_type(factory, value))
 
-    return _create_structure(cls, elements)
+    return _create_structure(cls, elements)  # pyrefly: ignore[bad-specialization]
   else:
     return factory(type_spec)
 
@@ -235,12 +235,12 @@ def to_structure_with_type(
   ) -> Union[computation_types.FederatedType, computation_types.StructType]:
     if isinstance(type_spec, computation_types.FederatedType):
       if not type_spec.all_equal:
-        return type_spec.member
+        return type_spec.member  # pyrefly: ignore[bad-return]
       else:
         type_spec = type_spec.member
 
     if isinstance(type_spec, computation_types.SequenceType):
-      return type_spec.element
+      return type_spec.element  # pyrefly: ignore[bad-return]
 
     if isinstance(type_spec, computation_types.StructType):
       return type_spec[key]
@@ -291,9 +291,9 @@ def to_structure_with_type(
         )
 
       if isinstance(container_cls, py_typecheck.SupportsNamedTuple):
-        elements = zip(names, values)
+        elements = zip(names, values)  # pyrefly: ignore[bad-argument-type]
       elif issubclass(container_cls, Mapping):
-        elements = zip(names, values)
+        elements = zip(names, values)  # pyrefly: ignore[bad-argument-type]
       elif issubclass(container_cls, Sequence):
         elements = values
       else:
@@ -302,7 +302,7 @@ def to_structure_with_type(
             f' `Sequence`, found {container_cls}.'
         )
 
-      return _create_structure(container_cls, elements)
+      return _create_structure(container_cls, elements)  # pyrefly: ignore[bad-argument-type, bad-specialization]
     else:
       return None
 

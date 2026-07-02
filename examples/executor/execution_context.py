@@ -57,7 +57,7 @@ class _ExecutionScope:
 
   def __init__(
       self,
-      scope: '_ExecutionScope' = None,
+      scope: '_ExecutionScope' = None,  # pyrefly: ignore[bad-function-definition]
       symbol_bindings: Optional[Mapping[str, object]] = None,
       cardinalities: Optional[
           Mapping[federated_language.framework.PlacementLiteral, int]
@@ -164,7 +164,7 @@ class ExecutionContext(federated_language.framework.AsyncContext):
     )
     cardinalities = {federated_language.SERVER: 1}
     cardinalities |= federated_language.framework.infer_cardinalities(
-        arg, comp.type_signature.parameter
+        arg, comp.type_signature.parameter  # pyrefly: ignore[bad-argument-type]
     )
     scope = _ExecutionScope(cardinalities=cardinalities)
     fn = self._compute(building_block, scope)
@@ -278,7 +278,7 @@ class ExecutionContext(federated_language.framework.AsyncContext):
     array_pb = array_pb2.Array()
     buildling_block.content.Unpack(array_pb)
     serialized_fn = federated_language.array_from_proto(array_pb)
-    fn = cloudpickle.loads(serialized_fn)
+    fn = cloudpickle.loads(serialized_fn)  # pyrefly: ignore[bad-argument-type]
 
     if buildling_block.type_signature.parameter is None:
       return lambda _: fn()
@@ -335,7 +335,7 @@ class ExecutionContext(federated_language.framework.AsyncContext):
     def _fn(arg: object) -> object:
       nonlocal scope
       if buildling_block.parameter_type is not None:
-        scope = _ExecutionScope(scope, {buildling_block.parameter_name: arg})
+        scope = _ExecutionScope(scope, {buildling_block.parameter_name: arg})  # pyrefly: ignore[bad-argument-type]
       return self._compute(buildling_block.result, scope)
 
     return _fn

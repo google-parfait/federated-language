@@ -101,9 +101,9 @@ def infer_cardinalities(
     else:
       elements = value
 
-    for element, (_, element_type) in zip(elements, type_spec.items()):
+    for element, (_, element_type) in zip(elements, type_spec.items()):  # pyrefly: ignore[bad-argument-type]
       update = infer_cardinalities(element, element_type)
       cardinalities = _merge_cardinalities(cardinalities, update)
-    return cardinalities
+    return cardinalities  # pyrefly: ignore[bad-return]
   else:
     return {}

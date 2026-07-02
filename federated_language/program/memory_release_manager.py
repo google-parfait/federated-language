@@ -41,7 +41,7 @@ class MemoryReleaseManager(
     """Returns an initialized `federated_language.program.MemoryReleaseManager`."""
     self._values = collections.OrderedDict()
 
-  async def release(
+  async def release(  # pyrefly: ignore[bad-override]
       self, value: release_manager.ReleasableStructure, key: Hashable
   ) -> None:
     """Releases `value` from a federated program.
@@ -50,7 +50,7 @@ class MemoryReleaseManager(
       value: A `federated_language.program.ReleasableStructure` to release.
       key: A hashable value used to reference the released `value`.
     """
-    materialized_value = await value_reference.materialize_value(value)
+    materialized_value = await value_reference.materialize_value(value)  # pyrefly: ignore[bad-argument-type]
     self._values[key] = materialized_value
 
   def remove_all(self) -> None:

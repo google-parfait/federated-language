@@ -109,6 +109,6 @@ def num_elements_in_shape(shape: ArrayShape) -> Optional[int]:
     shape: A `federated_language.types.ArrayShape`.
   """
   if is_shape_fully_defined(shape):
-    return functools.reduce(operator.mul, shape, 1)
+    return functools.reduce(operator.mul, shape, 1)  # pyrefly: ignore[bad-argument-type]
   else:
     return None

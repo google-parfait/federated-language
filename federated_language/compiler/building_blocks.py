@@ -483,7 +483,7 @@ class Struct(ComputationBuildingBlock, structure.Struct):
 
   @property
   def type_signature(self) -> computation_types.StructType:
-    return self._type_signature
+    return self._type_signature  # pyrefly: ignore[bad-return]
 
   def children(self) -> Iterator[ComputationBuildingBlock]:
     return (element for _, element in structure.iter_elements(self))
@@ -723,7 +723,7 @@ class Lambda(ComputationBuildingBlock):
 
   @property
   def type_signature(self) -> computation_types.FunctionType:
-    return self._type_signature
+    return self._type_signature  # pyrefly: ignore[bad-return]
 
   def children(self) -> Iterator[ComputationBuildingBlock]:
     yield self._result
@@ -734,7 +734,7 @@ class Lambda(ComputationBuildingBlock):
 
   @property
   def parameter_type(self) -> Optional[computation_types.Type]:
-    return self._parameter_type
+    return self._parameter_type  # pyrefly: ignore[bad-return]
 
   @property
   def result(self) -> ComputationBuildingBlock:
@@ -1126,7 +1126,7 @@ class CompiledComputation(ComputationBuildingBlock):
     return CompiledComputation(computation_pb)
 
   def to_proto(self) -> computation_pb2.Computation:
-    return self._proto
+    return self._proto  # pyrefly: ignore[bad-return]
 
   def children(self) -> Iterator[ComputationBuildingBlock]:
     del self
@@ -1154,7 +1154,7 @@ class CompiledComputation(ComputationBuildingBlock):
   def __hash__(self):
     if self._hash is None:
       self._hash = hash((
-          self._proto.SerializeToString(),
+          self._proto.SerializeToString(),  # pyrefly: ignore[missing-attribute]
           self._name,
           self._type_signature,
       ))
@@ -1297,7 +1297,7 @@ class Literal(ComputationBuildingBlock):
 
   @property
   def type_signature(self) -> computation_types.TensorType:
-    return self._type_signature
+    return self._type_signature  # pyrefly: ignore[bad-return]
 
   def children(self) -> Iterator[ComputationBuildingBlock]:
     return iter(())

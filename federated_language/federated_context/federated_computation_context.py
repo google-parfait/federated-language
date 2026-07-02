@@ -128,7 +128,7 @@ class FederatedComputationContext(
       result = fn()
 
     value_type = type_conversions.infer_type(result)
-    if not type_spec.result.is_assignable_from(value_type):
+    if not type_spec.result.is_assignable_from(value_type):  # pyrefly: ignore[bad-argument-type]
       raise computation_types.TypeNotAssignableError(value_type, type_spec)
 
     return result

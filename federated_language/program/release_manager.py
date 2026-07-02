@@ -193,7 +193,7 @@ class FilteringReleaseManager(ReleaseManager[ReleasableStructure, Key]):
       """
       if tree.is_nested(subtree) and not attrs.has(type(subtree)):
         # TODO: b/224484886 - Downcasting to all handled types.
-        subtree = typing.cast(
+        subtree = typing.cast(  # pyrefly: ignore[bad-assignment]
             Union[Sequence[object], Mapping[str, object]], subtree
         )
         if isinstance(subtree, Sequence):
@@ -202,7 +202,7 @@ class FilteringReleaseManager(ReleaseManager[ReleasableStructure, Key]):
             return _FILTERED_SUBTREE
           elif isinstance(subtree, py_typecheck.SupportsNamedTuple):
             if len(subtree) != len(elements):
-              fields = list(type(subtree)._fields)
+              fields = list(type(subtree)._fields)  # pyrefly: ignore[missing-attribute]
               missing_fields = [
                   k
                   for k, v in subtree._asdict().items()
