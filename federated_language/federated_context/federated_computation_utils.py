@@ -81,7 +81,7 @@ def zero_or_one_arg_fn_to_building_block(
     annotated_result_type = type_conversions.infer_type(result)
     result = value_impl.to_value(result, type_spec=annotated_result_type)
     result_comp = result.comp
-    symbols_bound_in_context = context_stack.current.symbol_bindings
+    symbols_bound_in_context = context_stack.current.symbol_bindings  # pyrefly: ignore[missing-attribute]
     if symbols_bound_in_context:
       result_comp = building_blocks.Block(
           local_symbols=symbols_bound_in_context, result=result_comp
