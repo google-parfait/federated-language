@@ -335,7 +335,7 @@ class ExecutionContext(federated_language.framework.AsyncContext):
     def _fn(arg: object) -> object:
       nonlocal scope
       if buildling_block.parameter_type is not None:
-        scope = _ExecutionScope(scope, {buildling_block.parameter_name: arg})  # pyrefly: ignore[bad-argument-type]
+        scope = _ExecutionScope(scope, {buildling_block.parameter_name: arg})  # pyrefly: ignore[bad-argument-type, bad-assignment]
       return self._compute(buildling_block.result, scope)
 
     return _fn
