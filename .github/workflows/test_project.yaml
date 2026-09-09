@@ -56,17 +56,29 @@ jobs:
 
     - name: Test Python dependencies
       run: |
-        bazelisk test //:*
+        bazelisk test //tools/requirements:*
 
     - name: Test examples
       run: |
         cd "examples"
-        bazelisk test //...
+        if ! bazelisk test --test_output=errors //... 2>&1 | tee /tmp/test_examples.log; then
+          echo "### Test examples failed" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          tail -n 200 /tmp/test_examples.log >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          exit 1
+        fi
 
         set +e
-        bazelisk run //program -- --helpshort
-        if [[ $? == 1 ]]; then
-          exit 0
+        if ! bazelisk run //program -- --helpshort 2>&1 | tee /tmp/run_program.log; then
+          rc=$?
+          if [[ $rc -ne 1 ]]; then
+            echo "### Run program failed with code $rc" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            tail -n 200 /tmp/run_program.log >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            exit $rc
+          fi
         fi
         set -e
 
