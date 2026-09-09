@@ -193,42 +193,52 @@ class FilteringReleaseManager(ReleaseManager[ReleasableStructure, Key]):
       """
       if tree.is_nested(subtree) and not attrs.has(type(subtree)):
         # TODO: b/224484886 - Downcasting to all handled types.
-        subtree = typing.cast(  # pyrefly: ignore[bad-assignment]
+        nested_subtree = typing.cast(
             Union[Sequence[object], Mapping[str, object]], subtree
         )
-        if isinstance(subtree, Sequence):
-          elements = [x for x in subtree if x is not _FILTERED_SUBTREE]
+        if isinstance(nested_subtree, Sequence):
+          elements = [x for x in nested_subtree if x is not _FILTERED_SUBTREE]
           if not elements:
             return _FILTERED_SUBTREE
-          elif isinstance(subtree, py_typecheck.SupportsNamedTuple):
-            if len(subtree) != len(elements):
-              fields = list(type(subtree)._fields)  # pyrefly: ignore[missing-attribute]
+          elif isinstance(nested_subtree, py_typecheck.SupportsNamedTuple):
+            if len(nested_subtree) != len(elements):
+              fields = list(nested_subtree._fields)
               missing_fields = [
                   k
-                  for k, v in subtree._asdict().items()
+                  for k, v in nested_subtree._asdict().items()
                   if v is _FILTERED_SUBTREE
               ]
               raise NotFilterableError(
-                  'The fields of a `NamedTuple` cannot be filtered. Expected '
-                  f'{type(subtree)} to have fields {fields}, found it was '
-                  f'missing fields {missing_fields}.'
+                  'The fields of a `NamedTuple` cannot be filtered. Expected'
+                  f' {type(nested_subtree)} to have fields {fields}, found it'
+                  f' was missing fields {missing_fields}.'
               )
 
-            return type(subtree)(*elements)
+            return type(nested_subtree)(*elements)
           else:
             # Assumes the `Sequence` has a constructor that accepts `elements`,
             #  this is safe because `tree` makes the same assumption.
-            return type(subtree)(elements)  # pytype: disable=wrong-arg-count
-        elif isinstance(subtree, Mapping):
+            container_type = typing.cast(
+                typing.Callable[[typing.Sequence[object]], typing.Any],
+                type(nested_subtree),
+            )
+            return container_type(elements)
+        elif isinstance(nested_subtree, Mapping):
           items = [
-              (k, v) for k, v in subtree.items() if v is not _FILTERED_SUBTREE
+              (k, v)
+              for k, v in nested_subtree.items()
+              if v is not _FILTERED_SUBTREE
           ]
           if not items:
             return _FILTERED_SUBTREE
           else:
             # Assumes the `Mapping` has a constructor that accepts `items`,
             # this is safe because `tree` makes the same assumption.
-            return type(subtree)(items)  # pytype: disable=wrong-arg-count
+            mapping_type = typing.cast(
+                typing.Callable[[list[tuple[str, object]]], typing.Any],
+                type(nested_subtree),
+            )
+            return mapping_type(items)
         else:
           raise NotImplementedError(
               f'Unexpected subtree found: {type(subtree)}.'

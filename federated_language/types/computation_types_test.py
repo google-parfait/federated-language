@@ -79,6 +79,25 @@ class InternTest(parameterized.TestCase):
     with self.assertRaises(TypeError):
       _ = Foo()
 
+  def test_call_raises_runtime_error_when_pool_cleared(self):
+
+    class Foo(metaclass=computation_types._Intern):  # pylint: disable=undefined-variable
+
+      @classmethod
+      def _hashable_from_init_args(cls, *args, **kwargs):
+        del args, kwargs  # Unused.
+        return ()
+
+    saved_pool = computation_types._intern_pool
+    computation_types._clear_intern_pool()
+    try:
+      with self.assertRaises(RuntimeError):
+        _ = Foo()
+      with self.assertRaises(RuntimeError):
+        _ = computation_types.TensorType(np.int32)
+    finally:
+      computation_types._intern_pool = saved_pool
+
 
 class TypeTest(parameterized.TestCase):
 
@@ -1791,6 +1810,36 @@ class ToTypeTest(parameterized.TestCase):
   def test_raises_type_error(self, obj):
     with self.assertRaises(TypeError):
       _ = computation_types.to_type(obj)
+
+
+class GetContainedChildrenTypesTest(parameterized.TestCase):
+
+  def test_returns_cached_contained_children_types(self):
+    type_spec = computation_types.TensorType(np.int32)
+    result = computation_types._get_contained_children_types(type_spec)
+    self.assertIsInstance(result, computation_types._ContainedChildrenTypes)
+    self.assertIs(
+        computation_types._get_contained_children_types(type_spec), result
+    )
+
+  def test_raises_runtime_error_when_cache_cleared(self):
+    saved_cache = computation_types._contained_children_types_cache
+    computation_types._clear_contained_children_types_cache()
+    try:
+      with self.assertRaises(RuntimeError):
+        _ = computation_types._get_contained_children_types(
+            computation_types.TensorType(np.int32)
+        )
+      with self.assertRaises(RuntimeError):
+        _ = computation_types.SequenceType(
+            computation_types.TensorType(np.int8, (12345,))
+        )
+      with self.assertRaises(RuntimeError):
+        _ = computation_types.FederatedType(
+            computation_types.TensorType(np.int8, (12345,)), placements.SERVER
+        )
+    finally:
+      computation_types._contained_children_types_cache = saved_cache
 
 
 class RepresentationTest(absltest.TestCase):

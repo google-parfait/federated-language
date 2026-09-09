@@ -1083,6 +1083,16 @@ class TransformationUtilsTest(parameterized.TestCase):
 
     self.assertEqual(symbol_tree, shadow_symbol_tree)
 
+  def test_ingest_variable_binding_raises_value_error_with_no_name_and_value(
+      self,
+  ):
+    symbol_tree = transformation_utils.SymbolTree(FakeTracker)
+    literal = building_blocks.Literal(1, computation_types.TensorType(np.int32))
+    with self.assertRaises(ValueError):
+      symbol_tree.ingest_variable_binding(None, literal)
+    with self.assertRaises(ValueError):
+      symbol_tree.ingest_variable_binding('', literal)
+
   def test_ingest_variable_overwrites_existing_node_with_same_name(self):
     symbol_tree = transformation_utils.SymbolTree(FakeTracker)
     symbol_tree.drop_scope_down(1)

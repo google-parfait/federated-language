@@ -26,7 +26,7 @@ The shape of an `Array` may be one of the following:
 from collections.abc import Sequence
 import functools
 import operator
-from typing import Optional, Union
+from typing import Optional, TypeGuard, Union
 
 from federated_language.proto import array_pb2
 from federated_language.proto import data_type_pb2  # pylint: disable=unused-import  # b/330931277
@@ -57,7 +57,7 @@ def to_proto(shape: ArrayShape) -> array_pb2.ArrayShape:
     return array_pb2.ArrayShape(unknown_rank=True)
 
 
-def is_shape_fully_defined(shape: ArrayShape) -> bool:
+def is_shape_fully_defined(shape: ArrayShape) -> TypeGuard[tuple[int, ...]]:
   """Returns `True` if `shape` is fully defined, False otherwise.
 
   Args:
@@ -109,6 +109,6 @@ def num_elements_in_shape(shape: ArrayShape) -> Optional[int]:
     shape: A `federated_language.types.ArrayShape`.
   """
   if is_shape_fully_defined(shape):
-    return functools.reduce(operator.mul, shape, 1)  # pyrefly: ignore[bad-argument-type]
+    return functools.reduce(operator.mul, shape, 1)
   else:
     return None

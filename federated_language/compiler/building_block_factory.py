@@ -1329,7 +1329,7 @@ def zip_to_match_type(
 
   def _can_be_zipped_into(
       source_type: computation_types.Type, target_type: computation_types.Type
-  ) -> bool:  # pyrefly: ignore[bad-return]
+  ) -> bool:
     """Indicates possibility of the transformation `zip_to_match_type`."""
 
     def _struct_can_be_zipped_to_federated(
@@ -1381,6 +1381,8 @@ def zip_to_match_type(
               _struct_elem_zippable(s_name, s_el, t_name, t_el)
           )
         return all(elements_zippable)
+      else:
+        return False
     else:
       return target_type.is_assignable_from(source_type)
 
