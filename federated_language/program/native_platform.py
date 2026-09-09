@@ -15,7 +15,7 @@
 
 import asyncio
 from collections.abc import Mapping
-from typing import Optional, Union
+from typing import Optional, Union, cast
 
 from federated_language.common_libs import structure
 from federated_language.computation import computation_base
@@ -115,14 +115,22 @@ def _create_structure_of_references(
     for index, (name, element_type) in enumerate(type_signature.items()):
       container_cls = _get_container_cls(type_signature)
       if issubclass(container_cls, Mapping):
-        key = name
+        if name is None:
+          raise ValueError(
+              'Expected `name` to not be None when container is a mapping,'
+              f' found {name}.'
+          )
+        key: Union[str, int] = name
       else:
         key = index
-      element = _get_item(task, key)  # pyrefly: ignore[bad-argument-type]
+      element = _get_item(task, key)
       element_task = asyncio.create_task(element)
       element = _create_structure_of_references(element_task, element_type)
       elements.append(element)
-    return type_conversions.to_structure_with_type(elements, type_signature)  # pyrefly: ignore[bad-return]
+    return cast(
+        structure_utils.Structure[NativeValueReference],
+        type_conversions.to_structure_with_type(elements, type_signature),
+    )
   elif (
       isinstance(type_signature, computation_types.FederatedType)
       and type_signature.placement == placements.SERVER
@@ -182,9 +190,13 @@ class NativeFederatedContext(federated_context.FederatedContext):
     async def _invoke(
         ctx: context.AsyncContext,
         comp: computation_base.Computation,
-        arg: value_reference.MaterializableStructure,
+        arg: Optional[federated_context.ComputationArg],
     ) -> value_reference.MaterializedStructure:
       if comp.type_signature.parameter is not None:
+        if arg is None:
+          raise ValueError(
+              'Expected `arg` to not be None when computation has a parameter.'
+          )
 
         def _to_python(obj):
           if isinstance(obj, structure.Struct):
@@ -192,11 +204,14 @@ class NativeFederatedContext(federated_context.FederatedContext):
           else:
             return None
 
-        arg = tree.traverse(_to_python, arg)
-        arg = await value_reference.materialize_value(arg)
+        python_arg = tree.traverse(_to_python, arg)
+        materialized_arg = await value_reference.materialize_value(python_arg)
+        result = await ctx.invoke(comp, materialized_arg)
+      else:
+        result = await ctx.invoke(comp, None)
 
-      return await ctx.invoke(comp, arg)
+      return cast(value_reference.MaterializedStructure, result)
 
-    coro = _invoke(self._ctx, comp, arg)  # pyrefly: ignore[bad-argument-type]
+    coro = _invoke(self._ctx, comp, arg)
     task = asyncio.create_task(coro)
     return _create_structure_of_references(task, result_type)
