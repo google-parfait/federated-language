@@ -91,7 +91,7 @@ class ProgramStateManager(abc.ABC, Generic[ProgramStateStructure]):
 
   async def load_latest(
       self, structure: ProgramStateStructure
-  ) -> tuple[ProgramStateStructure, int]:
+  ) -> tuple[Optional[ProgramStateStructure], int]:
     """Returns the latest saved program state and version or (`None`, 0).
 
     Args:
@@ -105,12 +105,12 @@ class ProgramStateManager(abc.ABC, Generic[ProgramStateStructure]):
     """
     versions = await self.get_versions()
     if versions is None or not versions:
-      return None, 0  # pyrefly: ignore[bad-return]
+      return None, 0
     latest_version = max(versions)
     try:
       return await self.load(latest_version, structure), latest_version
     except ProgramStateNotFoundError:
-      return None, 0  # pyrefly: ignore[bad-return]
+      return None, 0
 
   @abc.abstractmethod
   async def save(

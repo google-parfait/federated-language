@@ -13,17 +13,18 @@
 # limitations under the License.
 """Utilities for releasing values from a federated program to logs."""
 
-from typing import Optional
+from typing import Generic, Optional
 
 from absl import logging
-from federated_language.program import release_manager
 from federated_language.program import value_reference
+from federated_language.program.release_manager import Key
+from federated_language.program.release_manager import ReleasableStructure
+from federated_language.program.release_manager import ReleaseManager
 
 
 class LoggingReleaseManager(
-    release_manager.ReleaseManager[
-        release_manager.ReleasableStructure, release_manager.Key
-    ]
+    ReleaseManager[ReleasableStructure, Key],
+    Generic[ReleasableStructure, Key],
 ):
   """A `federated_language.program.ReleaseManager` that releases values to logs.
 
@@ -37,10 +38,10 @@ class LoggingReleaseManager(
   containing value references, each value reference is materialized.
   """
 
-  async def release(  # pyrefly: ignore[bad-override]
+  async def release(
       self,
-      value: release_manager.ReleasableStructure,  # pyrefly: ignore[invalid-type-var]
-      key: Optional[release_manager.Key],
+      value: ReleasableStructure,
+      key: Optional[Key] = None,
   ) -> None:
     """Releases `value` from a federated program.
 
@@ -48,7 +49,7 @@ class LoggingReleaseManager(
       value: A `federated_language.program.ReleasableStructure` to release.
       key: An optional value used to reference the released `value`.
     """
-    materialized_value = await value_reference.materialize_value(value)  # pyrefly: ignore[bad-argument-type]
+    materialized_value = await value_reference.materialize_value(value)
     logging.info('Releasing')
     logging.info('  value: %s', materialized_value)
     if key is not None:

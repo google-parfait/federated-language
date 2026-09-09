@@ -17,7 +17,7 @@ import abc
 from collections.abc import Iterable, Iterator
 import enum
 import typing
-from typing import Optional, Union
+from typing import Optional, Union, cast
 import zlib
 
 from federated_language.common_libs import py_typecheck
@@ -483,7 +483,7 @@ class Struct(ComputationBuildingBlock, structure.Struct):
 
   @property
   def type_signature(self) -> computation_types.StructType:
-    return self._type_signature  # pyrefly: ignore[bad-return]
+    return cast(computation_types.StructType, self._type_signature)
 
   def children(self) -> Iterator[ComputationBuildingBlock]:
     return (element for _, element in structure.iter_elements(self))
@@ -679,13 +679,15 @@ class Lambda(ComputationBuildingBlock):
           )
       )
     if parameter_name is not None:
-      parameter_type = computation_types.to_type(parameter_type)
+      typed_parameter_type = computation_types.to_type(parameter_type)
+    else:
+      typed_parameter_type = None
     type_signature = computation_types.FunctionType(
-        parameter_type, result.type_signature
+        typed_parameter_type, result.type_signature
     )
     super().__init__(type_signature)
     self._parameter_name = parameter_name
-    self._parameter_type = parameter_type
+    self._parameter_type = typed_parameter_type
     self._result = result
     self._type_signature = type_signature
 
@@ -723,7 +725,7 @@ class Lambda(ComputationBuildingBlock):
 
   @property
   def type_signature(self) -> computation_types.FunctionType:
-    return self._type_signature  # pyrefly: ignore[bad-return]
+    return cast(computation_types.FunctionType, self._type_signature)
 
   def children(self) -> Iterator[ComputationBuildingBlock]:
     yield self._result
@@ -734,7 +736,7 @@ class Lambda(ComputationBuildingBlock):
 
   @property
   def parameter_type(self) -> Optional[computation_types.Type]:
-    return self._parameter_type  # pyrefly: ignore[bad-return]
+    return self._parameter_type
 
   @property
   def result(self) -> ComputationBuildingBlock:
@@ -1113,7 +1115,7 @@ class CompiledComputation(ComputationBuildingBlock):
     if type_signature is None:
       type_signature = computation_types.Type.from_proto(proto.type)
     super().__init__(type_signature)
-    self._proto = proto
+    self._proto: computation_pb2.Computation = proto
     if name is None:
       name = '{:x}'.format(zlib.adler32(self._proto.SerializeToString()))
     self._name = name
@@ -1126,7 +1128,7 @@ class CompiledComputation(ComputationBuildingBlock):
     return CompiledComputation(computation_pb)
 
   def to_proto(self) -> computation_pb2.Computation:
-    return self._proto  # pyrefly: ignore[bad-return]
+    return self._proto
 
   def children(self) -> Iterator[ComputationBuildingBlock]:
     del self
@@ -1154,7 +1156,7 @@ class CompiledComputation(ComputationBuildingBlock):
   def __hash__(self):
     if self._hash is None:
       self._hash = hash((
-          self._proto.SerializeToString(),  # pyrefly: ignore[missing-attribute]
+          self._proto.SerializeToString(),
           self._name,
           self._type_signature,
       ))
@@ -1297,7 +1299,7 @@ class Literal(ComputationBuildingBlock):
 
   @property
   def type_signature(self) -> computation_types.TensorType:
-    return self._type_signature  # pyrefly: ignore[bad-return]
+    return cast(computation_types.TensorType, self._type_signature)
 
   def children(self) -> Iterator[ComputationBuildingBlock]:
     return iter(())
