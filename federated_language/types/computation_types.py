@@ -17,7 +17,7 @@ import abc
 import atexit
 import collections
 from collections.abc import Hashable, Iterable, Iterator, Mapping, MutableMapping, Sequence
-from typing import Optional, TypeGuard, TypeVar, Union
+from typing import Optional, TypeGuard, TypeVar, Union, cast
 import weakref
 
 import attrs
@@ -190,6 +190,9 @@ class _Intern(abc.ABCMeta):
     raise NotImplementedError
 
   def __call__(cls, *args, **kwargs):
+    if _intern_pool is None:
+      raise RuntimeError('Intern pool has been cleared.')
+
     # Convert all `Iterator`s in both `args` and `kwargs` to `list`s so they can
     # be used in both `_hashable_from_init_args` and `__init__`.
     def _normalize(obj):
@@ -204,9 +207,9 @@ class _Intern(abc.ABCMeta):
     # Salt the key with `cls` to account for two different classes that return
     # the same result from `_hashable_from_init_args`.
     key = (cls, cls._hashable_from_init_args(*args, **kwargs))
-    intern_pool = _intern_pool[cls]  # pyrefly: ignore[bad-index]
-    instance = intern_pool.get(key, None)
-    if instance is None:
+    type_cls = cast(type[Type], cls)
+    intern_pool = _intern_pool[type_cls]
+    if (instance := intern_pool.get(key)) is None:
       instance = super().__call__(*args, **kwargs)
       intern_pool[key] = instance
     return instance
@@ -222,9 +225,9 @@ class _Intern(abc.ABCMeta):
 # stored as a field of each class because some class objects themselves would
 # begin destruction before the map fields of other classes, causing errors
 # during destruction.
-_intern_pool: MutableMapping[type[Type], MutableMapping[Hashable, Type]] = (
-    collections.defaultdict(dict)
-)
+_intern_pool: Optional[
+    MutableMapping[type[Type], MutableMapping[Hashable, Type]]
+] = collections.defaultdict(dict)
 
 
 def _clear_intern_pool() -> None:
@@ -236,7 +239,7 @@ def _clear_intern_pool() -> None:
   # `abc.ABCMeta` has already been deleted from the world, resulting in
   # exceptions after main.
   global _intern_pool
-  _intern_pool = None  # pyrefly: ignore[bad-assignment]
+  _intern_pool = None
 
 
 atexit.register(_clear_intern_pool)
@@ -1188,12 +1191,12 @@ class _ContainedChildrenTypes:
 # Manual cache used rather than `cachetools.cached` due to incompatibility
 # with `WeakValueDictionary`. We want to use a `WeakValueDictionary` so that
 # cache entries are destroyed once the types they index no longer exist.
-_contained_children_types_cache: MutableMapping[
-    Type, _ContainedChildrenTypes
+_contained_children_types_cache: Optional[
+    MutableMapping[Type, _ContainedChildrenTypes]
 ] = weakref.WeakValueDictionary({})
 
 
-def _clear_contained_children_types_cache():
+def _clear_contained_children_types_cache() -> None:
   # We must clear our `WeakKeyValueDictionary`s at the end of the program to
   # prevent Python from deleting the standard library out from under us before
   # removing the  entries from the dictionary. Yes, this is cursed.
@@ -1202,7 +1205,7 @@ def _clear_contained_children_types_cache():
   # `abc.ABCMeta` has already been deleted from the world, resulting in
   # exceptions after main.
   global _contained_children_types_cache
-  _contained_children_types_cache = None  # pyrefly: ignore[bad-assignment]
+  _contained_children_types_cache = None
 
 
 atexit.register(_clear_contained_children_types_cache)
@@ -1222,8 +1225,9 @@ def _get_contained_children_types(type_spec: Type) -> _ContainedChildrenTypes:
   """
   if _contained_children_types_cache is None:
     raise RuntimeError('Unexpected runtime error.')
-  children_types = _contained_children_types_cache.get(type_spec, None)
-  if children_types is not None:
+  if (
+      children_types := _contained_children_types_cache.get(type_spec)
+  ) is not None:
     return children_types
 
   children_types = _ContainedChildrenTypes()

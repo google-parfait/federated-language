@@ -411,5 +411,41 @@ class CheckHasUniqueNamesTest(absltest.TestCase):
     tree_analysis.check_has_unique_names(single_block)
 
 
+class FindAggregationsInTreeTest(absltest.TestCase):
+
+  def test_finds_aggregations_with_default_predicate(self):
+    intrinsic = building_blocks.Intrinsic(
+        intrinsic_defs.FEDERATED_SUM.uri,
+        computation_types.FunctionType(
+            computation_types.FederatedType(np.int32, placements.CLIENTS),
+            computation_types.FederatedType(np.int32, placements.SERVER),
+        ),
+    )
+    arg = building_blocks.Reference(
+        'x', computation_types.FederatedType(np.int32, placements.CLIENTS)
+    )
+    call = building_blocks.Call(intrinsic, arg)
+    aggregations = tree_analysis.find_aggregations_in_tree(call)
+    self.assertEqual(aggregations, [call])
+
+  def test_filters_aggregations_with_custom_predicate(self):
+    intrinsic = building_blocks.Intrinsic(
+        intrinsic_defs.FEDERATED_SUM.uri,
+        computation_types.FunctionType(
+            computation_types.FederatedType(np.int32, placements.CLIENTS),
+            computation_types.FederatedType(np.int32, placements.SERVER),
+        ),
+    )
+    arg = building_blocks.Reference(
+        'x', computation_types.FederatedType(np.int32, placements.CLIENTS)
+    )
+    call = building_blocks.Call(intrinsic, arg)
+    aggregations = tree_analysis.find_aggregations_in_tree(
+        call,
+        kind_predicate=lambda k: k == intrinsic_defs.AggregationKind.SECURE,
+    )
+    self.assertEmpty(aggregations)
+
+
 if __name__ == '__main__':
   absltest.main()

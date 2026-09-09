@@ -1429,6 +1429,17 @@ class ZipUpToTest(absltest.TestCase):
 
     self.assertIsNone(zipped)
 
+  def test_does_not_zip_struct_to_incompatible_type(self):
+    comp = building_blocks.Struct([
+        ('a', building_blocks.Reference('x', np.int32)),
+        ('b', building_blocks.Reference('y', np.int32)),
+    ])
+    incompatible_type = computation_types.TensorType(np.int32)
+    zipped = building_block_factory.zip_to_match_type(
+        comp_to_zip=comp, target_type=incompatible_type
+    )
+    self.assertIsNone(zipped)
+
 
 if __name__ == '__main__':
   absltest.main()
