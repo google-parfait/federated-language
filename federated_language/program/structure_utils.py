@@ -92,7 +92,7 @@ def flatten(structure: Structure[T]) -> list[T]:
 
 
 def unflatten_as(
-    structure: Structure[T], flat_sequence: Sequence[T]
+    structure: Structure[object], flat_sequence: Sequence[T]
 ) -> Structure[T]:
   """Unflattens a sequence into a `federated_language.program.Structure`."""
   filtered_structure = _filter_structure(structure)

@@ -67,7 +67,11 @@ class TestMaterializableValueReference(
     if self._type_signature != other._type_signature:
       return False
     if isinstance(self._type_signature, computation_types.SequenceType):
-      return list(self._value) == list(other._value)  # pyrefly: ignore[bad-argument-type]
+      if isinstance(self._value, Iterable) and isinstance(
+          other._value, Iterable
+      ):
+        return list(self._value) == list(other._value)
+      return False
     else:
       return self._value == other._value
 
@@ -146,7 +150,7 @@ def assert_not_warns(
   # information.
   for v in list(sys.modules.values()):
     if getattr(v, '__warningregistry__', None):
-      v.__warningregistry__ = {}  # pyrefly: ignore[missing-attribute]
+      setattr(v, '__warningregistry__', {})
 
   with warnings.catch_warnings(record=True) as w:
     warnings.simplefilter('always', category=category)
@@ -159,17 +163,21 @@ def assert_not_warns(
 def assert_same_key_order(a: object, b: object) -> None:
   """Asserts that two structures contain the same order for keys."""
 
-  def _get_item(
-      structure: Union[Sequence[T], Mapping[str, T]], key: Union[str, int]
-  ) -> T:
-    if isinstance(structure, py_typecheck.SupportsNamedTuple):
-      return getattr(structure, key)  # pyrefly: ignore[bad-argument-type]
+  def _get_item(structure: object, key: Union[str, int]) -> object:
+    if isinstance(structure, py_typecheck.SupportsNamedTuple) and isinstance(
+        key, str
+    ):
+      return getattr(structure, key)
+    elif isinstance(key, str) and isinstance(structure, Mapping):
+      return structure[key]
+    elif isinstance(key, int) and isinstance(structure, Sequence):
+      return structure[key]
     else:
-      return structure[key]  # pyrefly: ignore[bad-index]
+      raise ValueError(f'Expected to find {key} in {structure}.')
 
   def _fn(path: tuple[Union[str, int], ...], obj: object) -> None:
     if isinstance(obj, Mapping):
-      other = functools.reduce(_get_item, path, b)  # pyrefly: ignore[bad-argument-type]
+      other = functools.reduce(_get_item, path, b)
       if not isinstance(other, Mapping):
         raise AssertionError(
             f'Expected `other` to be a `Mapping` type, found {type(other)}.'

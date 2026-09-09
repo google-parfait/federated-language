@@ -24,7 +24,7 @@ unplaced.
 import abc
 import asyncio
 from collections.abc import Iterable
-from typing import Union
+from typing import Union, overload
 
 from federated_language.program import structure_utils
 from federated_language.types import computation_types
@@ -84,9 +84,23 @@ class MaterializableValueReference(typed_object.TypedObject, abc.ABC):
     raise NotImplementedError
 
 
+@overload
 async def materialize_value(
     value: MaterializableStructure,
 ) -> MaterializedStructure:
+  pass
+
+
+@overload
+async def materialize_value(
+    value: structure_utils.Structure[object],
+) -> structure_utils.Structure[object]:
+  pass
+
+
+async def materialize_value(
+    value: structure_utils.Structure[object],
+) -> structure_utils.Structure[object]:
   """Materializes the `federated_language.program.MaterializableValueReference`s in `value`.
 
   Args:
@@ -97,7 +111,7 @@ async def materialize_value(
     A `federated_language.program.MaterializedStructure`.
   """
 
-  async def _materialize(value: MaterializableValue) -> MaterializedValue:
+  async def _materialize(value: object) -> object:
     if isinstance(value, MaterializableValueReference):
       return await value.get_value()
     else:
@@ -107,4 +121,4 @@ async def materialize_value(
   materialized_value = await asyncio.gather(
       *[_materialize(v) for v in flattened_value]
   )
-  return structure_utils.unflatten_as(value, materialized_value)  # pyrefly: ignore[bad-return]
+  return structure_utils.unflatten_as(value, materialized_value)

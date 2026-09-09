@@ -273,6 +273,28 @@ class FromProtoTest(parameterized.TestCase):
     with self.assertRaises(ValueError):
       array.from_proto(proto)
 
+  @parameterized.named_parameters(
+      (
+          'partially_defined',
+          array_pb2.Array(
+              dtype=data_type_pb2.DataType.DT_INT32,
+              shape=array_pb2.ArrayShape(dim=[2, -1]),
+              int32_list=array_pb2.Array.IntList(value=[1, 2]),
+          ),
+      ),
+      (
+          'unknown',
+          array_pb2.Array(
+              dtype=data_type_pb2.DataType.DT_INT32,
+              shape=array_pb2.ArrayShape(unknown_rank=True),
+              int32_list=array_pb2.Array.IntList(value=[1, 2]),
+          ),
+      ),
+  )
+  def test_raises_value_error_with_invalid_shape(self, proto):
+    with self.assertRaises(ValueError):
+      array.from_proto(proto)
+
 
 class ToProtoTest(parameterized.TestCase):
 
@@ -1102,6 +1124,28 @@ class FromProtoContentTest(parameterized.TestCase):
   def test_raises_value_error_with_invalid_dtype(self, proto):
     with self.assertRaises(ValueError):
       array.from_proto(proto)
+
+  @parameterized.named_parameters(
+      (
+          'partially_defined',
+          array_pb2.Array(
+              dtype=data_type_pb2.DataType.DT_INT32,
+              shape=array_pb2.ArrayShape(dim=[2, -1]),
+              content=np.int32([1, 2]).tobytes(),
+          ),
+      ),
+      (
+          'unknown',
+          array_pb2.Array(
+              dtype=data_type_pb2.DataType.DT_INT32,
+              shape=array_pb2.ArrayShape(unknown_rank=True),
+              content=np.int32([1, 2]).tobytes(),
+          ),
+      ),
+  )
+  def test_raises_value_error_with_invalid_shape(self, proto):
+    with self.assertRaises(ValueError):
+      array.from_proto_content(proto)
 
 
 class ToProtoContentTest(parameterized.TestCase):

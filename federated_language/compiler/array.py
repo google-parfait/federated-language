@@ -13,7 +13,7 @@
 # limitations under the License.
 """Utilities for working with arrays."""
 
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 from federated_language.proto import array_pb2
 from federated_language.types import array_shape
@@ -113,7 +113,9 @@ def from_proto(array_pb: array_pb2.Array) -> Array:
   # scalar strings using numpy and this is ok because string types can only be
   # inferred as string types.
   if not array_shape.is_shape_scalar(shape):
-    value = np.array(value, dtype).reshape(shape)  # pyrefly: ignore[no-matching-overload]
+    if not array_shape.is_shape_fully_defined(shape):
+      raise ValueError(f'Expected a fully defined shape, found {shape}.')
+    value = np.array(value, dtype).reshape(shape)
   else:
     (value,) = value
     value = dtype(value)
@@ -167,88 +169,88 @@ def to_proto(
 
   dtype_pb = dtype_utils.to_proto(dtype)
   shape_pb = array_shape.to_proto(value.shape)
-  value = value.flatten().tolist()  # pyrefly: ignore[bad-assignment]
+  flat_values: list[Any] = value.flatten().tolist()
 
   if dtype is np.bool_:
     return array_pb2.Array(
         dtype=dtype_pb,
         shape=shape_pb,
-        bool_list=array_pb2.Array.BoolList(value=value),  # pyrefly: ignore[bad-argument-type]
+        bool_list=array_pb2.Array.BoolList(value=flat_values),
     )
   elif dtype is np.int8:
     return array_pb2.Array(
         dtype=dtype_pb,
         shape=shape_pb,
-        int8_list=array_pb2.Array.IntList(value=value),  # pyrefly: ignore[bad-argument-type]
+        int8_list=array_pb2.Array.IntList(value=flat_values),
     )
   elif dtype is np.int16:
     return array_pb2.Array(
         dtype=dtype_pb,
         shape=shape_pb,
-        int16_list=array_pb2.Array.IntList(value=value),  # pyrefly: ignore[bad-argument-type]
+        int16_list=array_pb2.Array.IntList(value=flat_values),
     )
   elif dtype is np.int32:
     return array_pb2.Array(
         dtype=dtype_pb,
         shape=shape_pb,
-        int32_list=array_pb2.Array.IntList(value=value),  # pyrefly: ignore[bad-argument-type]
+        int32_list=array_pb2.Array.IntList(value=flat_values),
     )
   elif dtype is np.int64:
     return array_pb2.Array(
         dtype=dtype_pb,
         shape=shape_pb,
-        int64_list=array_pb2.Array.Int64List(value=value),  # pyrefly: ignore[bad-argument-type]
+        int64_list=array_pb2.Array.Int64List(value=flat_values),
     )
   elif dtype is np.uint8:
     return array_pb2.Array(
         dtype=dtype_pb,
         shape=shape_pb,
-        uint8_list=array_pb2.Array.IntList(value=value),  # pyrefly: ignore[bad-argument-type]
+        uint8_list=array_pb2.Array.IntList(value=flat_values),
     )
   elif dtype is np.uint16:
     return array_pb2.Array(
         dtype=dtype_pb,
         shape=shape_pb,
-        uint16_list=array_pb2.Array.IntList(value=value),  # pyrefly: ignore[bad-argument-type]
+        uint16_list=array_pb2.Array.IntList(value=flat_values),
     )
   elif dtype is np.uint32:
     return array_pb2.Array(
         dtype=dtype_pb,
         shape=shape_pb,
-        uint32_list=array_pb2.Array.Uint32List(value=value),  # pyrefly: ignore[bad-argument-type]
+        uint32_list=array_pb2.Array.Uint32List(value=flat_values),
     )
   elif dtype is np.uint64:
     return array_pb2.Array(
         dtype=dtype_pb,
         shape=shape_pb,
-        uint64_list=array_pb2.Array.Uint64List(value=value),  # pyrefly: ignore[bad-argument-type]
+        uint64_list=array_pb2.Array.Uint64List(value=flat_values),
     )
   elif dtype is np.float16:
     # Values of dtype `np.float16` are packed to and unpacked from a protobuf
     # field of type `int32` using the following logic in order to maintain
     # compatibility with how other external environments (e.g., TensorFlow, JAX)
     # represent values of `np.float16`.
-    value = np.asarray(value, np.float16).view(np.uint16).tolist()
+    packed_values = np.asarray(flat_values, np.float16).view(np.uint16).tolist()
     return array_pb2.Array(
         dtype=dtype_pb,
         shape=shape_pb,
-        float16_list=array_pb2.Array.IntList(value=value),
+        float16_list=array_pb2.Array.IntList(value=packed_values),
     )
   elif dtype is np.float32:
     return array_pb2.Array(
         dtype=dtype_pb,
         shape=shape_pb,
-        float32_list=array_pb2.Array.FloatList(value=value),  # pyrefly: ignore[bad-argument-type]
+        float32_list=array_pb2.Array.FloatList(value=flat_values),
     )
   elif dtype is np.float64:
     return array_pb2.Array(
         dtype=dtype_pb,
         shape=shape_pb,
-        float64_list=array_pb2.Array.DoubleList(value=value),  # pyrefly: ignore[bad-argument-type]
+        float64_list=array_pb2.Array.DoubleList(value=flat_values),
     )
   elif dtype is np.complex64:
     packed_value = []
-    for x in value:  # pyrefly: ignore[not-iterable]
+    for x in flat_values:
       if not isinstance(x, complex):
         raise ValueError(f'Expected a complex type, found {type(x)}.')
       packed_value.extend([x.real, x.imag])
@@ -259,7 +261,7 @@ def to_proto(
     )
   elif dtype is np.complex128:
     packed_value = []
-    for x in value:  # pyrefly: ignore[not-iterable]
+    for x in flat_values:
       if not isinstance(x, complex):
         raise ValueError(f'Expected a complex type, found {type(x)}.')
       packed_value.extend([x.real, x.imag])
@@ -273,17 +275,19 @@ def to_proto(
     # protobuf field of type `int32` using the following logic in order to
     # maintain compatibility with how other external environments (e.g.,
     # TensorFlow, JAX) represent values of `ml_dtypes.bfloat16`.
-    value = np.asarray(value, ml_dtypes.bfloat16).view(np.uint16).tolist()
+    packed_values = (
+        np.asarray(flat_values, ml_dtypes.bfloat16).view(np.uint16).tolist()
+    )
     return array_pb2.Array(
         dtype=dtype_pb,
         shape=shape_pb,
-        bfloat16_list=array_pb2.Array.IntList(value=value),
+        bfloat16_list=array_pb2.Array.IntList(value=packed_values),
     )
   elif dtype is np.str_:
     return array_pb2.Array(
         dtype=dtype_pb,
         shape=shape_pb,
-        string_list=array_pb2.Array.BytesList(value=value),  # pyrefly: ignore[bad-argument-type]
+        string_list=array_pb2.Array.BytesList(value=flat_values),
     )
   else:
     raise NotImplementedError(f'Unexpected dtype found: {dtype}.')
@@ -308,7 +312,9 @@ def from_proto_content(array_pb: array_pb2.Array) -> Array:
   # scalar strings using numpy and this is ok because string types can only be
   # inferred as string types.
   if not array_shape.is_shape_scalar(shape):
-    value = value.reshape(shape)  # pyrefly: ignore[no-matching-overload]
+    if not array_shape.is_shape_fully_defined(shape):
+      raise ValueError(f'Expected a fully defined shape, found {shape}.')
+    value = value.reshape(shape)
   else:
     value = value.item()
     value = dtype(value)
