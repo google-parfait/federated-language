@@ -760,10 +760,12 @@ class SymbolTree:
         or that we have a symbol tree instance that does not match the
         computation we are currently processing.
     """
-    if (name is None or not name) and value is None:
-      return
+    if not name:
+      if value is None:
+        return
+      raise ValueError('Variable binding with a value must have a name.')
 
-    node = SequentialBindingNode(self.payload_type(name=name, value=value))  # pyrefly: ignore[bad-argument-type]
+    node = SequentialBindingNode(self.payload_type(name=name, value=value))
     self.active_node = typing.cast(SequentialBindingNode, self.active_node)
     if self.active_node.younger_sibling is None:
       self._add_younger_sibling(node)

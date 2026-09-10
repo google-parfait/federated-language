@@ -28,7 +28,7 @@ the values held in those containers.
 from collections.abc import Sequence
 import importlib
 import struct
-from typing import Protocol, TypeVar
+from typing import Protocol, TypeVar, Union
 
 from federated_language.common_libs import serializable
 from federated_language.proto import computation_pb2
@@ -54,7 +54,7 @@ class UnpackFn(Protocol[_T]):
     ...
 
 
-def _pack_length(buffer: bytes) -> bytes:
+def _pack_length(buffer: Union[bytes, bytearray]) -> bytes:
   """Packs the length of `buffer` as bytes."""
   length = len(buffer)
   length_bytes = struct.pack('!Q', length)
@@ -106,7 +106,7 @@ def pack_sequence(fn: PackFn[_T], sequence: Sequence[_T]) -> bytes:
   for item in sequence:
     item_bytes = fn(item)
     sequence_bytes.extend(item_bytes)
-  length_bytes = _pack_length(sequence_bytes)  # pyrefly: ignore[bad-argument-type]
+  length_bytes = _pack_length(sequence_bytes)
   return length_bytes + sequence_bytes
 
 

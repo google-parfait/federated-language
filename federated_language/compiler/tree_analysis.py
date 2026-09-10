@@ -512,14 +512,17 @@ def contains_no_unbound_references(
   return num_unbound_references == 0
 
 
-_DEFAULT_KIND_PREDICATE = lambda k: k is not None
+def _default_kind_predicate(
+    k: Optional[intrinsic_defs.AggregationKind],
+) -> bool:
+  return k is not None
 
 
 def find_aggregations_in_tree(
     comp: building_blocks.ComputationBuildingBlock,
     kind_predicate: Callable[
-        [intrinsic_defs.AggregationKind], bool
-    ] = _DEFAULT_KIND_PREDICATE,
+        [Optional[intrinsic_defs.AggregationKind]], bool
+    ] = _default_kind_predicate,
 ) -> list[building_blocks.Call]:
   """Finds aggregating calls with kind matching `kind_predicate` in `comp`.
 
@@ -580,7 +583,7 @@ def find_aggregations_in_tree(
     ):
       return
 
-    if kind_predicate(comp.function.intrinsic_def().aggregation_kind):  # pyrefly: ignore[bad-argument-type]
+    if kind_predicate(comp.function.intrinsic_def().aggregation_kind):
       aggregation_calls.append(comp)
 
   visit_postorder(comp, record_intrinsic_calls)

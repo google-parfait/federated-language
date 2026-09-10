@@ -22,7 +22,6 @@ import attrs
 from federated_language.common_libs import py_typecheck
 import tree
 
-
 _T = TypeVar('_T')
 _U = TypeVar('_U')
 
@@ -312,8 +311,8 @@ def to_odict(
             'Cannot convert an `Struct` with unnamed entries to a '
             '`collections.OrderedDict`: {}'.format(struct)
         )
-    elements = typing.cast(list[tuple[str, _T]], elements)  # pyrefly: ignore[bad-assignment]
-    return collections.OrderedDict(elements)  # pyrefly: ignore[bad-return]
+    named_elements = typing.cast(list[tuple[str, _T]], elements)
+    return collections.OrderedDict(named_elements)
 
   if recursive:
     return _to_container_recursive(struct, _to_odict)
@@ -352,8 +351,8 @@ def to_odict_or_tuple(
                 struct
             )
         )
-      elements = typing.cast(list[tuple[str, _T]], elements)  # pyrefly: ignore[bad-assignment]
-      return collections.OrderedDict(elements)  # pyrefly: ignore[bad-return]
+      named_elements = typing.cast(list[tuple[str, _T]], elements)
+      return collections.OrderedDict(named_elements)
     else:
       return tuple(value for _, value in elements)
 

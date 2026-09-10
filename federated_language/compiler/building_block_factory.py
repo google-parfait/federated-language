@@ -243,27 +243,26 @@ def create_federated_getattr_comp(
     Instance of `building_blocks.Lambda` which grabs attribute
       according to `name` of its argument.
   """
-  if not isinstance(comp.type_signature, computation_types.FederatedType):
+  type_signature = comp.type_signature
+  if not isinstance(type_signature, computation_types.FederatedType):
     raise ValueError(
         'Expected a `federated_language.FederatedType`, found'
-        f' {comp.type_signature}.'
+        f' {type_signature}.'
     )
-  if not isinstance(comp.type_signature.member, computation_types.StructType):
+  member_type = type_signature.member
+  if not isinstance(member_type, computation_types.StructType):
     raise ValueError(
-        'Expected a `federated_language.StructType`, found'
-        f' {comp.type_signature.member}.'
+        f'Expected a `federated_language.StructType`, found {member_type}.'
     )
 
-  element_names = [
-      x for x, _ in comp.type_signature.member.items()  # pytype: disable=attribute-error
-  ]
+  element_names = [x for x, _ in member_type.items()]
   if name not in element_names:
     raise ValueError(
         'The federated value has no element of name `{}`. Value: {}'.format(
             name, comp.formatted_representation()
         )
     )
-  apply_input = building_blocks.Reference('x', comp.type_signature.member)  # pytype: disable=attribute-error
+  apply_input = building_blocks.Reference('x', member_type)
   selected = building_blocks.Selection(apply_input, name=name)
   apply_lambda = building_blocks.Lambda(
       'x', apply_input.type_signature, selected
@@ -292,22 +291,23 @@ def create_federated_getitem_comp(
     Instance of `building_blocks.Lambda` which grabs slice
       according to `key` of its argument.
   """
-  if not isinstance(comp.type_signature, computation_types.FederatedType):
+  type_signature = comp.type_signature
+  if not isinstance(type_signature, computation_types.FederatedType):
     raise ValueError(
         'Expected a `federated_language.FederatedType`, found'
-        f' {comp.type_signature}.'
+        f' {type_signature}.'
     )
-  if not isinstance(comp.type_signature.member, computation_types.StructType):
+  member_type = type_signature.member
+  if not isinstance(member_type, computation_types.StructType):
     raise ValueError(
-        'Expected a `federated_language.StructType`, found'
-        f' {comp.type_signature.member}.'
+        f'Expected a `federated_language.StructType`, found {member_type}.'
     )
 
-  apply_input = building_blocks.Reference('x', comp.type_signature.member)  # pytype: disable=attribute-error
+  apply_input = building_blocks.Reference('x', member_type)
   if isinstance(key, int):
     selected = building_blocks.Selection(apply_input, index=key)
   else:
-    elems = list(comp.type_signature.member.items())  # pytype: disable=attribute-error
+    elems = list(member_type.items())
     index_range = range(*key.indices(len(elems)))
     elem_list = []
     for k in index_range:
@@ -323,7 +323,12 @@ def create_federated_getitem_comp(
 
 def _unname_fn_parameter(fn, unnamed_parameter_type):
   """Coerces `fn` to a comp whose parameter type is `unnamed_parameter_type`."""
-  if any([n for n, _ in fn.type_signature.parameter.items()]):  # pytype: disable=attribute-error
+  fn_type = fn.type_signature
+  if (
+      isinstance(fn_type, computation_types.FunctionType)
+      and isinstance(fn_type.parameter, computation_types.StructType)
+      and any([n for n, _ in fn_type.parameter.items()])
+  ):
     return building_blocks.Lambda(
         'a',
         unnamed_parameter_type,
@@ -368,16 +373,36 @@ def create_federated_aggregate(
   # Its okay if the first argument of accumulate is assignable from the zero,
   # without being the exact type. This occurs when accumulate has a type like
   # (<int32[?], int32> -> int32[?]) but zero is int32[0].
-  zero_arg_type = accumulate.type_signature.parameter[0]  # pytype: disable=attribute-error
+  accumulate_type = accumulate.type_signature
+  if not isinstance(
+      accumulate_type, computation_types.FunctionType
+  ) or not isinstance(accumulate_type.parameter, computation_types.StructType):
+    raise ValueError(
+        'Expected `accumulate` to be a FunctionType with StructType parameter,'
+        f' found {accumulate_type}.'
+    )
+  zero_arg_type = accumulate_type.parameter[0]
   zero_arg_type.check_assignable_from(zero.type_signature)
+
+  report_type = report.type_signature
+  if not isinstance(report_type, computation_types.FunctionType):
+    raise ValueError(
+        f'Expected `report` to be a FunctionType, found {report_type}.'
+    )
   result_type = computation_types.FederatedType(
-      report.type_signature.result,  # pytype: disable=attribute-error
+      report_type.result,
       placements.SERVER,
   )
 
+  value_type = value.type_signature
+  if not isinstance(value_type, computation_types.FederatedType):
+    raise ValueError(
+        f'Expected `value` to be a FederatedType, found {value_type}.'
+    )
+
   accumulate_parameter_type = computation_types.StructType([
       zero_arg_type,
-      value.type_signature.member,  # pytype: disable=attribute-error
+      value_type.member,
   ])
   accumulate = _unname_fn_parameter(accumulate, accumulate_parameter_type)
   merge_parameter_type = computation_types.StructType(
@@ -388,8 +413,8 @@ def create_federated_aggregate(
   intrinsic_type = computation_types.FunctionType(
       (
           computation_types.FederatedType(
-              value.type_signature.member,  # pytype: disable=attribute-error
-              value.type_signature.placement,  # pytype: disable=attribute-error
+              value_type.member,
+              value_type.placement,
               all_equal=False,
           ),
           zero_arg_type,
@@ -425,8 +450,13 @@ def create_federated_apply(
   Returns:
     A `building_blocks.Call`.
   """
+  fn_type = fn.type_signature
+  if not isinstance(fn_type, computation_types.FunctionType):
+    raise ValueError(
+        f'Expected a `federated_language.FunctionType`, found {fn_type}.'
+    )
   result_type = computation_types.FederatedType(
-      fn.type_signature.result,  # pytype: disable=attribute-error
+      fn_type.result,
       placements.SERVER,
   )
   intrinsic_type = computation_types.FunctionType(
@@ -454,8 +484,13 @@ def create_federated_broadcast(
   Returns:
     A `building_blocks.Call`.
   """
+  value_type = value.type_signature
+  if not isinstance(value_type, computation_types.FederatedType):
+    raise ValueError(
+        f'Expected a `federated_language.FederatedType`, found {value_type}.'
+    )
   result_type = computation_types.FederatedType(
-      value.type_signature.member,  # pytype: disable=attribute-error
+      value_type.member,
       placements.CLIENTS,
       all_equal=True,
   )
@@ -488,10 +523,10 @@ def create_federated_eval(
   Raises:
     TypeError: If any of the types do not match.
   """
-  if not isinstance(fn.type_signature, computation_types.FunctionType):
+  fn_type = fn.type_signature
+  if not isinstance(fn_type, computation_types.FunctionType):
     raise ValueError(
-        'Expected a `federated_language.FederatedType`, found'
-        f' {fn.type_signature}.'
+        f'Expected a `federated_language.FunctionType`, found {fn_type}.'
     )
 
   if placement is placements.CLIENTS:
@@ -503,7 +538,7 @@ def create_federated_eval(
   else:
     raise TypeError('Unsupported placement {}.'.format(placement))
   result_type = computation_types.FederatedType(
-      fn.type_signature.result,  # pytype: disable=attribute-error
+      fn_type.result,
       placement,
       all_equal=all_equal,
   )
@@ -533,12 +568,22 @@ def create_federated_map(
   Returns:
     A `building_blocks.Call`.
   """
+  arg_type = arg.type_signature
+  if not isinstance(arg_type, computation_types.FederatedType):
+    raise ValueError(
+        f'Expected a `federated_language.FederatedType`, found {arg_type}.'
+    )
+  fn_type = fn.type_signature
+  if not isinstance(fn_type, computation_types.FunctionType):
+    raise ValueError(
+        f'Expected a `federated_language.FunctionType`, found {fn_type}.'
+    )
   parameter_type = computation_types.FederatedType(
-      arg.type_signature.member,  # pytype: disable=attribute-error
+      arg_type.member,
       placements.CLIENTS,
   )
   result_type = computation_types.FederatedType(
-      fn.type_signature.result,  # pytype: disable=attribute-error
+      fn_type.result,
       placements.CLIENTS,
   )
   intrinsic_type = computation_types.FunctionType(
@@ -573,13 +618,23 @@ def create_federated_map_all_equal(
   Returns:
     A `building_blocks.Call`.
   """
+  arg_type = arg.type_signature
+  if not isinstance(arg_type, computation_types.FederatedType):
+    raise ValueError(
+        f'Expected a `federated_language.FederatedType`, found {arg_type}.'
+    )
+  fn_type = fn.type_signature
+  if not isinstance(fn_type, computation_types.FunctionType):
+    raise ValueError(
+        f'Expected a `federated_language.FunctionType`, found {fn_type}.'
+    )
   parameter_type = computation_types.FederatedType(
-      arg.type_signature.member,  # pytype: disable=attribute-error
+      arg_type.member,
       placements.CLIENTS,
       all_equal=True,
   )
   result_type = computation_types.FederatedType(
-      fn.type_signature.result,  # pytype: disable=attribute-error
+      fn_type.result,
       placements.CLIENTS,
       all_equal=True,
   )
@@ -612,17 +667,20 @@ def create_federated_map_or_apply(
   Returns:
     A `building_blocks.Call`.
   """
-  if arg.type_signature.placement is placements.CLIENTS:  # pytype: disable=attribute-error
-    if arg.type_signature.all_equal:  # pytype: disable=attribute-error
+  arg_type = arg.type_signature
+  if not isinstance(arg_type, computation_types.FederatedType):
+    raise TypeError(
+        f'Expected a `federated_language.FederatedType`, found {arg_type}.'
+    )
+  if arg_type.placement is placements.CLIENTS:
+    if arg_type.all_equal:
       return create_federated_map_all_equal(fn, arg)
     else:
       return create_federated_map(fn, arg)
-  elif arg.type_signature.placement is placements.SERVER:  # pytype: disable=attribute-error
+  elif arg_type.placement is placements.SERVER:
     return create_federated_apply(fn, arg)
   else:
-    raise TypeError(
-        'Unsupported placement {}.'.format(arg.type_signature.placement)  # pytype: disable=attribute-error
-    )
+    raise TypeError('Unsupported placement {}.'.format(arg_type.placement))
 
 
 def create_federated_mean(
@@ -648,21 +706,31 @@ def create_federated_mean(
   Raises:
     TypeError: If any of the types do not match.
   """
+  value_type = value.type_signature
+  if not isinstance(value_type, computation_types.FederatedType):
+    raise TypeError(
+        f'Expected a `federated_language.FederatedType`, found {value_type}.'
+    )
   result_type = computation_types.FederatedType(
-      value.type_signature.member,  # pytype: disable=attribute-error
+      value_type.member,
       placements.SERVER,
   )
   if weight is not None:
+    weight_type = weight.type_signature
+    if not isinstance(weight_type, computation_types.FederatedType):
+      raise TypeError(
+          f'Expected a `federated_language.FederatedType`, found {weight_type}.'
+      )
     intrinsic_type = computation_types.FunctionType(
         (
             computation_types.FederatedType(
-                value.type_signature.member,  # pytype: disable=attribute-error
-                value.type_signature.placement,  # pytype: disable=attribute-error
+                value_type.member,
+                value_type.placement,
                 all_equal=False,
             ),
             computation_types.FederatedType(
-                weight.type_signature.member,  # pytype: disable=attribute-error
-                weight.type_signature.placement,  # pytype: disable=attribute-error
+                weight_type.member,
+                weight_type.placement,
                 all_equal=False,
             ),
         ),
@@ -676,8 +744,8 @@ def create_federated_mean(
   else:
     intrinsic_type = computation_types.FunctionType(
         computation_types.FederatedType(
-            value.type_signature.member,  # pytype: disable=attribute-error
-            value.type_signature.placement,  # pytype: disable=attribute-error
+            value_type.member,
+            value_type.placement,
             all_equal=False,
         ),
         result_type,
@@ -706,16 +774,17 @@ def create_federated_min(
   Raises:
     ValueError: If any of the types do not match.
   """
-  if not isinstance(value.type_signature, computation_types.FederatedType):
+  value_type = value.type_signature
+  if not isinstance(value_type, computation_types.FederatedType):
     raise ValueError('Expected a federated value.')
   result_type = computation_types.FederatedType(
-      value.type_signature.member,
+      value_type.member,
       placements.SERVER,
   )
   intrinsic_type = computation_types.FunctionType(
       computation_types.FederatedType(
-          value.type_signature.member,  # pytype: disable=attribute-error
-          value.type_signature.placement,  # pytype: disable=attribute-error
+          value_type.member,
+          value_type.placement,
           all_equal=False,
       ),
       result_type,
@@ -744,16 +813,17 @@ def create_federated_max(
   Raises:
     ValueError: If any of the types do not match.
   """
-  if not isinstance(value.type_signature, computation_types.FederatedType):
+  value_type = value.type_signature
+  if not isinstance(value_type, computation_types.FederatedType):
     raise ValueError('Expected a federated value.')
   result_type = computation_types.FederatedType(
-      value.type_signature.member,
+      value_type.member,
       placements.SERVER,
   )
   intrinsic_type = computation_types.FunctionType(
       computation_types.FederatedType(
-          value.type_signature.member,  # pytype: disable=attribute-error
-          value.type_signature.placement,  # pytype: disable=attribute-error
+          value_type.member,
+          value_type.placement,
           all_equal=False,
       ),
       result_type,
@@ -782,15 +852,20 @@ def create_federated_secure_sum(
   Returns:
     A `building_blocks.Call`.
   """
+  value_type = value.type_signature
+  if not isinstance(value_type, computation_types.FederatedType):
+    raise ValueError(
+        f'Expected a `federated_language.FederatedType`, found {value_type}.'
+    )
   result_type = computation_types.FederatedType(
-      value.type_signature.member,  # pytype: disable=attribute-error
+      value_type.member,
       placements.SERVER,
   )
   intrinsic_type = computation_types.FunctionType(
       [
           computation_types.FederatedType(
-              value.type_signature.member,  # pytype: disable=attribute-error
-              value.type_signature.placement,  # pytype: disable=attribute-error
+              value_type.member,
+              value_type.placement,
               all_equal=False,
           ),
           max_input.type_signature,
@@ -822,15 +897,20 @@ def create_federated_secure_sum_bitwidth(
   Returns:
     A `building_blocks.Call`.
   """
+  value_type = value.type_signature
+  if not isinstance(value_type, computation_types.FederatedType):
+    raise ValueError(
+        f'Expected a `federated_language.FederatedType`, found {value_type}.'
+    )
   result_type = computation_types.FederatedType(
-      value.type_signature.member,  # pytype: disable=attribute-error
+      value_type.member,
       placements.SERVER,
   )
   intrinsic_type = computation_types.FunctionType(
       [
           computation_types.FederatedType(
-              value.type_signature.member,  # pytype: disable=attribute-error
-              value.type_signature.placement,  # pytype: disable=attribute-error
+              value_type.member,
+              value_type.placement,
               all_equal=False,
           ),
           bitwidth.type_signature,
@@ -852,37 +932,50 @@ def create_federated_select(
     secure: bool,
 ) -> building_blocks.Call:
   """Creates a called `federated_select` or `federated_secure_select`."""
-  if not isinstance(max_key.type_signature, computation_types.FederatedType):
+  client_keys_type = client_keys.type_signature
+  if not isinstance(client_keys_type, computation_types.FederatedType):
     raise ValueError(
         'Expected a `federated_language.FederatedType`, found'
-        f' {max_key.type_signature}.'
+        f' {client_keys_type}.'
     )
-  if not isinstance(server_val.type_signature, computation_types.FederatedType):
+  max_key_type = max_key.type_signature
+  if not isinstance(max_key_type, computation_types.FederatedType):
+    raise ValueError(
+        f'Expected a `federated_language.FederatedType`, found {max_key_type}.'
+    )
+  server_val_type = server_val.type_signature
+  if not isinstance(server_val_type, computation_types.FederatedType):
     raise ValueError(
         'Expected a `federated_language.FederatedType`, found'
-        f' {server_val.type_signature}.'
+        f' {server_val_type}.'
     )
-  if not isinstance(select_fn.type_signature, computation_types.FunctionType):
+  select_fn_type = select_fn.type_signature
+  if not isinstance(select_fn_type, computation_types.FunctionType):
     raise ValueError(
-        'Expected a `federated_language.FunctionType`, found'
-        f' {select_fn.type_signature}.'
+        f'Expected a `federated_language.FunctionType`, found {select_fn_type}.'
     )
 
-  single_key_type = max_key.type_signature.member
+  single_key_type = max_key_type.member
   select_fn_unnamed_param_type = computation_types.StructType([
-      (None, server_val.type_signature.member),
+      (None, server_val_type.member),
       (None, single_key_type),
   ])
   select_fn = _unname_fn_parameter(select_fn, select_fn_unnamed_param_type)
+  updated_select_fn_type = select_fn.type_signature
+  if not isinstance(updated_select_fn_type, computation_types.FunctionType):
+    raise ValueError(
+        'Expected a `federated_language.FunctionType`, found'
+        f' {updated_select_fn_type}.'
+    )
   result_type = computation_types.FederatedType(
-      computation_types.SequenceType(select_fn.type_signature.result),
+      computation_types.SequenceType(updated_select_fn_type.result),
       placements.CLIENTS,
   )
   intrinsic_type = computation_types.FunctionType(
       [
           computation_types.FederatedType(
-              client_keys.type_signature.member,  # pytype: disable=attribute-error
-              client_keys.type_signature.placement,  # pytype: disable=attribute-error
+              client_keys_type.member,
+              client_keys_type.placement,
               all_equal=False,
           ),
           max_key.type_signature,
@@ -915,14 +1008,19 @@ def create_federated_sum(
   Returns:
     A `building_blocks.Call`.
   """
+  value_type = value.type_signature
+  if not isinstance(value_type, computation_types.FederatedType):
+    raise ValueError(
+        f'Expected a `federated_language.FederatedType`, found {value_type}.'
+    )
   result_type = computation_types.FederatedType(
-      value.type_signature.member,  # pytype: disable=attribute-error
+      value_type.member,
       placements.SERVER,
   )
   intrinsic_type = computation_types.FunctionType(
       computation_types.FederatedType(
-          value.type_signature.member,  # pytype: disable=attribute-error
-          value.type_signature.placement,  # pytype: disable=attribute-error
+          value_type.member,
+          value_type.placement,
           all_equal=False,
       ),
       result_type,
@@ -965,7 +1063,17 @@ def create_federated_unzip(
   Raises:
     ValueError: If `value` does not contain any elements.
   """
-  named_type_signatures = list(value.type_signature.member.items())  # pytype: disable=attribute-error
+  value_type = value.type_signature
+  if not isinstance(value_type, computation_types.FederatedType):
+    raise ValueError(
+        f'Expected a `federated_language.FederatedType`, found {value_type}.'
+    )
+  member_type = value_type.member
+  if not isinstance(member_type, computation_types.StructType):
+    raise ValueError(
+        f'Expected a `federated_language.StructType`, found {member_type}.'
+    )
+  named_type_signatures = list(member_type.items())
   length = len(named_type_signatures)
   if length == 0:
     raise ValueError('federated_zip is only supported on non-empty tuples.')
@@ -979,7 +1087,7 @@ def create_federated_unzip(
     elements.append((name, intrinsic))
   result = building_blocks.Struct(
       elements,
-      value.type_signature.member.python_container,  # pytype: disable=attribute-error
+      member_type.python_container,
   )
   symbols = ((value_ref.name, value),)
   return building_blocks.Block(symbols, result)
@@ -1141,7 +1249,12 @@ def create_sequence_map(
   Returns:
     A `building_blocks.Call`.
   """
-  result_type = computation_types.SequenceType(fn.type_signature.result)  # pytype: disable=attribute-error
+  fn_type = fn.type_signature
+  if not isinstance(fn_type, computation_types.FunctionType):
+    raise ValueError(
+        f'Expected a `federated_language.FunctionType`, found {fn_type}.'
+    )
+  result_type = computation_types.SequenceType(fn_type.result)
   intrinsic_type = computation_types.FunctionType(
       (fn.type_signature, arg.type_signature), result_type
   )
@@ -1174,18 +1287,34 @@ def create_sequence_reduce(
   Returns:
     A `building_blocks.Call`.
   """
+  value_type = value.type_signature
+  if not isinstance(value_type, computation_types.SequenceType):
+    raise ValueError(
+        f'Expected a `federated_language.SequenceType`, found {value_type}.'
+    )
+  op_type = op.type_signature
+  if not isinstance(op_type, computation_types.FunctionType):
+    raise ValueError(
+        f'Expected a `federated_language.FunctionType`, found {op_type}.'
+    )
   op_parameter_type = computation_types.StructType([
       zero.type_signature,
-      value.type_signature.element,  # pytype: disable=attribute-error
+      value_type.element,
   ])
   op = _unname_fn_parameter(op, op_parameter_type)
+  updated_op_type = op.type_signature
+  if not isinstance(updated_op_type, computation_types.FunctionType):
+    raise ValueError(
+        'Expected a `federated_language.FunctionType`, found'
+        f' {updated_op_type}.'
+    )
   intrinsic_type = computation_types.FunctionType(
       (
           value.type_signature,
           zero.type_signature,
           op.type_signature,
       ),
-      op.type_signature.result,  # pytype: disable=attribute-error
+      updated_op_type.result,
   )
   intrinsic = building_blocks.Intrinsic(
       intrinsic_defs.SEQUENCE_REDUCE.uri, intrinsic_type
@@ -1209,9 +1338,14 @@ def create_sequence_sum(
   Returns:
     A `building_blocks.Call`.
   """
+  value_type = value.type_signature
+  if not isinstance(value_type, computation_types.SequenceType):
+    raise ValueError(
+        f'Expected a `federated_language.SequenceType`, found {value_type}.'
+    )
   intrinsic_type = computation_types.FunctionType(
       value.type_signature,
-      value.type_signature.element,  # pytype: disable=attribute-error
+      value_type.element,
   )
   intrinsic = building_blocks.Intrinsic(
       intrinsic_defs.SEQUENCE_SUM.uri, intrinsic_type
@@ -1243,14 +1377,13 @@ def _create_naming_function(
     ValueError: If `tuple_type_to_name` and `names_to_add` have different
     lengths.
   """
-  if len(names_to_add) != len(tuple_type_to_name):  # pytype: disable=wrong-arg-types
+  tuple_len = len(list(tuple_type_to_name.items()))
+  if len(names_to_add) != tuple_len:
     raise ValueError(
-        'Number of elements in `names_to_add` must match number of element in '
-        'the named tuple type `tuple_type_to_name`; here, `names_to_add` has '
-        '{} elements and `tuple_type_to_name` has {}.'.format(
-            len(names_to_add),  # pytype: disable=wrong-arg-types
-            len(tuple_type_to_name),  # pytype: disable=wrong-arg-types
-        )
+        'Number of elements in `names_to_add` must match number of element in'
+        ' the named tuple type `tuple_type_to_name`; here, `names_to_add` has'
+        f' {len(names_to_add)} elements and `tuple_type_to_name` has'
+        f' {tuple_len}.'
     )
   naming_lambda_arg = building_blocks.Reference('x', tuple_type_to_name)
 
@@ -1329,7 +1462,7 @@ def zip_to_match_type(
 
   def _can_be_zipped_into(
       source_type: computation_types.Type, target_type: computation_types.Type
-  ) -> bool:  # pyrefly: ignore[bad-return]
+  ) -> bool:
     """Indicates possibility of the transformation `zip_to_match_type`."""
 
     def _struct_can_be_zipped_to_federated(
@@ -1381,6 +1514,8 @@ def zip_to_match_type(
               _struct_elem_zippable(s_name, s_el, t_name, t_el)
           )
         return all(elements_zippable)
+      else:
+        return False
     else:
       return target_type.is_assignable_from(source_type)
 

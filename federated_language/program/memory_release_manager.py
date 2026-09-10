@@ -15,15 +15,17 @@
 
 import collections
 from collections.abc import Hashable
+from typing import Generic, TypeVar
 
 from federated_language.program import release_manager
 from federated_language.program import value_reference
 
+_ReleasableStructure = TypeVar('_ReleasableStructure')
+
 
 class MemoryReleaseManager(
-    release_manager.ReleaseManager[
-        release_manager.ReleasableStructure, Hashable
-    ]
+    release_manager.ReleaseManager[_ReleasableStructure, Hashable],
+    Generic[_ReleasableStructure],
 ):
   """A `federated_language.program.ReleaseManager` that releases values to memory.
 
@@ -37,20 +39,18 @@ class MemoryReleaseManager(
   each value reference is materialized.
   """
 
-  def __init__(self):
+  def __init__(self) -> None:
     """Returns an initialized `federated_language.program.MemoryReleaseManager`."""
     self._values = collections.OrderedDict()
 
-  async def release(  # pyrefly: ignore[bad-override]
-      self, value: release_manager.ReleasableStructure, key: Hashable
-  ) -> None:
+  async def release(self, value: _ReleasableStructure, key: Hashable) -> None:
     """Releases `value` from a federated program.
 
     Args:
       value: A `federated_language.program.ReleasableStructure` to release.
       key: A hashable value used to reference the released `value`.
     """
-    materialized_value = await value_reference.materialize_value(value)  # pyrefly: ignore[bad-argument-type]
+    materialized_value = await value_reference.materialize_value(value)
     self._values[key] = materialized_value
 
   def remove_all(self) -> None:
@@ -59,6 +59,6 @@ class MemoryReleaseManager(
 
   def values(
       self,
-  ) -> collections.OrderedDict[Hashable, release_manager.ReleasableStructure]:
+  ) -> collections.OrderedDict[Hashable, _ReleasableStructure]:
     """Returns an `collections.OrderedDict` of all keys and released values."""
     return self._values.copy()
