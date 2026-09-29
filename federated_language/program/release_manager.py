@@ -166,7 +166,7 @@ class FilteringReleaseManager(ReleaseManager[ReleasableStructure, Key]):
     def _filter_value(
         path: tuple[Union[str, int], ...],
         subtree: ReleasableStructure,
-    ) -> Optional[Union[ReleasableStructure, type(_FILTERED_SUBTREE)]]:
+    ) -> Optional[Union[ReleasableStructure, type(_FILTERED_SUBTREE)]]:  # pyrefly: ignore[invalid-annotation]
       """The function to apply when filtering the `value`.
 
       This function is meant to be used with `tree.traverse_with_path` to filter
