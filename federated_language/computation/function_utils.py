@@ -132,7 +132,7 @@ def unpack_args_from_struct(
     elements = structure.to_elements(struct_with_args)
   elif isinstance(struct_with_args, typed_object.TypedObject):
     elements = []
-    for index, (name, _) in enumerate(struct_with_args.type_signature.items()):  # pytype: disable=attribute-error
+    for index, (name, _) in enumerate(struct_with_args.type_signature.items()):  # pyrefly: ignore[missing-attribute]
       if name is not None:
         elements.append((name, getattr(struct_with_args, name)))
       else:
@@ -200,7 +200,7 @@ def pack_args_into_struct(
       result_elements = []
       positions_used = set()
       keywords_used = set()
-      for index, (name, elem_type) in enumerate(type_spec.items()):  # pytype: disable=attribute-error
+      for index, (name, elem_type) in enumerate(type_spec.items()):  # pyrefly: ignore[missing-attribute]
         if index < len(args):
           # This argument is present in `args`.
           if name is not None and name in kwargs:

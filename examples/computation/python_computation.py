@@ -176,6 +176,6 @@ def python_computation(
     result_type = federated_language.to_type(result_type)
 
     comp = _create_concrete_computation_from_fn(fn, parameter_type, result_type)
-    return functools.update_wrapper(comp, fn, updated=())  # pytype: disable=bad-return-type
+    return functools.update_wrapper(comp, fn, updated=())  # pyrefly: ignore[bad-return]
 
   return _decorator

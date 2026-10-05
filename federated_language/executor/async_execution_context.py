@@ -113,7 +113,7 @@ async def _invoke(
   """
   comp = await executor.create_value(
       comp,
-      comp.type_signature,  # pytype: disable=attribute-error
+      comp.type_signature,
   )
   result = await executor.create_call(comp, arg)
   result_value = await result.compute()
@@ -244,7 +244,7 @@ class AsyncExecutionContext(context.AsyncContext):
       if arg is not None:
         cardinalities = self._cardinality_inference_fn(
             arg,
-            comp.type_signature.parameter,  # pytype: disable=attribute-error
+            comp.type_signature.parameter,
         )
       else:
         cardinalities = {}
@@ -256,7 +256,7 @@ class AsyncExecutionContext(context.AsyncContext):
               _ingest(
                   executor,
                   arg,
-                  comp.type_signature.parameter,  # pytype: disable=attribute-error
+                  comp.type_signature.parameter,
               )
           )
 

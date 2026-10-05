@@ -688,8 +688,8 @@ def update_struct(structure, **kwargs):
             'structure does not contain a field named "{!s}"'.format(key)
         )
     # Create a copy to prevent mutation of the original `structure`
-    dictionary = type(structure)(**structure)  # pyrefly: ignore[bad-instantiation]
+    dictionary = type(structure)(**structure)
   dictionary.update(kwargs)  # pyrefly: ignore[missing-attribute]
   if isinstance(structure, Mapping):
     return dictionary
-  return type(structure)(**dictionary)  # pyrefly: ignore[bad-argument-type, bad-instantiation]
+  return type(structure)(**dictionary)  # pyrefly: ignore[bad-argument-type]

@@ -121,10 +121,10 @@ class Value(typed_object.TypedObject, abc.ABC):
   def __getattr__(self, name: str) -> 'Value':
     _check_struct_or_federated_struct(self, name)
     if _is_federated_struct(self.type_signature):
-      if name not in self.type_signature.member.fields():  # pytype: disable=attribute-error
+      if name not in self.type_signature.member.fields():
         raise AttributeError(
             f"There is no such attribute '{name}' in this federated tuple."
-            f" Valid attributes: ({', '.join(dir(self.type_signature.member))})"  # pytype: disable=attribute-error
+            f" Valid attributes: ({', '.join(dir(self.type_signature.member))})"
         )
 
       return Value(
@@ -226,7 +226,7 @@ class Value(typed_object.TypedObject, abc.ABC):
 def _dictlike_items_to_value(items, type_spec, container_type) -> Value:
   elements = []
   for i, (k, v) in enumerate(items):
-    element_type = None if type_spec is None else type_spec[i]  # pytype: disable=unsupported-operands
+    element_type = None if type_spec is None else type_spec[i]
     element_value = to_value(v, element_type)
     elements.append((k, element_value.comp))
   return Value(building_blocks.Struct(elements, container_type))

@@ -39,7 +39,7 @@ class ConcreteComputation(computation_base.Computation):
     return cls(
         computation_proto=building_block.to_proto(),
         context_stack=context_stack_impl.context_stack,
-        annotated_type=building_block.type_signature,  # pytype: disable=wrong-arg-types
+        annotated_type=building_block.type_signature,  # pyrefly: ignore[bad-argument-type]
     )
 
   def to_building_block(self):

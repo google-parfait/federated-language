@@ -97,12 +97,12 @@ def ensure_federated_value(
       ) from e
     value = value_impl.Value(zipped)
 
-  if placement is not None and value.type_signature.placement is not placement:  # pytype: disable=attribute-error
+  if placement is not None and value.type_signature.placement is not placement:
     raise TypeError(
         'The {} should be placed at {}, but it is placed at {}.'.format(
             label if label else 'value',
             placement,
-            value.type_signature.placement,  # pytype: disable=attribute-error
+            value.type_signature.placement,
         )
     )
 

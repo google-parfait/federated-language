@@ -41,7 +41,7 @@ def create_lambda_empty_struct() -> computation_pb2.Computation:
   # https://developers.google.com/protocol-buffers/docs/reference/python-generated#keyword-conflicts
   return computation_pb2.Computation(
       type=type_signature.to_proto(), **{'lambda': fn}
-  )  # pytype: disable=wrong-keyword-args
+  )
 
 
 def create_lambda_identity(
@@ -71,4 +71,4 @@ def create_lambda_identity(
   # https://developers.google.com/protocol-buffers/docs/reference/python-generated#keyword-conflicts
   return computation_pb2.Computation(
       type=type_signature.to_proto(), **{'lambda': fn}
-  )  # pytype: disable=wrong-keyword-args
+  )

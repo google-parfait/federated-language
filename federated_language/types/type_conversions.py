@@ -469,4 +469,4 @@ def type_to_py_container(value, type_spec: computation_types.Type):
     # E.g., tuple and list when elements only has values, but also `dict`,
     # `collections.OrderedDict`, or `structure.Struct` when
     # elements has (name, value) tuples.
-    return container_type(elements)  # pytype: disable=wrong-arg-count
+    return container_type(elements)  # pyrefly: ignore[bad-argument-count]

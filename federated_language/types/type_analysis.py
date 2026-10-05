@@ -496,8 +496,8 @@ def check_concrete_instance_of(
       if generic_type_member != concrete_type_member:
         _raise_structural('placements')
     elif _both_are(lambda t: isinstance(t, computation_types.StructType)):
-      generic_elements = list(generic_type_member.items())  # pytype: disable=attribute-error
-      concrete_elements = list(concrete_type_member.items())  # pytype: disable=attribute-error
+      generic_elements = list(generic_type_member.items())  # pyrefly: ignore[missing-attribute]
+      concrete_elements = list(concrete_type_member.items())  # pyrefly: ignore[missing-attribute]
       if len(generic_elements) != len(concrete_elements):
         _raise_structural('length')
       for generic_element, concrete_element in zip(
@@ -508,33 +508,33 @@ def check_concrete_instance_of(
         _check_helper(generic_element[1], concrete_element[1], defining)
     elif _both_are(lambda t: isinstance(t, computation_types.SequenceType)):
       _check_helper(
-          generic_type_member.element,  # pytype: disable=attribute-error
-          concrete_type_member.element,  # pytype: disable=attribute-error
+          generic_type_member.element,  # pyrefly: ignore[missing-attribute]
+          concrete_type_member.element,  # pyrefly: ignore[missing-attribute]
           defining,
       )
     elif _both_are(lambda t: isinstance(t, computation_types.FunctionType)):
-      if generic_type_member.parameter is None:  # pytype: disable=attribute-error
-        if concrete_type_member.parameter is not None:  # pytype: disable=attribute-error
+      if generic_type_member.parameter is None:  # pyrefly: ignore[missing-attribute]
+        if concrete_type_member.parameter is not None:  # pyrefly: ignore[missing-attribute]
           _raise_structural('parameter')
       else:
         _check_helper(
-            generic_type_member.parameter,  # pytype: disable=attribute-error
-            concrete_type_member.parameter,  # pytype: disable=attribute-error
+            generic_type_member.parameter,  # pyrefly: ignore[bad-argument-type]
+            concrete_type_member.parameter,  # pyrefly: ignore[missing-attribute]
             not defining,
         )
       _check_helper(
-          generic_type_member.result,  # pytype: disable=attribute-error
-          concrete_type_member.result,  # pytype: disable=attribute-error
+          generic_type_member.result,  # pyrefly: ignore[missing-attribute]
+          concrete_type_member.result,  # pyrefly: ignore[missing-attribute]
           defining,
       )
     elif _both_are(lambda t: isinstance(t, computation_types.FederatedType)):
-      if generic_type_member.placement != concrete_type_member.placement:  # pytype: disable=attribute-error
+      if generic_type_member.placement != concrete_type_member.placement:  # pyrefly: ignore[missing-attribute]
         _raise_structural('placement')
-      if generic_type_member.all_equal != concrete_type_member.all_equal:  # pytype: disable=attribute-error
+      if generic_type_member.all_equal != concrete_type_member.all_equal:  # pyrefly: ignore[missing-attribute]
         _raise_structural('all equal')
       _check_helper(
-          generic_type_member.member,  # pytype: disable=attribute-error
-          concrete_type_member.member,  # pytype: disable=attribute-error
+          generic_type_member.member,  # pyrefly: ignore[missing-attribute]
+          concrete_type_member.member,  # pyrefly: ignore[missing-attribute]
           defining,
       )
     else:
