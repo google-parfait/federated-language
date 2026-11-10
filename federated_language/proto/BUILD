@@ -15,7 +15,7 @@
 load("@protobuf//bazel:cc_proto_library.bzl", "cc_proto_library")
 load("@protobuf//bazel:proto_library.bzl", "proto_library")
 load("@protobuf//bazel:py_proto_library.bzl", "py_proto_library")
-load("@rules_python//python:defs.bzl", "py_library")
+load("//third_party/bazel_rules/rules_python/python:py_library.bzl", "py_library")
 
 package(
     default_applicable_licenses = ["//:package_license"],
@@ -27,6 +27,7 @@ licenses(["notice"])
 py_library(
     name = "proto",
     srcs = ["__init__.py"],
+    type_checking = True,
     visibility = ["//tools:__subpackages__"],
 )
 

@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_python//python:defs.bzl", "py_library", "py_test")
+load("@rules_python//python:defs.bzl", "py_test")
+load("//third_party/bazel_rules/rules_python/python:py_library.bzl", "py_library")
 
 package(
     default_applicable_licenses = ["//:package_license"],
@@ -30,12 +31,14 @@ licenses(["notice"])
 py_library(
     name = "computation",
     srcs = ["__init__.py"],
+    type_checking = True,
     visibility = ["//tools:__subpackages__"],
 )
 
 py_library(
     name = "computation_analysis",
     srcs = ["computation_analysis.py"],
+    type_checking = True,
     deps = [
         ":computation_impl",
         "//federated_language/compiler:building_block_analysis",
@@ -48,6 +51,7 @@ py_library(
 py_library(
     name = "computation_base",
     srcs = ["computation_base.py"],
+    type_checking = True,
     deps = [
         "//federated_language/types:computation_types",
         "//federated_language/types:typed_object",
@@ -57,6 +61,7 @@ py_library(
 py_library(
     name = "computation_impl",
     srcs = ["computation_impl.py"],
+    type_checking = True,
     deps = [
         ":computation_base",
         ":function_utils",
@@ -82,11 +87,15 @@ py_test(
     ],
 )
 
-py_library(name = "computation_serialization")
+py_library(
+    name = "computation_serialization",
+    type_checking = True,
+)
 
 py_library(
     name = "computation_wrapper",
     srcs = ["computation_wrapper.py"],
+    type_checking = True,
     deps = [
         ":computation_base",
         ":polymorphic_computation",
@@ -115,6 +124,7 @@ py_test(
 py_library(
     name = "function_utils",
     srcs = ["function_utils.py"],
+    type_checking = True,
     deps = [
         "//federated_language/common_libs:structure",
         "//federated_language/types:computation_types",
@@ -139,6 +149,7 @@ py_test(
 py_library(
     name = "polymorphic_computation",
     srcs = ["polymorphic_computation.py"],
+    type_checking = True,
     deps = [
         ":computation_impl",
         ":function_utils",

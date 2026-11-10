@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_python//python:defs.bzl", "py_library", "py_test")
+load("@rules_python//python:defs.bzl", "py_test")
+load("//third_party/bazel_rules/rules_python/python:py_library.bzl", "py_library")
 
 package(
     default_applicable_licenses = ["//:package_license"],
@@ -31,17 +32,20 @@ licenses(["notice"])
 py_library(
     name = "context_stack",
     srcs = ["__init__.py"],
+    type_checking = True,
     visibility = ["//tools:__subpackages__"],
 )
 
 py_library(
     name = "context",
     srcs = ["context.py"],
+    type_checking = True,
 )
 
 py_library(
     name = "context_stack_impl",
     srcs = ["context_stack_impl.py"],
+    type_checking = True,
     deps = [
         ":context",
         ":runtime_error_context",
@@ -62,6 +66,7 @@ py_test(
 py_library(
     name = "context_stack_test_utils",
     srcs = ["context_stack_test_utils.py"],
+    type_checking = True,
     deps = [
         ":context",
         ":context_stack_impl",
@@ -82,11 +87,13 @@ py_test(
 py_library(
     name = "runtime_error_context",
     srcs = ["runtime_error_context.py"],
+    type_checking = True,
     deps = [":context"],
 )
 
 py_library(
     name = "symbol_binding_context",
     srcs = ["symbol_binding_context.py"],
+    type_checking = True,
     deps = [":context"],
 )

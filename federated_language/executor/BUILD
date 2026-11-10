@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_python//python:defs.bzl", "py_library", "py_test")
+load("@rules_python//python:defs.bzl", "py_test")
+load("//third_party/bazel_rules/rules_python/python:py_library.bzl", "py_library")
 
 package(
     default_applicable_licenses = ["//:package_license"],
@@ -28,12 +29,14 @@ licenses(["notice"])
 py_library(
     name = "executor",
     srcs = ["__init__.py"],
+    type_checking = True,
     visibility = ["//tools:__subpackages__"],
 )
 
 py_library(
     name = "async_execution_context",
     srcs = ["async_execution_context.py"],
+    type_checking = True,
     deps = [
         ":cardinalities_utils",
         ":executor_base",
@@ -66,6 +69,7 @@ py_test(
 py_library(
     name = "cardinalities_utils",
     srcs = ["cardinalities_utils.py"],
+    type_checking = True,
     deps = [
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
@@ -88,12 +92,14 @@ py_test(
 py_library(
     name = "executor_base",
     srcs = ["executor_base.py"],
+    type_checking = True,
     deps = [":executor_value_base"],
 )
 
 py_library(
     name = "executor_factory",
     srcs = ["executor_factory.py"],
+    type_checking = True,
     deps = [
         ":executor_base",
         "//federated_language/types:placements",
@@ -103,12 +109,14 @@ py_library(
 py_library(
     name = "executor_value_base",
     srcs = ["executor_value_base.py"],
+    type_checking = True,
     deps = ["//federated_language/types:typed_object"],
 )
 
 py_library(
     name = "sync_execution_context",
     srcs = ["sync_execution_context.py"],
+    type_checking = True,
     deps = [
         ":async_execution_context",
         ":cardinalities_utils",

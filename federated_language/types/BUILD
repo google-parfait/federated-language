@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_python//python:defs.bzl", "py_library", "py_test")
+load("@rules_python//python:defs.bzl", "py_test")
+load("//third_party/bazel_rules/rules_python/python:py_library.bzl", "py_library")
 
 package(
     default_applicable_licenses = ["//:package_license"],
@@ -32,12 +33,14 @@ licenses(["notice"])
 py_library(
     name = "types",
     srcs = ["__init__.py"],
+    type_checking = True,
     visibility = ["//tools:__subpackages__"],
 )
 
 py_library(
     name = "array_shape",
     srcs = ["array_shape.py"],
+    type_checking = True,
     deps = [
         "//federated_language/proto:array_py_pb2",
         "//federated_language/proto:data_type_py_pb2",
@@ -57,6 +60,7 @@ py_test(
 py_library(
     name = "computation_types",
     srcs = ["computation_types.py"],
+    type_checking = True,
     deps = [
         ":array_shape",
         ":dtype_utils",
@@ -89,6 +93,7 @@ py_test(
 py_library(
     name = "dtype_utils",
     srcs = ["dtype_utils.py"],
+    type_checking = True,
     deps = [
         "//federated_language/proto:data_type_py_pb2",
         "@federated_language_pypi//ml_dtypes",
@@ -110,6 +115,7 @@ py_test(
 py_library(
     name = "placements",
     srcs = ["placements.py"],
+    type_checking = True,
 )
 
 py_test(
@@ -125,6 +131,7 @@ py_test(
 py_library(
     name = "type_analysis",
     srcs = ["type_analysis.py"],
+    type_checking = True,
     deps = [
         ":array_shape",
         ":computation_types",
@@ -151,6 +158,7 @@ py_test(
 py_library(
     name = "type_conversions",
     srcs = ["type_conversions.py"],
+    type_checking = True,
     deps = [
         ":computation_types",
         ":dtype_utils",
@@ -182,6 +190,7 @@ py_test(
 py_library(
     name = "type_factory",
     srcs = ["type_factory.py"],
+    type_checking = True,
     deps = [":computation_types"],
 )
 
@@ -200,6 +209,7 @@ py_test(
 py_library(
     name = "type_transformations",
     srcs = ["type_transformations.py"],
+    type_checking = True,
     deps = [":computation_types"],
 )
 
@@ -219,5 +229,6 @@ py_test(
 py_library(
     name = "typed_object",
     srcs = ["typed_object.py"],
+    type_checking = True,
     deps = [":computation_types"],
 )

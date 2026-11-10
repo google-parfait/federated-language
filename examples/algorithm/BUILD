@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_python//python:defs.bzl", "py_library", "py_test")
+load("@rules_python//python:defs.bzl", "py_test")
+load("//third_party/bazel_rules/rules_python/python:py_library.bzl", "py_library")
 
 package(
     default_applicable_licenses = ["@federated_language//:package_license"],
@@ -24,6 +25,7 @@ licenses(["notice"])
 py_library(
     name = "program_logic",
     srcs = ["program_logic.py"],
+    type_checking = True,
     deps = ["@federated_language//federated_language"],
 )
 

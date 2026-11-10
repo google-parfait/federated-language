@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_python//python:defs.bzl", "py_binary", "py_library", "py_test")
+load("@rules_python//python:defs.bzl", "py_test")
+load("//corp/common/build_defs:helpshort_test.bzl", "helpshort_test")
+load("//third_party/bazel_rules/rules_python/python:py_binary.bzl", "py_binary")
+load("//third_party/bazel_rules/rules_python/python:py_library.bzl", "py_library")
 
 package(
     default_applicable_licenses = ["@federated_language//:package_license"],
@@ -24,6 +27,7 @@ licenses(["notice"])
 py_library(
     name = "computations",
     srcs = ["computations.py"],
+    type_checking = True,
     deps = [
         "//computation:python_computation",
         "@examples_pypi//numpy",
@@ -48,6 +52,7 @@ py_test(
 py_binary(
     name = "program",
     srcs = ["program.py"],
+    type_checking = True,
     deps = [
         ":computations",
         "//algorithm:program_logic",
@@ -57,4 +62,10 @@ py_binary(
         "@examples_pypi//absl_py",
         "@federated_language//federated_language",
     ],
+)
+
+helpshort_test(
+    name = "program_helpshort_test",
+    srcs = [":program"],
+    visibility = ["//visibility:private"],
 )

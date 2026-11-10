@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_python//python:defs.bzl", "py_library", "py_test")
+load("@rules_python//python:defs.bzl", "py_test")
+load("//third_party/bazel_rules/rules_python/python:py_library.bzl", "py_library")
 
 package(
     default_applicable_licenses = ["//:package_license"],
@@ -28,14 +29,19 @@ licenses(["notice"])
 py_library(
     name = "federated_context",
     srcs = ["__init__.py"],
+    type_checking = True,
     visibility = ["//tools:__subpackages__"],
 )
 
-py_library(name = "data")
+py_library(
+    name = "data",
+    type_checking = True,
+)
 
 py_library(
     name = "federated_computation",
     srcs = ["federated_computation.py"],
+    type_checking = True,
     deps = [
         ":federated_computation_utils",
         "//federated_language/computation:computation_impl",
@@ -64,6 +70,7 @@ py_test(
 py_library(
     name = "federated_computation_context",
     srcs = ["federated_computation_context.py"],
+    type_checking = True,
     deps = [
         ":value_impl",
         "//federated_language/compiler:building_blocks",
@@ -96,6 +103,7 @@ py_test(
 py_library(
     name = "federated_computation_utils",
     srcs = ["federated_computation_utils.py"],
+    type_checking = True,
     deps = [
         ":federated_computation_context",
         ":value_impl",
@@ -125,6 +133,7 @@ py_test(
 py_library(
     name = "intrinsics",
     srcs = ["intrinsics.py"],
+    type_checking = True,
     deps = [
         ":value_impl",
         ":value_utils",
@@ -165,6 +174,7 @@ py_test(
 py_library(
     name = "value_impl",
     srcs = ["value_impl.py"],
+    type_checking = True,
     deps = [
         "//federated_language/common_libs:py_typecheck",
         "//federated_language/common_libs:structure",
@@ -208,6 +218,7 @@ py_test(
 py_library(
     name = "value_utils",
     srcs = ["value_utils.py"],
+    type_checking = True,
     deps = [
         ":value_impl",
         "//federated_language/compiler:building_block_factory",
