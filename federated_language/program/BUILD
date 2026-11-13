@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_python//python:defs.bzl", "py_library", "py_test")
+load("@rules_python//python:defs.bzl", "py_test")
+load("//third_party/bazel_rules/rules_python/python:py_library.bzl", "py_library")
 
 package(
     default_applicable_licenses = ["//:package_license"],
@@ -24,6 +25,7 @@ licenses(["notice"])
 py_library(
     name = "program",
     srcs = ["__init__.py"],
+    type_checking = True,
     visibility = [
         "//federated_language:__pkg__",
         "//tools:__subpackages__",
@@ -43,6 +45,7 @@ py_library(
 py_library(
     name = "data_source",
     srcs = ["data_source.py"],
+    type_checking = True,
     deps = [
         "//federated_language/common_libs:serializable",
         "//federated_language/types:computation_types",
@@ -52,6 +55,7 @@ py_library(
 py_library(
     name = "federated_context",
     srcs = ["federated_context.py"],
+    type_checking = True,
     deps = [
         ":structure_utils",
         ":value_reference",
@@ -81,6 +85,7 @@ py_test(
 py_library(
     name = "logging_release_manager",
     srcs = ["logging_release_manager.py"],
+    type_checking = True,
     deps = [
         ":release_manager",
         ":value_reference",
@@ -103,6 +108,7 @@ py_test(
 py_library(
     name = "memory_release_manager",
     srcs = ["memory_release_manager.py"],
+    type_checking = True,
     deps = [
         ":release_manager",
         ":value_reference",
@@ -124,6 +130,7 @@ py_test(
 py_library(
     name = "native_platform",
     srcs = ["native_platform.py"],
+    type_checking = True,
     deps = [
         ":federated_context",
         ":structure_utils",
@@ -160,6 +167,7 @@ py_test(
 py_library(
     name = "program_state_manager",
     srcs = ["program_state_manager.py"],
+    type_checking = True,
     deps = [
         ":structure_utils",
         ":value_reference",
@@ -180,6 +188,7 @@ py_library(
     name = "program_test_utils",
     testonly = True,
     srcs = ["program_test_utils.py"],
+    type_checking = True,
     deps = [
         ":value_reference",
         "//federated_language/common_libs:py_typecheck",
@@ -194,6 +203,7 @@ py_library(
 py_library(
     name = "release_manager",
     srcs = ["release_manager.py"],
+    type_checking = True,
     deps = [
         ":structure_utils",
         ":value_reference",
@@ -218,6 +228,7 @@ py_test(
 py_library(
     name = "serialization_utils",
     srcs = ["serialization_utils.py"],
+    type_checking = True,
     deps = [
         "//federated_language/common_libs:serializable",
         "//federated_language/proto:computation_py_pb2",
@@ -240,6 +251,7 @@ py_test(
 py_library(
     name = "structure_utils",
     srcs = ["structure_utils.py"],
+    type_checking = True,
     deps = [
         "//federated_language/common_libs:py_typecheck",
         "@federated_language_pypi//attrs",
@@ -262,6 +274,7 @@ py_test(
 py_library(
     name = "value_reference",
     srcs = ["value_reference.py"],
+    type_checking = True,
     deps = [
         ":structure_utils",
         "//federated_language/types:computation_types",

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_python//python:defs.bzl", "py_library")
+load("//third_party/bazel_rules/rules_python/python:py_library.bzl", "py_library")
 
 package(
     default_applicable_licenses = ["@federated_language//:package_license"],
@@ -24,6 +24,7 @@ licenses(["notice"])
 py_library(
     name = "data_source",
     srcs = ["data_source.py"],
+    type_checking = True,
     deps = [
         "@examples_pypi//numpy",
         "@federated_language//federated_language",
@@ -33,6 +34,7 @@ py_library(
 py_library(
     name = "program_state_manager",
     srcs = ["program_state_manager.py"],
+    type_checking = True,
     deps = [
         "@examples_pypi//dm_tree",
         "@federated_language//federated_language",

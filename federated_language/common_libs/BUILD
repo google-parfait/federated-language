@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_python//python:defs.bzl", "py_library", "py_test")
+load("@rules_python//python:defs.bzl", "py_test")
+load("//third_party/bazel_rules/rules_python/python:py_library.bzl", "py_library")
 
 package(
     default_applicable_licenses = ["//:package_license"],
@@ -24,18 +25,21 @@ licenses(["notice"])
 py_library(
     name = "common_libs",
     srcs = ["__init__.py"],
+    type_checking = True,
     visibility = ["//tools:__subpackages__"],
 )
 
 py_library(
     name = "async_utils",
     srcs = ["async_utils.py"],
+    type_checking = True,
     deps = [":tracing"],
 )
 
 py_library(
     name = "py_typecheck",
     srcs = ["py_typecheck.py"],
+    type_checking = True,
 )
 
 py_test(
@@ -51,6 +55,7 @@ py_test(
 py_library(
     name = "retrying",
     srcs = ["retrying.py"],
+    type_checking = True,
 )
 
 py_test(
@@ -66,11 +71,13 @@ py_test(
 py_library(
     name = "serializable",
     srcs = ["serializable.py"],
+    type_checking = True,
 )
 
 py_library(
     name = "structure",
     srcs = ["structure.py"],
+    type_checking = True,
     deps = [
         ":py_typecheck",
         "@federated_language_pypi//attrs",
@@ -92,6 +99,7 @@ py_test(
 py_library(
     name = "tracing",
     srcs = ["tracing.py"],
+    type_checking = True,
     deps = ["@federated_language_pypi//absl_py"],
 )
 

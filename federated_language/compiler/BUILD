@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_python//python:defs.bzl", "py_library", "py_test")
+load("@rules_python//python:defs.bzl", "py_test")
+load("//third_party/bazel_rules/rules_python/python:py_library.bzl", "py_library")
 
 package(
     default_applicable_licenses = ["//:package_license"],
@@ -29,12 +30,14 @@ licenses(["notice"])
 py_library(
     name = "compiler",
     srcs = ["__init__.py"],
+    type_checking = True,
     visibility = ["//tools:__subpackages__"],
 )
 
 py_library(
     name = "array",
     srcs = ["array.py"],
+    type_checking = True,
     deps = [
         "//federated_language/proto:array_py_pb2",
         "//federated_language/types:array_shape",
@@ -60,6 +63,7 @@ py_test(
 py_library(
     name = "building_block_analysis",
     srcs = ["building_block_analysis.py"],
+    type_checking = True,
     deps = [
         ":building_blocks",
         ":intrinsic_defs",
@@ -69,6 +73,7 @@ py_library(
 py_library(
     name = "building_block_factory",
     srcs = ["building_block_factory.py"],
+    type_checking = True,
     deps = [
         ":building_blocks",
         ":intrinsic_defs",
@@ -97,6 +102,7 @@ py_test(
 py_library(
     name = "building_blocks",
     srcs = ["building_blocks.py"],
+    type_checking = True,
     deps = [
         ":array",
         ":intrinsic_defs",
@@ -139,6 +145,7 @@ py_test(
 py_library(
     name = "computation_factory",
     srcs = ["computation_factory.py"],
+    type_checking = True,
     deps = [
         "//federated_language/proto:computation_py_pb2",
         "//federated_language/types:computation_types",
@@ -162,6 +169,7 @@ py_test(
 py_library(
     name = "intrinsic_defs",
     srcs = ["intrinsic_defs.py"],
+    type_checking = True,
     deps = [
         "//federated_language/types:computation_types",
         "//federated_language/types:placements",
@@ -183,6 +191,7 @@ py_test(
 py_library(
     name = "transformation_utils",
     srcs = ["transformation_utils.py"],
+    type_checking = True,
     deps = [":building_blocks"],
 )
 
@@ -205,6 +214,7 @@ py_test(
 py_library(
     name = "tree_analysis",
     srcs = ["tree_analysis.py"],
+    type_checking = True,
     deps = [
         ":building_block_analysis",
         ":building_blocks",
