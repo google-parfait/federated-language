@@ -24,6 +24,8 @@ licenses(["notice"])
 py_library(
     name = "federated_language",
     srcs = ["__init__.py"],
+    strict_deps = True,
+    type_checking = True,
     visibility = ["//visibility:public"],
     deps = [
         ":version",
